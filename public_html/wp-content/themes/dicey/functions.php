@@ -15,6 +15,7 @@ define( 'DICEY_ASSETS_URI', DICEY_THEME_URI . '/assets' );
 define( 'DICEY_VERSION', '0.1.0' );
 
 require DICEY_THEME_DIR . '/inc/helpers.php';
+require DICEY_THEME_DIR . '/inc/home-block-renderers.php';
 require DICEY_THEME_DIR . '/inc/assets.php';
 require DICEY_THEME_DIR . '/inc/blocks.php';
 
@@ -60,4 +61,3 @@ function dicey_allow_svg_uploads( $mimes ) {
 
 	return $mimes;
 }
-
