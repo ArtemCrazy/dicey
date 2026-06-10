@@ -43,6 +43,15 @@ function dicey_register_blocks() {
 		'home-hero' => array(
 			'title'    => __( 'Dicey: Hero', 'dicey' ),
 			'template' => 'template-parts/blocks/home-hero',
+			'callback' => 'dicey_render_home_hero',
+			'attributes' => array(
+				'eyebrow' => array( 'type' => 'string' ),
+				'title' => array( 'type' => 'string' ),
+				'title_accent' => array( 'type' => 'string' ),
+				'text' => array( 'type' => 'string' ),
+				'button_label' => array( 'type' => 'string' ),
+				'button_url' => array( 'type' => 'string' ),
+			),
 		),
 		'home-conveniences' => array(
 			'title'    => __( 'Dicey: Conveniences', 'dicey' ),

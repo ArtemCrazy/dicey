@@ -9,6 +9,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+function dicey_home_hero_defaults() {
+	return array(
+		'eyebrow'        => 'Приготовлено с любовью',
+		'title'          => 'Натуральное питание для собак',
+		'title_accent'   => 'без лишних забот',
+		'text'           => 'Готовые свежие рационы, рассчитанные <br> под потребности вашего питомца',
+		'button_label'   => 'Выбрать рацион',
+		'button_url'     => '/shop/',
+		'image'          => 'imgs/bg/main-img.png',
+	);
+}
+
 function dicey_home_conveniences_defaults() {
 	return array(
 		'title' => 'Почему это удобно для Вас',
@@ -191,6 +203,35 @@ function dicey_faq_icon_svg() {
 	return '<svg width="29" height="23" viewBox="0 0 29 23" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_719_9436)"><path d="M13.207 1.95898C14.2337 7.24048 15.8576 12.7843 15.9153 18.209C15.9272 19.3202 16.0498 20.4341 16.1237 21.5423" stroke="#5182A6" stroke-width="2.5" stroke-linecap="round" /><path d="M3 13.5C10.9996 13.1361 18.9979 12.8042 27 12.5" stroke="#5182A6" stroke-width="2.5" stroke-linecap="round" /></g><defs><clipPath id="clip0_719_9436"><rect width="29" height="23" fill="white" /></clipPath></defs></svg>';
 }
 
+function dicey_render_home_hero( $attrs = array() ) {
+	$data = dicey_merge_block_attrs( $attrs, dicey_home_hero_defaults() );
+	ob_start();
+	?>
+	<section class="main">
+		<div class="container">
+			<div class="main-wr">
+				<p class="main__subname"><?php echo dicey_kses_inline( $data['eyebrow'] ); ?></p>
+				<h1 class="main__title">
+					<?php echo dicey_kses_inline( $data['title'] ); ?>
+					<span><?php echo dicey_kses_inline( $data['title_accent'] ); ?></span>
+				</h1>
+				<p class="main__text"><?php echo dicey_kses_inline( $data['text'] ); ?></p>
+				<a href="<?php echo esc_url( home_url( $data['button_url'] ) ); ?>" class="main__link xs-hide">
+					<?php echo esc_html( $data['button_label'] ); ?>
+					<?php echo dicey_cta_icon_svg(); ?>
+				</a>
+			</div>
+			<img src="<?php echo esc_url( dicey_asset_img( $data['image'] ) ); ?>" alt="" class="main__img">
+			<a href="<?php echo esc_url( home_url( $data['button_url'] ) ); ?>" class="main__link xs-show">
+				<?php echo esc_html( $data['button_label'] ); ?>
+				<?php echo dicey_cta_icon_svg(); ?>
+			</a>
+		</div>
+	</section>
+	<?php
+	return ob_get_clean();
+}
+
 function dicey_render_home_conveniences( $attrs = array() ) {
 	$data = dicey_merge_block_attrs( $attrs, dicey_home_conveniences_defaults() );
 	ob_start();
@@ -311,4 +352,3 @@ function dicey_render_home_questions( $attrs = array() ) {
 	<?php
 	return ob_get_clean();
 }
-

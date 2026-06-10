@@ -6,6 +6,14 @@
 	var PanelBody = components.PanelBody;
 
 	var defaults = {
+		'home-hero': {
+			eyebrow: 'Приготовлено с любовью',
+			title: 'Натуральное питание для собак',
+			title_accent: 'без лишних забот',
+			text: 'Готовые свежие рационы, рассчитанные <br> под потребности вашего питомца',
+			button_label: 'Выбрать рацион',
+			button_url: '/shop/',
+		},
 		'home-conveniences': {
 			title: 'Почему это удобно для Вас',
 			cards: [
@@ -130,6 +138,48 @@
 			},
 			el( 'div', { style: { paddingTop: '8px' } }, children )
 		);
+	}
+
+	function heroEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+
+		return box( 'Главный экран', [
+			panel( 'Тексты', [
+				el( TextControl, {
+					label: 'Надзаголовок',
+					value: val( attrs, 'home-hero', 'eyebrow' ),
+					onChange: function ( value ) { setAttributes( { eyebrow: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'home-hero', 'title' ),
+					onChange: function ( value ) { setAttributes( { title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Выделенная строка заголовка',
+					value: val( attrs, 'home-hero', 'title_accent' ),
+					onChange: function ( value ) { setAttributes( { title_accent: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'home-hero', 'text' ),
+					onChange: function ( value ) { setAttributes( { text: value } ); },
+				} ),
+			], true ),
+			panel( 'Кнопка', [
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'home-hero', 'button_label' ),
+					onChange: function ( value ) { setAttributes( { button_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Ссылка кнопки',
+					value: val( attrs, 'home-hero', 'button_url' ),
+					onChange: function ( value ) { setAttributes( { button_url: value } ); },
+				} ),
+			], false ),
+		], true );
 	}
 
 	function conveniencesEdit( props ) {
@@ -308,6 +358,19 @@
 	}
 
 	var editable = {
+		'dicey/home-hero': {
+			title: __( 'Dicey: Hero', 'dicey' ),
+			icon: 'cover-image',
+			attributes: {
+				eyebrow: { type: 'string' },
+				title: { type: 'string' },
+				title_accent: { type: 'string' },
+				text: { type: 'string' },
+				button_label: { type: 'string' },
+				button_url: { type: 'string' },
+			},
+			edit: heroEdit,
+		},
 		'dicey/home-conveniences': {
 			title: __( 'Dicey: Conveniences', 'dicey' ),
 			icon: 'grid-view',
@@ -371,7 +434,6 @@
 
 	[
 		[ 'dicey/home-legacy', __( 'Dicey: Home Page', 'dicey' ), 'layout' ],
-		[ 'dicey/home-hero', __( 'Dicey: Hero', 'dicey' ), 'cover-image' ],
 		[ 'dicey/home-popularity', __( 'Dicey: Popular Products', 'dicey' ), 'products' ],
 		[ 'dicey/home-about-food', __( 'Dicey: Food Benefits', 'dicey' ), 'food' ],
 		[ 'dicey/home-plan', __( 'Dicey: Nutrition Plan', 'dicey' ), 'id' ],
