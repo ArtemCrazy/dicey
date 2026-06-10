@@ -1,4 +1,4 @@
-( function ( blocks, element, components, i18n ) {
+( function ( blocks, element, components, i18n, data ) {
 	var el = element.createElement;
 	var __ = i18n.__;
 	var TextControl = components.TextControl;
@@ -82,7 +82,26 @@
 		return attrs[ key ] && attrs[ key ].length ? clone( attrs[ key ] ) : clone( defaults[ block ][ key ] );
 	}
 
-	function box( title, children, showNote ) {
+	function isFirstDiceyBlock( props ) {
+		var fallback = props && 'dicey/home-hero' === props.name;
+
+		if ( ! props || ! props.clientId || ! data || ! data.select ) {
+			return fallback;
+		}
+
+		var blockEditor = data.select( 'core/block-editor' );
+		var pageBlocks = blockEditor && blockEditor.getBlocks ? blockEditor.getBlocks() : [];
+
+		for ( var index = 0; index < pageBlocks.length; index++ ) {
+			if ( pageBlocks[ index ].name && 0 === pageBlocks[ index ].name.indexOf( 'dicey/' ) ) {
+				return pageBlocks[ index ].clientId === props.clientId;
+			}
+		}
+
+		return fallback;
+	}
+
+	function box( title, children, showNote, initialOpen ) {
 		return el(
 			'div',
 			{
@@ -96,18 +115,19 @@
 				},
 			},
 			el(
-				'div',
+				PanelBody,
 				{
-					style: {
-						borderBottom: '1px solid #e0e0e0',
-						padding: '14px 16px 12px',
-						background: '#f6f7f7',
-					},
+					title: title,
+					initialOpen: !! initialOpen,
+					className: 'dicey-editor-section',
 				},
-				el( 'h2', { style: { margin: showNote ? '0 0 6px' : 0, fontSize: '18px', lineHeight: '1.3' } }, title ),
-				showNote ? previewNote() : null
-			),
-			el( 'div', { style: { padding: '12px 16px 16px' } }, children )
+				el(
+					'div',
+					{ style: { padding: '4px 0 8px' } },
+					showNote ? previewNote() : null,
+					children
+				)
+			)
 		);
 	}
 
@@ -179,7 +199,7 @@
 					onChange: function ( value ) { setAttributes( { button_url: value } ); },
 				} ),
 			], false ),
-		], true );
+		], true, isFirstDiceyBlock( props ) );
 	}
 
 	function conveniencesEdit( props ) {
@@ -213,7 +233,7 @@
 					} ),
 				], 0 === index );
 			} ),
-		], true );
+		], true, isFirstDiceyBlock( props ) );
 	}
 
 	function deliveryEdit( props ) {
@@ -256,7 +276,7 @@
 					onChange: function ( value ) { setAttributes( { button_url: value } ); },
 				} ),
 			], false ),
-		], true );
+		], true, isFirstDiceyBlock( props ) );
 	}
 
 	function worksEdit( props ) {
@@ -305,7 +325,7 @@
 					} ),
 				], 0 === index );
 			} ),
-		], true );
+		], true, isFirstDiceyBlock( props ) );
 	}
 
 	function questionsEdit( props ) {
@@ -354,7 +374,7 @@
 					} ),
 				], 0 === tabIndex );
 			} ),
-		], true );
+		], true, isFirstDiceyBlock( props ) );
 	}
 
 	var editable = {
@@ -448,7 +468,7 @@
 			icon: block[2],
 			category: 'dicey',
 			supports: { html: false, align: [ 'wide', 'full' ] },
-			edit: function () {
+			edit: function ( props ) {
 				return box(
 					block[1],
 					el(
@@ -457,7 +477,8 @@
 						__( 'Эта секция пока подключена как готовый блок верстки.', 'dicey' )
 					)
 					,
-					false
+					false,
+					isFirstDiceyBlock( props )
 				);
 			},
 			save: function () {
@@ -465,4 +486,4 @@
 			},
 		} );
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.components, window.wp.i18n );
+} )( window.wp.blocks, window.wp.element, window.wp.components, window.wp.i18n, window.wp.data );

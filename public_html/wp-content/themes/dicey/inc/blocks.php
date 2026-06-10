@@ -30,7 +30,7 @@ function dicey_register_blocks() {
 	wp_register_script(
 		'dicey-blocks-editor',
 		DICEY_THEME_URI . '/blocks/index.js',
-		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n' ),
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n', 'wp-data' ),
 		filemtime( DICEY_THEME_DIR . '/blocks/index.js' ),
 		true
 	);

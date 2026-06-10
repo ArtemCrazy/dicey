@@ -6,3 +6,42 @@
 .edit-post-visual-editor__post-title-wrapper {
 	display: none !important;
 }
+
+.dicey-editor-fields > .components-panel__body {
+	border-top: 0;
+}
+
+.dicey-editor-fields > .components-panel__body > .components-panel__body-title {
+	margin: 0;
+	background: #f6f7f7;
+}
+
+.dicey-editor-fields > .components-panel__body.is-opened > .components-panel__body-title {
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.dicey-editor-fields > .components-panel__body > .components-panel__body-title:hover {
+	background: #f0f2f4;
+}
+
+.dicey-editor-fields > .components-panel__body > .components-panel__body-title button {
+	color: #5182a6;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.3;
+	padding: 14px 16px;
+}
+
+.dicey-editor-fields > .components-panel__body > .components-panel__body-title svg {
+	color: #5182a6;
+}
+
+.dicey-editor-fields .dicey-editor-panel {
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin: 8px 0;
+}
+
+.dicey-editor-fields .dicey-editor-panel > .components-panel__body-title {
+	background: #fff;
+}
