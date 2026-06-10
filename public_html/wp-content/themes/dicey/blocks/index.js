@@ -359,7 +359,7 @@
 
 	var editable = {
 		'dicey/home-hero': {
-			title: __( 'Dicey: Hero', 'dicey' ),
+			title: __( 'Главный экран', 'dicey' ),
 			icon: 'cover-image',
 			attributes: {
 				eyebrow: { type: 'string' },
@@ -372,7 +372,7 @@
 			edit: heroEdit,
 		},
 		'dicey/home-conveniences': {
-			title: __( 'Dicey: Conveniences', 'dicey' ),
+			title: __( 'Почему это удобно для Вас', 'dicey' ),
 			icon: 'grid-view',
 			attributes: {
 				title: { type: 'string' },
@@ -381,7 +381,7 @@
 			edit: conveniencesEdit,
 		},
 		'dicey/home-delivery': {
-			title: __( 'Dicey: Subscription Delivery', 'dicey' ),
+			title: __( 'Регулярные доставки рациона', 'dicey' ),
 			icon: 'calendar-alt',
 			attributes: {
 				title: { type: 'string' },
@@ -394,7 +394,7 @@
 			edit: deliveryEdit,
 		},
 		'dicey/home-works': {
-			title: __( 'Dicey: How It Works Section', 'dicey' ),
+			title: __( 'Как это работает', 'dicey' ),
 			icon: 'list-view',
 			attributes: {
 				title: { type: 'string' },
@@ -406,7 +406,7 @@
 			edit: worksEdit,
 		},
 		'dicey/home-questions': {
-			title: __( 'Dicey: FAQ', 'dicey' ),
+			title: __( 'Часто задаваемые вопросы', 'dicey' ),
 			icon: 'editor-help',
 			attributes: {
 				title: { type: 'string' },
@@ -433,14 +433,14 @@
 	} );
 
 	[
-		[ 'dicey/home-legacy', __( 'Dicey: Home Page', 'dicey' ), 'layout' ],
-		[ 'dicey/home-popularity', __( 'Dicey: Popular Products', 'dicey' ), 'products' ],
-		[ 'dicey/home-about-food', __( 'Dicey: Food Benefits', 'dicey' ), 'food' ],
-		[ 'dicey/home-plan', __( 'Dicey: Nutrition Plan', 'dicey' ), 'id' ],
-		[ 'dicey/shipping', __( 'Dicey: Shipping', 'dicey' ), 'location-alt' ],
-		[ 'dicey/sale', __( 'Dicey: Sale Banner', 'dicey' ), 'tag' ],
-		[ 'dicey/why', __( 'Dicey: Contact CTA', 'dicey' ), 'email-alt' ],
-		[ 'dicey/works', __( 'Dicey: How It Works', 'dicey' ), 'list-view' ],
+		[ 'dicey/home-legacy', __( 'Домашняя страница', 'dicey' ), 'layout' ],
+		[ 'dicey/home-popularity', __( 'Заказывают чаще всего', 'dicey' ), 'products' ],
+		[ 'dicey/home-about-food', __( 'Что получает ваша собака', 'dicey' ), 'food' ],
+		[ 'dicey/home-plan', __( 'Составим индивидуальный план питания', 'dicey' ), 'id' ],
+		[ 'dicey/shipping', __( 'Бесплатная доставка', 'dicey' ), 'location-alt' ],
+		[ 'dicey/sale', __( 'Скидка - 30% на первый заказ', 'dicey' ), 'tag' ],
+		[ 'dicey/why', __( 'Остались вопросы по питанию?', 'dicey' ), 'email-alt' ],
+		[ 'dicey/works', __( 'Шаги оформления заказа', 'dicey' ), 'list-view' ],
 	].forEach( function ( block ) {
 		blocks.registerBlockType( block[0], {
 			apiVersion: 2,

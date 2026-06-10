@@ -37,11 +37,11 @@ function dicey_register_blocks() {
 
 	$blocks = array(
 		'home-legacy' => array(
-			'title'    => __( 'Dicey: Home Page', 'dicey' ),
+			'title'    => __( 'Домашняя страница', 'dicey' ),
 			'template' => 'template-parts/pages/front-page',
 		),
 		'home-hero' => array(
-			'title'    => __( 'Dicey: Hero', 'dicey' ),
+			'title'    => __( 'Главный экран', 'dicey' ),
 			'template' => 'template-parts/blocks/home-hero',
 			'callback' => 'dicey_render_home_hero',
 			'attributes' => array(
@@ -54,7 +54,7 @@ function dicey_register_blocks() {
 			),
 		),
 		'home-conveniences' => array(
-			'title'    => __( 'Dicey: Conveniences', 'dicey' ),
+			'title'    => __( 'Почему это удобно для Вас', 'dicey' ),
 			'template' => 'template-parts/blocks/home-conveniences',
 			'callback' => 'dicey_render_home_conveniences',
 			'attributes' => array(
@@ -66,11 +66,11 @@ function dicey_register_blocks() {
 			),
 		),
 		'home-popularity' => array(
-			'title'    => __( 'Dicey: Popular Products', 'dicey' ),
+			'title'    => __( 'Заказывают чаще всего', 'dicey' ),
 			'template' => 'template-parts/blocks/home-popularity',
 		),
 		'home-delivery' => array(
-			'title'    => __( 'Dicey: Subscription Delivery', 'dicey' ),
+			'title'    => __( 'Регулярные доставки рациона', 'dicey' ),
 			'template' => 'template-parts/blocks/home-delivery',
 			'callback' => 'dicey_render_home_delivery',
 			'attributes' => array(
@@ -83,15 +83,15 @@ function dicey_register_blocks() {
 			),
 		),
 		'home-about-food' => array(
-			'title'    => __( 'Dicey: Food Benefits', 'dicey' ),
+			'title'    => __( 'Что получает ваша собака', 'dicey' ),
 			'template' => 'template-parts/blocks/home-about-food',
 		),
 		'home-plan' => array(
-			'title'    => __( 'Dicey: Nutrition Plan', 'dicey' ),
+			'title'    => __( 'Составим индивидуальный план питания', 'dicey' ),
 			'template' => 'template-parts/blocks/home-plan',
 		),
 		'home-works' => array(
-			'title'    => __( 'Dicey: How It Works Section', 'dicey' ),
+			'title'    => __( 'Как это работает', 'dicey' ),
 			'template' => 'template-parts/blocks/home-works',
 			'callback' => 'dicey_render_home_works',
 			'attributes' => array(
@@ -106,7 +106,7 @@ function dicey_register_blocks() {
 			),
 		),
 		'home-questions' => array(
-			'title'    => __( 'Dicey: FAQ', 'dicey' ),
+			'title'    => __( 'Часто задаваемые вопросы', 'dicey' ),
 			'template' => 'template-parts/blocks/home-questions',
 			'callback' => 'dicey_render_home_questions',
 			'attributes' => array(
@@ -118,19 +118,19 @@ function dicey_register_blocks() {
 			),
 		),
 		'works'       => array(
-			'title'    => __( 'Dicey: How It Works', 'dicey' ),
+			'title'    => __( 'Шаги оформления заказа', 'dicey' ),
 			'template' => 'template-parts/blocks/works',
 		),
 		'shipping'    => array(
-			'title'    => __( 'Dicey: Shipping', 'dicey' ),
+			'title'    => __( 'Бесплатная доставка', 'dicey' ),
 			'template' => 'template-parts/blocks/shipping',
 		),
 		'sale'        => array(
-			'title'    => __( 'Dicey: Sale Banner', 'dicey' ),
+			'title'    => __( 'Скидка - 30% на первый заказ', 'dicey' ),
 			'template' => 'template-parts/blocks/sale',
 		),
 		'why'         => array(
-			'title'    => __( 'Dicey: Contact CTA', 'dicey' ),
+			'title'    => __( 'Остались вопросы по питанию?', 'dicey' ),
 			'template' => 'template-parts/blocks/why',
 		),
 	);
