@@ -175,7 +175,7 @@ function dicey_register_patterns() {
 		array(
 			'title'      => __( 'Dicey home page', 'dicey' ),
 			'categories' => array( 'dicey' ),
-			'content'    => '<!-- wp:dicey/home-hero /--><!-- wp:dicey/home-conveniences /--><!-- wp:dicey/home-popularity /--><!-- wp:dicey/home-delivery /--><!-- wp:dicey/home-about-food /--><!-- wp:dicey/home-plan /--><!-- wp:dicey/home-works /--><!-- wp:dicey/shipping /--><!-- wp:dicey/sale /--><!-- wp:dicey/home-questions /--><!-- wp:dicey/why /-->',
+			'content'    => '<!-- wp:dicey/home-hero /--><!-- wp:dicey/home-conveniences /--><!-- wp:dicey/home-delivery /--><!-- wp:dicey/home-about-food /--><!-- wp:dicey/home-plan /--><!-- wp:dicey/home-works /--><!-- wp:dicey/shipping /--><!-- wp:dicey/sale /--><!-- wp:dicey/home-questions /--><!-- wp:dicey/why /-->',
 		)
 	);
 }
