@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'wp_enqueue_scripts', 'dicey_enqueue_assets' );
+add_action( 'enqueue_block_editor_assets', 'dicey_enqueue_editor_assets' );
 
 function dicey_enqueue_assets() {
 	wp_enqueue_style(
@@ -45,6 +46,15 @@ function dicey_enqueue_assets() {
 	);
 }
 
+function dicey_enqueue_editor_assets() {
+	wp_enqueue_style(
+		'dicey-editor',
+		DICEY_ASSETS_URI . '/styles/editor.css',
+		array(),
+		dicey_asset_version( 'styles/editor.css' )
+	);
+}
+
 add_action( 'wp_head', 'dicey_print_favicon', 5 );
 
 function dicey_print_favicon() {
@@ -53,4 +63,3 @@ function dicey_print_favicon() {
 		esc_url( DICEY_ASSETS_URI . '/imgs/icons/fav.svg' )
 	);
 }
-
