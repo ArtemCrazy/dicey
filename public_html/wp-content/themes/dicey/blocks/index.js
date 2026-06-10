@@ -3,6 +3,7 @@
 	var __ = i18n.__;
 	var TextControl = components.TextControl;
 	var TextareaControl = components.TextareaControl;
+	var PanelBody = components.PanelBody;
 
 	var defaults = {
 		'home-conveniences': {
@@ -73,20 +74,32 @@
 		return attrs[ key ] && attrs[ key ].length ? clone( attrs[ key ] ) : clone( defaults[ block ][ key ] );
 	}
 
-	function box( title, children ) {
+	function box( title, children, showNote ) {
 		return el(
 			'div',
 			{
 				className: 'dicey-editor-fields',
 				style: {
 					border: '1px solid #ccd0d4',
-					padding: '16px',
 					background: '#fff',
 					marginBottom: '12px',
+					borderRadius: '4px',
+					overflow: 'hidden',
 				},
 			},
-			el( 'h3', { style: { marginTop: 0 } }, title ),
-			children
+			el(
+				'div',
+				{
+					style: {
+						borderBottom: '1px solid #e0e0e0',
+						padding: '14px 16px 12px',
+						background: '#f6f7f7',
+					},
+				},
+				el( 'h2', { style: { margin: showNote ? '0 0 6px' : 0, fontSize: '18px', lineHeight: '1.3' } }, title ),
+				showNote ? previewNote() : null
+			),
+			el( 'div', { style: { padding: '12px 16px 16px' } }, children )
 		);
 	}
 
@@ -95,6 +108,27 @@
 			'p',
 			{ style: { margin: '0 0 12px', color: '#646970' } },
 			__( 'Сохраните/обновите страницу, чтобы увидеть изменения на сайте.', 'dicey' )
+		);
+	}
+
+	function plainText( value ) {
+		return String( value || '' ).replace( /<[^>]*>/g, ' ' ).replace( /\s+/g, ' ' ).trim();
+	}
+
+	function panelTitle( prefix, index, value ) {
+		var text = plainText( value );
+		return prefix + ' ' + ( index + 1 ) + ( text ? ': ' + text : '' );
+	}
+
+	function panel( title, children, initialOpen ) {
+		return el(
+			PanelBody,
+			{
+				title: title,
+				initialOpen: !! initialOpen,
+				className: 'dicey-editor-panel',
+			},
+			el( 'div', { style: { paddingTop: '8px' } }, children )
 		);
 	}
 
@@ -110,15 +144,13 @@
 		}
 
 		return box( 'Почему удобно для вас', [
-			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок',
 				value: val( attrs, 'home-conveniences', 'title' ),
 				onChange: function ( value ) { setAttributes( { title: value } ); },
 			} ),
 			cards.map( function ( card, index ) {
-				return el( 'div', { key: index, style: { borderTop: '1px solid #eee', paddingTop: '12px', marginTop: '12px' } }, [
-					el( 'strong', {}, 'Карточка ' + ( index + 1 ) ),
+				return panel( panelTitle( 'Карточка', index, card.title ), [
 					el( TextControl, {
 						label: 'Заголовок карточки',
 						value: card.title,
@@ -129,47 +161,52 @@
 						value: card.text,
 						onChange: function ( value ) { setCard( index, 'text', value ); },
 					} ),
-				] );
+				], 0 === index );
 			} ),
-		] );
+		], true );
 	}
 
 	function deliveryEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
 		return box( 'Регулярные доставки рациона', [
-			previewNote(),
-			el( TextControl, {
-				label: 'Заголовок',
-				value: val( attrs, 'home-delivery', 'title' ),
-				onChange: function ( value ) { setAttributes( { title: value } ); },
-			} ),
-			el( TextControl, {
-				label: 'Подзаголовок',
-				value: val( attrs, 'home-delivery', 'subtitle' ),
-				onChange: function ( value ) { setAttributes( { subtitle: value } ); },
-			} ),
-			el( TextareaControl, {
-				label: 'Первый абзац',
-				value: val( attrs, 'home-delivery', 'text_first' ),
-				onChange: function ( value ) { setAttributes( { text_first: value } ); },
-			} ),
-			el( TextareaControl, {
-				label: 'Второй абзац',
-				value: val( attrs, 'home-delivery', 'text_second' ),
-				onChange: function ( value ) { setAttributes( { text_second: value } ); },
-			} ),
-			el( TextControl, {
-				label: 'Текст кнопки',
-				value: val( attrs, 'home-delivery', 'button_label' ),
-				onChange: function ( value ) { setAttributes( { button_label: value } ); },
-			} ),
-			el( TextControl, {
-				label: 'Ссылка кнопки',
-				value: val( attrs, 'home-delivery', 'button_url' ),
-				onChange: function ( value ) { setAttributes( { button_url: value } ); },
-			} ),
-		] );
+			panel( 'Заголовки', [
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'home-delivery', 'title' ),
+					onChange: function ( value ) { setAttributes( { title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Подзаголовок',
+					value: val( attrs, 'home-delivery', 'subtitle' ),
+					onChange: function ( value ) { setAttributes( { subtitle: value } ); },
+				} ),
+			], true ),
+			panel( 'Текст', [
+				el( TextareaControl, {
+					label: 'Первый абзац',
+					value: val( attrs, 'home-delivery', 'text_first' ),
+					onChange: function ( value ) { setAttributes( { text_first: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Второй абзац',
+					value: val( attrs, 'home-delivery', 'text_second' ),
+					onChange: function ( value ) { setAttributes( { text_second: value } ); },
+				} ),
+			], false ),
+			panel( 'Кнопка', [
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'home-delivery', 'button_label' ),
+					onChange: function ( value ) { setAttributes( { button_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Ссылка кнопки',
+					value: val( attrs, 'home-delivery', 'button_url' ),
+					onChange: function ( value ) { setAttributes( { button_url: value } ); },
+				} ),
+			], false ),
+		], true );
 	}
 
 	function worksEdit( props ) {
@@ -184,7 +221,6 @@
 		}
 
 		return box( 'Как это работает', [
-			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок',
 				value: val( attrs, 'home-works', 'title' ),
@@ -206,8 +242,7 @@
 				onChange: function ( value ) { setAttributes( { link_url: value } ); },
 			} ),
 			steps.map( function ( step, index ) {
-				return el( 'div', { key: index, style: { borderTop: '1px solid #eee', paddingTop: '12px', marginTop: '12px' } }, [
-					el( 'strong', {}, 'Шаг ' + ( index + 1 ) ),
+				return panel( panelTitle( 'Шаг', index, step.title ), [
 					el( TextControl, {
 						label: 'Заголовок шага',
 						value: step.title,
@@ -218,9 +253,9 @@
 						value: step.text,
 						onChange: function ( value ) { setStep( index, 'text', value ); },
 					} ),
-				] );
+				], 0 === index );
 			} ),
-		] );
+		], true );
 	}
 
 	function questionsEdit( props ) {
@@ -241,21 +276,20 @@
 		}
 
 		return box( 'Часто задаваемые вопросы', [
-			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок секции',
 				value: val( attrs, 'home-questions', 'title' ),
 				onChange: function ( value ) { setAttributes( { title: value } ); },
 			} ),
 			tabs.map( function ( tab, tabIndex ) {
-				return el( 'div', { key: tabIndex, style: { borderTop: '1px solid #ddd', paddingTop: '14px', marginTop: '14px' } }, [
+				return panel( panelTitle( 'Вкладка', tabIndex, tab.title ), [
 					el( TextControl, {
 						label: 'Вкладка ' + ( tabIndex + 1 ),
 						value: tab.title,
 						onChange: function ( value ) { setTabTitle( tabIndex, value ); },
 					} ),
 					tab.items.map( function ( item, itemIndex ) {
-						return el( 'div', { key: itemIndex, style: { borderTop: '1px solid #eee', paddingTop: '10px', marginTop: '10px' } }, [
+						return panel( panelTitle( 'Вопрос', itemIndex, item.question ), [
 							el( TextControl, {
 								label: 'Вопрос ' + ( itemIndex + 1 ),
 								value: item.question,
@@ -266,11 +300,11 @@
 								value: item.answer,
 								onChange: function ( value ) { setItem( tabIndex, itemIndex, 'answer', value ); },
 							} ),
-						] );
+						], false );
 					} ),
-				] );
+				], 0 === tabIndex );
 			} ),
-		] );
+		], true );
 	}
 
 	var editable = {
@@ -360,6 +394,8 @@
 						{ style: { margin: 0, color: '#646970' } },
 						__( 'Эта секция пока подключена как готовый блок верстки.', 'dicey' )
 					)
+					,
+					false
 				);
 			},
 			save: function () {
