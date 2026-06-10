@@ -93,7 +93,7 @@
 	function previewNote() {
 		return el(
 			'p',
-			{ style: { margin: '12px 0 0', color: '#646970' } },
+			{ style: { margin: '0 0 12px', color: '#646970' } },
 			__( 'Сохраните/обновите страницу, чтобы увидеть изменения на сайте.', 'dicey' )
 		);
 	}
@@ -110,6 +110,7 @@
 		}
 
 		return box( 'Почему удобно для вас', [
+			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок',
 				value: val( attrs, 'home-conveniences', 'title' ),
@@ -130,7 +131,6 @@
 					} ),
 				] );
 			} ),
-			previewNote(),
 		] );
 	}
 
@@ -138,6 +138,7 @@
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
 		return box( 'Регулярные доставки рациона', [
+			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок',
 				value: val( attrs, 'home-delivery', 'title' ),
@@ -168,7 +169,6 @@
 				value: val( attrs, 'home-delivery', 'button_url' ),
 				onChange: function ( value ) { setAttributes( { button_url: value } ); },
 			} ),
-			previewNote(),
 		] );
 	}
 
@@ -184,6 +184,7 @@
 		}
 
 		return box( 'Как это работает', [
+			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок',
 				value: val( attrs, 'home-works', 'title' ),
@@ -219,7 +220,6 @@
 					} ),
 				] );
 			} ),
-			previewNote(),
 		] );
 	}
 
@@ -241,6 +241,7 @@
 		}
 
 		return box( 'Часто задаваемые вопросы', [
+			previewNote(),
 			el( TextControl, {
 				label: 'Заголовок секции',
 				value: val( attrs, 'home-questions', 'title' ),
@@ -269,7 +270,6 @@
 					} ),
 				] );
 			} ),
-			previewNote(),
 		] );
 	}
 
@@ -353,7 +353,14 @@
 			category: 'dicey',
 			supports: { html: false, align: [ 'wide', 'full' ] },
 			edit: function () {
-				return box( block[1], previewNote() );
+				return box(
+					block[1],
+					el(
+						'p',
+						{ style: { margin: 0, color: '#646970' } },
+						__( 'Эта секция пока подключена как готовый блок верстки.', 'dicey' )
+					)
+				);
 			},
 			save: function () {
 				return null;
