@@ -36,6 +36,9 @@ function dicey_rewrite_legacy_html( $html ) {
 		'href="/dietology.php"' => 'href="' . esc_url( home_url( '/dietology/' ) ) . '"',
 		'href="/contacts.php"' => 'href="' . esc_url( home_url( '/contacts/' ) ) . '"',
 		'href="/basket.php"' => 'href="' . esc_url( home_url( '/basket/' ) ) . '"',
+		'href="blog.php"'     => 'href="' . esc_url( home_url( '/blog/' ) ) . '"',
+		"href='blog.php'"     => "href='" . esc_url( home_url( '/blog/' ) ) . "'",
+		'href="/blog.php"'    => 'href="' . esc_url( home_url( '/blog/' ) ) . '"',
 	);
 
 	$html = strtr( $html, $replacements );

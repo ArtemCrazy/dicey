@@ -91,6 +91,7 @@ ob_start();
         <li><a href="/about.php">О нас</a></li>
         <li><a href="/delivery.php">Доставка и оплата</a></li>
         <li><a href="/contacts.php">Контакты</a></li>
+        <li><a href="/blog.php">Блог</a></li>
        </ul>
     </div>
     <div class="header__wr">
@@ -140,6 +141,7 @@ ob_start();
       <li><a href="/about.php">О нас</a></li>
       <li><a href="/delivery.php">Доставка и оплата</a></li>
       <li><a href="/contacts.php">Контакты</a></li>
+      <li><a href="/blog.php">Блог</a></li>
     </ul>
     <a href="/shop.php" class="header__link-shopm header__link-shop">Магазин</a>
     <button class="header__btn-consultm header__btn-consult" data-fancybox data-src="#consult-modal">Консультация диетолога</button>

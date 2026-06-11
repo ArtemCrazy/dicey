@@ -5302,6 +5302,14 @@ footer::before {
 	background: #295D82;
 }
 
+.blog__empty {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 18px;
+	line-height: 150%;
+	text-align: center;
+}
+
 .blog {
 	margin-bottom: 256px;
 }
@@ -5411,6 +5419,20 @@ footer::before {
 
 .article__content ul li {
 	list-style-type: disc;
+}
+
+.article__content .wp-block-image {
+	margin: 28px 0;
+}
+
+.article__content .wp-block-image img {
+	border-radius: 24px;
+	height: auto;
+	max-width: 100%;
+}
+
+.article__content strong {
+	font-weight: 700;
 }
 
 .article .standart-nav {
