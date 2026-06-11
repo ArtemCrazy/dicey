@@ -140,7 +140,7 @@ function dicey_render_dietology( $attrs = array() ) {
 			<div class="container">
 				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['advantages_title'] ); ?></h2>
 				<div class="advantages__blocks">
-					<?php foreach ( $data['advantages'] as $item ) : ?><div class="advantages__block"><img src="<?php echo esc_url( dicey_asset_img( $item['image'] ) ); ?>" alt="" class="advantages__img"><p class="advantages__name"><?php echo dicey_kses_inline( $item['title'] ); ?></p></div><?php endforeach; ?>
+					<?php foreach ( $data['advantages'] as $item ) : ?><div class="advantages__block"><?php if ( ! empty( $item['image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['image'] ) ); ?>" alt="" class="advantages__img"><?php endif; ?><p class="advantages__name"><?php echo dicey_kses_inline( $item['title'] ); ?></p></div><?php endforeach; ?>
 				</div>
 			</div>
 		</section>

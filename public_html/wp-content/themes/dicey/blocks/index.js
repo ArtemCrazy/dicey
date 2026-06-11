@@ -637,8 +637,8 @@
 			setArrayItem( advisorySteps, setAttributes, 'advisory_steps', index, key, value );
 		}
 
-		function setAdvantage( index, value ) {
-			setArrayItem( advantages, setAttributes, 'advantages', index, 'title', value );
+		function setAdvantage( index, key, value ) {
+			setArrayItem( advantages, setAttributes, 'advantages', index, key, value );
 		}
 
 		function setPrice( index, key, value ) {
@@ -769,10 +769,11 @@
 				} ),
 				advantages.map( function ( item, index ) {
 					return panel( panelTitle( 'Пункт', index, item.title ), [
+						imageControl( 'Изображение пункта', item.image, function ( value ) { setAdvantage( index, 'image', value ); } ),
 						el( TextareaControl, {
 							label: 'Текст пункта',
 							value: item.title,
-							onChange: function ( value ) { setAdvantage( index, value ); },
+							onChange: function ( value ) { setAdvantage( index, 'title', value ); },
 						} ),
 					], false );
 				} ),
