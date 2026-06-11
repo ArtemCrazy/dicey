@@ -173,6 +173,34 @@
 			partnership_button_label: 'Узнать подробнее',
 			partnership_image: 'imgs/bg/partnership-img.png',
 		},
+		'delivery-page': {
+			hero_title: 'Оплата и доставка <span>до двери</span>',
+			hero_text: 'Мы не храним готовую еду — каждый рацион <br> готовится после заказа, чтобы сохранить <br> максимум свежести и пользы',
+			hero_button_label: 'Выбрать рацион',
+			hero_button_url: '/shop/',
+			hero_image: 'imgs/bg/main-img3.png',
+			works_title: 'Как это работает',
+			works_text: 'Всего несколько шагов — и питание уже у вас дома',
+			works_steps: [
+				{ title: 'Выбираете рацион', text: 'В онлайн-магазине или с помощью нашего консультанта — с учётом породы, веса, возраста и особенностей собаки', image: 'imgs/bg/works__block-img1.svg', color: '' },
+				{ title: 'Мы готовим заказ', text: 'После оформления и оплаты заказа готовим выбранные рационы', image: 'imgs/bg/works__block-img2.svg', color: '#EFF1EB' },
+				{ title: 'Доставляем к двери', text: 'Свежие рационы приезжают к вам домой в течение 2-х <br> дней после заказа', image: 'imgs/bg/works__block-img3.svg', color: '#EEF5FF' },
+				{ title: 'Вам остаётся только покормить собаку', text: 'Без расчётов рационов, закупок продуктов и готовки — всё уже продумано за Вас', image: 'imgs/bg/works__block-img4.svg', color: '#FAF4FF' },
+			],
+			info_blocks: [
+				{ title: 'доставка', items: [ { label: 'Сроки', text: 'Заказы, оформленные до 21:00, доставляются в течение 2х дней' }, { label: 'Время', text: 'Доставка осуществляется с 11:00 до 23:00 <br>Время согласовывается заранее курьером' }, { label: 'Стоимость', text: 'Бесплатная доставка по Москве и Санкт-Петербургу' }, { label: 'Важно', text: 'Мы привозим готовые свежие рационы — важно, чтобы вы могли сразу убрать их в холодильник.' } ] },
+				{ title: 'оплата', items: [ { label: 'Способы оплаты', text: 'Онлайн-оплата на сайте банковской картой' }, { label: 'Дополнение', text: 'После оплаты вы получаете электронный чек на указанную почту' }, { label: 'Важно', text: 'Каждый заказ готовится индивидуально после оплаты' } ] },
+				{ title: 'Что происходит после оплаты?', list: [ 'Приходит смс-уведомление с номером заказа и датой доставки', 'Готовим заказ', 'Доставляем в течение 2х дней курьером. Точное время доставки уточняется у курьера в день доставки' ] },
+				{ title: 'Изменение и отмена', text: 'Изменение адреса и отмена заказа производится не позднее чем за сутки до даты доставки через нашего специалиста 8(800)000-00-00' },
+			],
+			faq_title: 'часто задаваемые вопросы',
+			faq_items: [
+				{ question: 'Можно ли выбрать удобное время доставки?', answer: '' },
+				{ question: 'Можно ли перенести доставку?', answer: '' },
+				{ question: 'Как хранить рацион?', answer: '' },
+				{ question: 'На сколько дней хватает набора?', answer: '' },
+			],
+		},
 		'shipping': {
 			title: 'Бесплатная доставка',
 			tabs: [
@@ -213,6 +241,11 @@
 	];
 
 	defaults.dietology.faq_items = defaults.dietology.faq_items.map( function ( item ) {
+		item.answer = item.answer || defaultAnswer;
+		return item;
+	} );
+
+	defaults['delivery-page'].faq_items = defaults['delivery-page'].faq_items.map( function ( item ) {
 		item.answer = item.answer || defaultAnswer;
 		return item;
 	} );
@@ -1046,6 +1079,149 @@
 		] );
 	}
 
+	function deliveryPageEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var steps = arr( attrs, 'delivery-page', 'works_steps' );
+		var infoBlocks = arr( attrs, 'delivery-page', 'info_blocks' );
+		var faqItems = arr( attrs, 'delivery-page', 'faq_items' );
+
+		function setStep( index, key, value ) {
+			setArrayItem( steps, setAttributes, 'works_steps', index, key, value );
+		}
+
+		function setInfoBlock( index, key, value ) {
+			setArrayItem( infoBlocks, setAttributes, 'info_blocks', index, key, value );
+		}
+
+		function setInfoItem( blockIndex, itemIndex, key, value ) {
+			var next = clone( infoBlocks );
+			next[ blockIndex ].items[ itemIndex ][ key ] = value;
+			setAttributes( { info_blocks: next } );
+		}
+
+		function setInfoListItem( blockIndex, itemIndex, value ) {
+			var next = clone( infoBlocks );
+			next[ blockIndex ].list[ itemIndex ] = value;
+			setAttributes( { info_blocks: next } );
+		}
+
+		function setFaqItem( index, key, value ) {
+			setArrayItem( faqItems, setAttributes, 'faq_items', index, key, value );
+		}
+
+		return el( element.Fragment, null, [
+			box( 'Главный экран', [
+				imageControl( 'Изображение', val( attrs, 'delivery-page', 'hero_image' ), function ( value ) { setAttributes( { hero_image: value } ); } ),
+				el( TextareaControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'delivery-page', 'hero_title' ),
+					onChange: function ( value ) { setAttributes( { hero_title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'delivery-page', 'hero_text' ),
+					onChange: function ( value ) { setAttributes( { hero_text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'delivery-page', 'hero_button_label' ),
+					onChange: function ( value ) { setAttributes( { hero_button_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Ссылка кнопки',
+					value: val( attrs, 'delivery-page', 'hero_button_url' ),
+					onChange: function ( value ) { setAttributes( { hero_button_url: value } ); },
+				} ),
+			], true, isFirstDiceyBlock( props ) ),
+			box( 'Как это работает', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'delivery-page', 'works_title' ),
+					onChange: function ( value ) { setAttributes( { works_title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание секции',
+					value: val( attrs, 'delivery-page', 'works_text' ),
+					onChange: function ( value ) { setAttributes( { works_text: value } ); },
+				} ),
+				steps.map( function ( step, index ) {
+					return panel( panelTitle( 'Шаг', index, step.title ), [
+						imageControl( 'Изображение шага', step.image, function ( value ) { setStep( index, 'image', value ); } ),
+						el( TextControl, {
+							label: 'Заголовок шага',
+							value: step.title,
+							onChange: function ( value ) { setStep( index, 'title', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Текст шага',
+							value: step.text,
+							onChange: function ( value ) { setStep( index, 'text', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			box( 'Условия доставки и оплаты', [
+				infoBlocks.map( function ( block, blockIndex ) {
+					return panel( panelTitle( 'Блок', blockIndex, block.title ), [
+						el( TextControl, {
+							label: 'Название блока',
+							value: block.title,
+							onChange: function ( value ) { setInfoBlock( blockIndex, 'title', value ); },
+						} ),
+						block.items ? block.items.map( function ( item, itemIndex ) {
+							return panel( panelTitle( 'Пункт', itemIndex, item.label ), [
+								el( TextControl, {
+									label: 'Подзаголовок',
+									value: item.label,
+									onChange: function ( value ) { setInfoItem( blockIndex, itemIndex, 'label', value ); },
+								} ),
+								el( TextareaControl, {
+									label: 'Текст',
+									value: item.text,
+									onChange: function ( value ) { setInfoItem( blockIndex, itemIndex, 'text', value ); },
+								} ),
+							], false );
+						} ) : null,
+						block.list ? block.list.map( function ( item, itemIndex ) {
+							return el( TextareaControl, {
+								label: 'Пункт списка ' + ( itemIndex + 1 ),
+								value: item,
+								onChange: function ( value ) { setInfoListItem( blockIndex, itemIndex, value ); },
+							} );
+						} ) : null,
+						block.text !== undefined ? el( TextareaControl, {
+							label: 'Текст',
+							value: block.text,
+							onChange: function ( value ) { setInfoBlock( blockIndex, 'text', value ); },
+						} ) : null,
+					], false );
+				} ),
+			], false ),
+			box( 'Часто задаваемые вопросы', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'delivery-page', 'faq_title' ),
+					onChange: function ( value ) { setAttributes( { faq_title: value } ); },
+				} ),
+				faqItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Вопрос', index, item.question ), [
+						el( TextControl, {
+							label: 'Вопрос',
+							value: item.question,
+							onChange: function ( value ) { setFaqItem( index, 'question', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Ответ',
+							value: item.answer,
+							onChange: function ( value ) { setFaqItem( index, 'answer', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+		] );
+	}
+
 	function shippingEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
@@ -1318,6 +1494,24 @@
 				partnership_image: { type: 'string' },
 			},
 			edit: aboutEdit,
+		},
+		'dicey/delivery-page': {
+			title: __( 'Доставка и оплата', 'dicey' ),
+			icon: 'cart',
+			attributes: {
+				hero_title: { type: 'string' },
+				hero_text: { type: 'string' },
+				hero_button_label: { type: 'string' },
+				hero_button_url: { type: 'string' },
+				hero_image: { type: 'string' },
+				works_title: { type: 'string' },
+				works_text: { type: 'string' },
+				works_steps: { type: 'array', default: defaults['delivery-page'].works_steps },
+				info_blocks: { type: 'array', default: defaults['delivery-page'].info_blocks },
+				faq_title: { type: 'string' },
+				faq_items: { type: 'array', default: defaults['delivery-page'].faq_items },
+			},
+			edit: deliveryPageEdit,
 		},
 		'dicey/shipping': {
 			title: __( 'Бесплатная доставка', 'dicey' ),

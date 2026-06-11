@@ -234,6 +234,33 @@ function dicey_register_blocks() {
 				'partnership_image' => array( 'type' => 'string' ),
 			),
 		),
+		'delivery-page' => array(
+			'title'    => __( 'Доставка и оплата', 'dicey' ),
+			'template' => 'template-parts/static/delivery',
+			'callback' => 'dicey_render_delivery_page',
+			'attributes' => array(
+				'hero_title' => array( 'type' => 'string' ),
+				'hero_text' => array( 'type' => 'string' ),
+				'hero_button_label' => array( 'type' => 'string' ),
+				'hero_button_url' => array( 'type' => 'string' ),
+				'hero_image' => array( 'type' => 'string' ),
+				'works_title' => array( 'type' => 'string' ),
+				'works_text' => array( 'type' => 'string' ),
+				'works_steps' => array(
+					'type' => 'array',
+					'default' => dicey_delivery_defaults()['works_steps'],
+				),
+				'info_blocks' => array(
+					'type' => 'array',
+					'default' => dicey_delivery_defaults()['info_blocks'],
+				),
+				'faq_title' => array( 'type' => 'string' ),
+				'faq_items' => array(
+					'type' => 'array',
+					'default' => dicey_delivery_defaults()['faq_items'],
+				),
+			),
+		),
 		'works'       => array(
 			'title'    => __( 'Шаги оформления заказа', 'dicey' ),
 			'template' => 'template-parts/blocks/works',
