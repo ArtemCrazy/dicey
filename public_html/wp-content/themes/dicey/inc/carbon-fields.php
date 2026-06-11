@@ -80,5 +80,67 @@ function dicey_register_carbon_global_fields() {
 		);
 }
 
+function dicey_get_page_id_by_slug( $slug ) {
+	$page = get_page_by_path( $slug, OBJECT, 'page' );
+
+	return $page ? (int) $page->ID : 0;
+}
+
+function dicey_register_carbon_contacts_fields() {
+	if ( ! class_exists( '\Carbon_Fields\Container' ) || ! class_exists( '\Carbon_Fields\Field' ) ) {
+		return;
+	}
+
+	$page_id = dicey_get_page_id_by_slug( 'contacts' );
+	if ( ! $page_id ) {
+		return;
+	}
+
+	\Carbon_Fields\Container::make( 'post_meta', 'Контакты' )
+		->where( 'post_id', '=', $page_id )
+		->add_tab(
+			'Главный экран',
+			array(
+				\Carbon_Fields\Field::make( 'text', 'dicey_contacts_hero_title', 'Заголовок' ),
+				\Carbon_Fields\Field::make( 'image', 'dicey_contacts_hero_image', 'Изображение' )
+					->set_value_type( 'url' ),
+			)
+		)
+		->add_tab(
+			'По каким вопросам можно обратиться',
+			array(
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_contacts_apply_title', 'Заголовок' )
+					->set_rows( 3 ),
+				\Carbon_Fields\Field::make( 'complex', 'dicey_contacts_apply_items', 'Пункты' )
+					->set_layout( 'tabbed-horizontal' )
+					->add_fields(
+						array(
+							\Carbon_Fields\Field::make( 'text', 'icon', 'Иконка' )
+								->set_help_text( 'URL, ID изображения или путь в теме, например imgs/icons/apply__icon1.svg.' ),
+							\Carbon_Fields\Field::make( 'text', 'text', 'Текст' ),
+						)
+					),
+			)
+		)
+		->add_tab(
+			'Контактные данные',
+			array(
+				\Carbon_Fields\Field::make( 'complex', 'dicey_contacts_contact_items', 'Контакты' )
+					->set_layout( 'tabbed-horizontal' )
+					->add_fields(
+						array(
+							\Carbon_Fields\Field::make( 'text', 'icon', 'Иконка' )
+								->set_help_text( 'URL, ID изображения или путь в теме, например imgs/icons/contacts__icon1.svg.' ),
+							\Carbon_Fields\Field::make( 'text', 'label', 'Текст ссылки' ),
+							\Carbon_Fields\Field::make( 'text', 'url', 'URL' ),
+						)
+					),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_contacts_company_info', 'Реквизиты' )
+					->set_rows( 5 ),
+			)
+		);
+}
+
 add_action( 'carbon_fields_register_fields', 'dicey_register_carbon_product_fields' );
 add_action( 'carbon_fields_register_fields', 'dicey_register_carbon_global_fields' );
+add_action( 'carbon_fields_register_fields', 'dicey_register_carbon_contacts_fields' );
