@@ -30,9 +30,17 @@ function dicey_register_blocks() {
 	wp_register_script(
 		'dicey-blocks-editor',
 		DICEY_THEME_URI . '/blocks/index.js',
-		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n', 'wp-data' ),
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n', 'wp-data', 'wp-block-editor' ),
 		filemtime( DICEY_THEME_DIR . '/blocks/index.js' ),
 		true
+	);
+
+	wp_localize_script(
+		'dicey-blocks-editor',
+		'diceyBlocks',
+		array(
+			'assetsUrl' => DICEY_ASSETS_URI,
+		)
 	);
 
 	$blocks = array(

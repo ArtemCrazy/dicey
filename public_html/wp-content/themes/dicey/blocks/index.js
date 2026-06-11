@@ -1,9 +1,12 @@
-( function ( blocks, element, components, i18n, data ) {
+( function ( blocks, element, components, i18n, data, blockEditor ) {
 	var el = element.createElement;
 	var __ = i18n.__;
 	var TextControl = components.TextControl;
 	var TextareaControl = components.TextareaControl;
 	var PanelBody = components.PanelBody;
+	var Button = components.Button;
+	var MediaUpload = blockEditor.MediaUpload;
+	var MediaUploadCheck = blockEditor.MediaUploadCheck;
 
 	var defaults = {
 		'home-hero': {
@@ -261,6 +264,62 @@
 			},
 			el( 'div', { style: { paddingTop: '8px' } }, children )
 		);
+	}
+
+	function imageSrc( path ) {
+		if ( ! path ) {
+			return '';
+		}
+
+		if ( 0 === path.indexOf( 'http://' ) || 0 === path.indexOf( 'https://' ) ) {
+			return path;
+		}
+
+		return ( window.diceyBlocks && window.diceyBlocks.assetsUrl ? window.diceyBlocks.assetsUrl : '' ) + '/' + path.replace( /^\/+/, '' );
+	}
+
+	function imageControl( label, value, onChange ) {
+		var preview = imageSrc( value );
+
+		return el( 'div', { style: { marginBottom: '16px' } }, [
+			el( 'p', { style: { margin: '0 0 8px', color: '#1d2327', fontWeight: 500 } }, label ),
+			preview ? el( 'img', {
+				src: preview,
+				alt: '',
+				style: {
+					display: 'block',
+					width: '120px',
+					height: '90px',
+					objectFit: 'contain',
+					marginBottom: '10px',
+					background: '#f6f7f7',
+					border: '1px solid #dcdcde',
+					borderRadius: '4px',
+				},
+			} ) : null,
+			el( MediaUploadCheck, null,
+				el( MediaUpload, {
+					onSelect: function ( media ) {
+						onChange( media && media.url ? media.url : '' );
+					},
+					allowedTypes: [ 'image' ],
+					value: value,
+					render: function ( mediaProps ) {
+						return el( 'div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } }, [
+							el( Button, {
+								variant: 'secondary',
+								onClick: mediaProps.open,
+							}, value ? 'Заменить изображение' : 'Выбрать изображение' ),
+							value ? el( Button, {
+								variant: 'link',
+								isDestructive: true,
+								onClick: function () { onChange( '' ); },
+							}, 'Очистить' ) : null,
+						] );
+					},
+				} )
+			),
+		] );
 	}
 
 	function setArrayItem( source, setAttributes, attrName, index, key, value ) {
@@ -560,6 +619,10 @@
 			setArrayItem( consultItems, setAttributes, 'consult_items', index, 'text', value );
 		}
 
+		function setConsultImage( index, key, value ) {
+			setArrayItem( consultItems, setAttributes, 'consult_items', index, key, value );
+		}
+
 		function setAdvisoryStep( index, key, value ) {
 			setArrayItem( advisorySteps, setAttributes, 'advisory_steps', index, key, value );
 		}
@@ -616,6 +679,8 @@
 				} ),
 				consultItems.map( function ( item, index ) {
 					return panel( panelTitle( 'Карточка', index, item.text ), [
+						imageControl( 'Изображение карточки', item.icon, function ( value ) { setConsultImage( index, 'icon', value ); } ),
+						item.icon_mobile ? imageControl( 'Изображение на мобильной версии', item.icon_mobile, function ( value ) { setConsultImage( index, 'icon_mobile', value ); } ) : null,
 						el( TextareaControl, {
 							label: 'Текст карточки',
 							value: item.text,
@@ -1096,4 +1161,4 @@
 			},
 		} );
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.components, window.wp.i18n, window.wp.data );
+} )( window.wp.blocks, window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.blockEditor );

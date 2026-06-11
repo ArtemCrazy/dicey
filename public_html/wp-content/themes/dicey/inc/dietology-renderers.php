@@ -93,7 +93,7 @@ function dicey_render_dietology( $attrs = array() ) {
 				<div class="consultation__blocks">
 					<?php foreach ( $data['consult_items'] as $item ) : ?>
 						<div class="consultation__block">
-							<img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="consultation__img<?php echo ! empty( $item['icon_mobile'] ) ? ' xs-hide' : ''; ?>">
+							<?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="consultation__img<?php echo ! empty( $item['icon_mobile'] ) ? ' xs-hide' : ''; ?>"><?php endif; ?>
 							<?php if ( ! empty( $item['icon_mobile'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon_mobile'] ) ); ?>" alt="" class="consultation__img xs-show"><?php endif; ?>
 							<p class="consultation__text"><?php echo dicey_kses_inline( $item['text'] ); ?></p>
 						</div>
