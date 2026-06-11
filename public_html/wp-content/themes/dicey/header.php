@@ -4,7 +4,6 @@ ob_start();
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta name="description" content="Натуральное питание для собак без лишних забот">
 	<meta name="Content-Type" content="text/html;charset=UTF-8">
 	<meta name="viewport" content="width=device-width,height=device-height, initial-scale=1.0, user-scalable=no,maximum-scale=1.0, minimal-ui"/>
 <?php wp_head(); ?>
