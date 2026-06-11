@@ -78,6 +78,10 @@
             </div>
         </div>
     </section>
+    <?php $dicey_featured_products = function_exists( 'dicey_render_featured_products' ) ? dicey_render_featured_products() : ''; ?>
+    <?php if ( $dicey_featured_products ) : ?>
+        <?php echo $dicey_featured_products; ?>
+    <?php else : ?>
     <section class="popularity">
         <div class="container">
             <h2 class="popularity__title">Заказывают чаще всего</h2>
@@ -159,6 +163,7 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
     <section class="delivery">
         <div class="container">
             <div class="delivery-block">

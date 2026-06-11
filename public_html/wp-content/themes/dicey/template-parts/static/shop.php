@@ -223,6 +223,8 @@
           </div>
           <div class="shop__blocks-wr">
             <div class="shop__blocks">
+                <?php if ( function_exists( 'dicey_render_products_grid' ) && dicey_render_products_grid() ) : ?>
+                <?php else : ?>
                 <div class="popularity__block">
                     <a href="#" class="popularity__link">
                         <div class="popularity__img-wr">
@@ -424,6 +426,7 @@
                     </a>
                     <div class="popularity__btn">В корзину</div>
                 </div>
+                <?php endif; ?>
             </div>
           </div>
           <div class="shop__more-btn">Показать еще</div>
