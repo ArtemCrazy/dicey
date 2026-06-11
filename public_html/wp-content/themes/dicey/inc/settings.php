@@ -13,12 +13,30 @@ add_action( 'admin_menu', 'dicey_register_settings_page' );
 add_action( 'admin_enqueue_scripts', 'dicey_enqueue_settings_assets' );
 
 function dicey_get_global_why_settings() {
+	if ( function_exists( 'carbon_get_theme_option' ) ) {
+		$carbon_settings = array(
+			'title'        => carbon_get_theme_option( 'dicey_why_title' ),
+			'text'         => carbon_get_theme_option( 'dicey_why_text' ),
+			'button_label' => carbon_get_theme_option( 'dicey_why_button_label' ),
+			'image'        => carbon_get_theme_option( 'dicey_why_image' ),
+			'image_mobile' => carbon_get_theme_option( 'dicey_why_image_mobile' ),
+		);
+
+		if ( array_filter( $carbon_settings ) ) {
+			return dicey_merge_block_attrs( $carbon_settings, dicey_why_defaults() );
+		}
+	}
+
 	$settings = get_option( 'dicey_global_why', array() );
 
 	return dicey_merge_block_attrs( is_array( $settings ) ? $settings : array(), dicey_why_defaults() );
 }
 
 function dicey_register_settings_page() {
+	if ( function_exists( 'carbon_get_theme_option' ) ) {
+		return;
+	}
+
 	add_menu_page(
 		__( 'Остались вопросы', 'dicey' ),
 		__( 'Остались вопросы', 'dicey' ),

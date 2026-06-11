@@ -24,6 +24,33 @@ function dicey_allowed_block_types( $allowed_block_types, $editor_context ) {
 		);
 	}
 
+	if ( 'page' === $editor_context->post->post_type ) {
+		$blocks_by_slug = array(
+			'home'      => array(
+				'dicey/home-hero',
+				'dicey/home-conveniences',
+				'dicey/home-delivery',
+				'dicey/home-about-food',
+				'dicey/home-plan',
+				'dicey/home-works',
+				'dicey/shipping',
+				'dicey/sale',
+				'dicey/home-questions',
+				'dicey/why',
+			),
+			'dietology' => array( 'dicey/dietology', 'dicey/why' ),
+			'about'     => array( 'dicey/about' ),
+			'delivery'  => array( 'dicey/delivery-page', 'dicey/shipping', 'dicey/why' ),
+			'contacts'  => array( 'dicey/contacts-page', 'dicey/why' ),
+		);
+
+		$slug = $editor_context->post->post_name;
+
+		if ( isset( $blocks_by_slug[ $slug ] ) ) {
+			return $blocks_by_slug[ $slug ];
+		}
+	}
+
 	return $allowed_block_types;
 }
 

@@ -57,4 +57,28 @@ function dicey_register_carbon_product_fields() {
 		);
 }
 
+function dicey_register_carbon_global_fields() {
+	if ( ! class_exists( '\Carbon_Fields\Container' ) || ! class_exists( '\Carbon_Fields\Field' ) ) {
+		return;
+	}
+
+	\Carbon_Fields\Container::make( 'theme_options', 'Остались вопросы' )
+		->add_fields(
+			array(
+				\Carbon_Fields\Field::make( 'html', 'dicey_why_note' )
+					->set_html( '<p>Глобальный блок: изменения применяются на всех страницах, где он выведен.</p>' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_why_title', 'Заголовок' )
+					->set_rows( 3 ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_why_text', 'Текст' )
+					->set_rows( 3 ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_why_button_label', 'Кнопка' ),
+				\Carbon_Fields\Field::make( 'image', 'dicey_why_image', 'Изображение' )
+					->set_value_type( 'url' ),
+				\Carbon_Fields\Field::make( 'image', 'dicey_why_image_mobile', 'Изображение на мобильной версии' )
+					->set_value_type( 'url' ),
+			)
+		);
+}
+
 add_action( 'carbon_fields_register_fields', 'dicey_register_carbon_product_fields' );
+add_action( 'carbon_fields_register_fields', 'dicey_register_carbon_global_fields' );
