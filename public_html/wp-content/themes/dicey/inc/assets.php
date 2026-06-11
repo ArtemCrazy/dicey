@@ -56,6 +56,8 @@ function dicey_enqueue_editor_assets() {
 }
 
 add_action( 'wp_head', 'dicey_print_favicon', 5 );
+add_action( 'admin_head', 'dicey_print_favicon', 5 );
+add_action( 'login_head', 'dicey_print_favicon', 5 );
 
 function dicey_print_favicon() {
 	printf(
