@@ -35,46 +35,59 @@ function dicey_contacts_data( $attrs = array() ) {
 
 function dicey_render_contacts_page( $attrs = array() ) {
 	$data = dicey_contacts_data( $attrs );
+	$apply_items   = dicey_non_empty_items( $data['apply_items'] );
+	$contact_items = dicey_non_empty_items( $data['contact_items'] );
+
+	if ( ! dicey_has_value( $data ) ) {
+		return '';
+	}
+
 	ob_start();
 	?>
 	<main>
-		<section class="about-banner">
-			<div class="container">
-				<div class="about-banner__wr">
-					<?php if ( ! empty( $data['hero_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['hero_image'] ) ); ?>" alt="" class="about-banner__img"><?php endif; ?>
-					<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Контакты</p></div>
-					<h1 class="about-banner__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?></h1>
+		<?php if ( '' !== trim( $data['hero_title'] ) || ! empty( $data['hero_image'] ) ) : ?>
+			<section class="about-banner">
+				<div class="container">
+					<div class="about-banner__wr">
+						<?php if ( ! empty( $data['hero_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['hero_image'] ) ); ?>" alt="" class="about-banner__img"><?php endif; ?>
+						<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Контакты</p></div>
+						<?php if ( '' !== trim( $data['hero_title'] ) ) : ?><h1 class="about-banner__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?></h1><?php endif; ?>
+					</div>
 				</div>
-			</div>
-		</section>
-		<section class="apply">
-			<div class="container">
-				<h2 class="shipping__title"><?php echo dicey_kses_inline( $data['apply_title'] ); ?></h2>
-				<div class="apply__blocks">
-					<?php foreach ( $data['apply_items'] as $item ) : ?>
-						<div class="apply__block">
-							<?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="apply__icon"><?php endif; ?>
-							<p class="apply__name"><?php echo dicey_kses_inline( $item['text'] ); ?></p>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</section>
-		<section class="contacts">
-			<div class="container">
-				<div class="contacts__wr">
-					<div class="contacts__blocks">
-						<?php foreach ( $data['contact_items'] as $item ) : ?>
-							<div class="contacts__block">
-								<div class="contacts__icon"><?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt=""><?php endif; ?></div>
-								<a href="<?php echo esc_url( $item['url'] ); ?>"><?php echo esc_html( $item['label'] ); ?></a>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['apply_title'] ) || $apply_items ) : ?>
+			<section class="apply">
+				<div class="container">
+					<?php if ( '' !== trim( $data['apply_title'] ) ) : ?><h2 class="shipping__title"><?php echo dicey_kses_inline( $data['apply_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $apply_items ) : ?><div class="apply__blocks">
+						<?php foreach ( $apply_items as $item ) : ?>
+							<div class="apply__block">
+								<?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="apply__icon"><?php endif; ?>
+								<?php if ( ! empty( $item['text'] ) ) : ?><p class="apply__name"><?php echo dicey_kses_inline( $item['text'] ); ?></p><?php endif; ?>
 							</div>
 						<?php endforeach; ?>
-					</div>
-					<p class="contacts__info"><?php echo dicey_kses_inline( $data['company_info'] ); ?></p>
+					</div><?php endif; ?>
 				</div>
-			</div>
-		</section>
+			</section>
+		<?php endif; ?>
+		<?php if ( $contact_items || '' !== trim( $data['company_info'] ) ) : ?>
+			<section class="contacts">
+				<div class="container">
+					<div class="contacts__wr">
+						<?php if ( $contact_items ) : ?><div class="contacts__blocks">
+							<?php foreach ( $contact_items as $item ) : ?>
+								<div class="contacts__block">
+									<?php if ( ! empty( $item['icon'] ) ) : ?><div class="contacts__icon"><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt=""></div><?php endif; ?>
+									<?php if ( ! empty( $item['label'] ) ) : ?><a href="<?php echo esc_url( ! empty( $item['url'] ) ? $item['url'] : '#' ); ?>"><?php echo esc_html( $item['label'] ); ?></a><?php endif; ?>
+								</div>
+							<?php endforeach; ?>
+						</div><?php endif; ?>
+						<?php if ( '' !== trim( $data['company_info'] ) ) : ?><p class="contacts__info"><?php echo dicey_kses_inline( $data['company_info'] ); ?></p><?php endif; ?>
+					</div>
+				</div>
+			</section>
+		<?php endif; ?>
 	</main>
 	<?php
 	return ob_get_clean();

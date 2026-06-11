@@ -64,72 +64,92 @@ function dicey_delivery_defaults() {
 
 function dicey_render_delivery_page( $attrs = array() ) {
 	$data = dicey_merge_block_attrs( $attrs, dicey_delivery_defaults() );
+	$works_steps = dicey_non_empty_items( $data['works_steps'] );
+	$info_blocks = dicey_non_empty_items( $data['info_blocks'] );
+	$faq_items   = dicey_non_empty_items( $data['faq_items'] );
+
+	if ( ! dicey_has_value( $data ) ) {
+		return '';
+	}
+
 	ob_start();
 	?>
 	<main>
-		<section class="main main3">
-			<div class="container">
-				<div class="main-wr">
-					<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Доставка и оплата</p></div>
-					<h1 class="main__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?></h1>
-					<p class="main__text"><?php echo dicey_kses_inline( $data['hero_text'] ); ?></p>
-					<a href="<?php echo esc_url( home_url( $data['hero_button_url'] ) ); ?>" class="main__link xs-hide"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></a>
-				</div>
-				<?php if ( ! empty( $data['hero_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['hero_image'] ) ); ?>" alt="" class="main__img"><?php endif; ?>
-				<a href="<?php echo esc_url( home_url( $data['hero_button_url'] ) ); ?>" class="main__link xs-show"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></a>
-			</div>
-		</section>
-		<section class="works works2">
-			<div class="container">
-				<div class="about-food__head">
-					<h2 class="about-food__title"><?php echo dicey_kses_inline( $data['works_title'] ); ?></h2>
-					<p class="about-food__text"><?php echo dicey_kses_inline( $data['works_text'] ); ?></p>
-				</div>
-				<div class="works__blocks">
-					<?php foreach ( $data['works_steps'] as $step ) : ?>
-						<div class="works__block"<?php echo ! empty( $step['color'] ) ? ' style="background-color: ' . esc_attr( $step['color'] ) . ';"' : ''; ?>>
-							<span class="works__block-number"></span>
-							<div class="works__block-info">
-								<p class="works__block-name"><?php echo dicey_kses_inline( $step['title'] ); ?></p>
-								<p class="works__block-text"><?php echo dicey_kses_inline( $step['text'] ); ?></p>
-								<?php if ( ! empty( $step['image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $step['image'] ) ); ?>" alt="" class="works__block-img"><?php endif; ?>
-							</div>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</section>
-		<section class="functional">
-			<div class="container">
-				<?php foreach ( $data['info_blocks'] as $block ) : ?>
-					<div class="functional__block">
-						<p class="functional__name"><?php echo dicey_kses_inline( $block['title'] ); ?></p>
-						<div class="functional__content">
-							<?php if ( ! empty( $block['items'] ) ) : ?>
-								<?php foreach ( $block['items'] as $item ) : ?><span><?php echo dicey_kses_inline( $item['label'] ); ?></span><p><?php echo dicey_kses_inline( $item['text'] ); ?></p><?php endforeach; ?>
-							<?php elseif ( ! empty( $block['list'] ) ) : ?>
-								<ul><?php foreach ( $block['list'] as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul>
-							<?php elseif ( ! empty( $block['text'] ) ) : ?>
-								<p><?php echo dicey_kses_inline( $block['text'] ); ?></p>
-							<?php endif; ?>
-						</div>
+		<?php if ( '' !== trim( $data['hero_title'] ) || '' !== trim( $data['hero_text'] ) || ! empty( $data['hero_image'] ) ) : ?>
+			<section class="main main3">
+				<div class="container">
+					<div class="main-wr">
+						<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Доставка и оплата</p></div>
+						<?php if ( '' !== trim( $data['hero_title'] ) ) : ?><h1 class="main__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?></h1><?php endif; ?>
+						<?php if ( '' !== trim( $data['hero_text'] ) ) : ?><p class="main__text"><?php echo dicey_kses_inline( $data['hero_text'] ); ?></p><?php endif; ?>
+						<?php if ( '' !== trim( $data['hero_button_label'] ) && '' !== trim( $data['hero_button_url'] ) ) : ?><a href="<?php echo esc_url( home_url( $data['hero_button_url'] ) ); ?>" class="main__link xs-hide"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></a><?php endif; ?>
 					</div>
-				<?php endforeach; ?>
-			</div>
-		</section>
-		<section class="questions2">
-			<div class="container">
-				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['faq_title'] ); ?></h2>
-				<div class="questions__blocks">
-					<?php foreach ( $data['faq_items'] as $item ) : ?>
-						<div class="questions__block">
-							<div class="questions__top"><p><?php echo esc_html( $item['question'] ); ?></p><?php echo dicey_faq_icon_svg(); ?></div>
-							<div class="questions__content" style="display: none;"><p><?php echo dicey_kses_inline( $item['answer'] ); ?></p></div>
+					<?php if ( ! empty( $data['hero_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['hero_image'] ) ); ?>" alt="" class="main__img"><?php endif; ?>
+					<?php if ( '' !== trim( $data['hero_button_label'] ) && '' !== trim( $data['hero_button_url'] ) ) : ?><a href="<?php echo esc_url( home_url( $data['hero_button_url'] ) ); ?>" class="main__link xs-show"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></a><?php endif; ?>
+				</div>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['works_title'] ) || '' !== trim( $data['works_text'] ) || $works_steps ) : ?>
+			<section class="works works2">
+				<div class="container">
+					<div class="about-food__head">
+						<?php if ( '' !== trim( $data['works_title'] ) ) : ?><h2 class="about-food__title"><?php echo dicey_kses_inline( $data['works_title'] ); ?></h2><?php endif; ?>
+						<?php if ( '' !== trim( $data['works_text'] ) ) : ?><p class="about-food__text"><?php echo dicey_kses_inline( $data['works_text'] ); ?></p><?php endif; ?>
+					</div>
+					<?php if ( $works_steps ) : ?><div class="works__blocks">
+						<?php foreach ( $works_steps as $step ) : ?>
+							<div class="works__block"<?php echo ! empty( $step['color'] ) ? ' style="background-color: ' . esc_attr( $step['color'] ) . ';"' : ''; ?>>
+								<span class="works__block-number"></span>
+								<div class="works__block-info">
+									<?php if ( ! empty( $step['title'] ) ) : ?><p class="works__block-name"><?php echo dicey_kses_inline( $step['title'] ); ?></p><?php endif; ?>
+									<?php if ( ! empty( $step['text'] ) ) : ?><p class="works__block-text"><?php echo dicey_kses_inline( $step['text'] ); ?></p><?php endif; ?>
+									<?php if ( ! empty( $step['image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $step['image'] ) ); ?>" alt="" class="works__block-img"><?php endif; ?>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					</div><?php endif; ?>
+				</div>
+			</section>
+		<?php endif; ?>
+		<?php if ( $info_blocks ) : ?>
+			<section class="functional">
+				<div class="container">
+					<?php foreach ( $info_blocks as $block ) : ?>
+						<?php
+						$items = dicey_non_empty_items( isset( $block['items'] ) ? $block['items'] : array() );
+						$list  = dicey_non_empty_items( isset( $block['list'] ) ? $block['list'] : array() );
+						?>
+						<div class="functional__block">
+							<?php if ( ! empty( $block['title'] ) ) : ?><p class="functional__name"><?php echo dicey_kses_inline( $block['title'] ); ?></p><?php endif; ?>
+							<?php if ( $items || $list || ! empty( $block['text'] ) ) : ?><div class="functional__content">
+								<?php if ( $items ) : ?>
+									<?php foreach ( $items as $item ) : ?><?php if ( ! empty( $item['label'] ) ) : ?><span><?php echo dicey_kses_inline( $item['label'] ); ?></span><?php endif; ?><?php if ( ! empty( $item['text'] ) ) : ?><p><?php echo dicey_kses_inline( $item['text'] ); ?></p><?php endif; ?><?php endforeach; ?>
+								<?php elseif ( $list ) : ?>
+									<ul><?php foreach ( $list as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul>
+								<?php elseif ( ! empty( $block['text'] ) ) : ?>
+									<p><?php echo dicey_kses_inline( $block['text'] ); ?></p>
+								<?php endif; ?>
+							</div><?php endif; ?>
 						</div>
 					<?php endforeach; ?>
 				</div>
-			</div>
-		</section>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['faq_title'] ) || $faq_items ) : ?>
+			<section class="questions2">
+				<div class="container">
+					<?php if ( '' !== trim( $data['faq_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['faq_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $faq_items ) : ?><div class="questions__blocks">
+						<?php foreach ( $faq_items as $item ) : ?>
+							<div class="questions__block">
+								<div class="questions__top"><?php if ( ! empty( $item['question'] ) ) : ?><p><?php echo esc_html( $item['question'] ); ?></p><?php endif; ?><?php echo dicey_faq_icon_svg(); ?></div>
+								<?php if ( ! empty( $item['answer'] ) ) : ?><div class="questions__content" style="display: none;"><p><?php echo dicey_kses_inline( $item['answer'] ); ?></p></div><?php endif; ?>
+							</div>
+						<?php endforeach; ?>
+					</div><?php endif; ?>
+				</div>
+			</section>
+		<?php endif; ?>
 	</main>
 	<?php
 	return ob_get_clean();

@@ -75,6 +75,7 @@
 			hero_text: 'Подберем и приготовим рацион с учётом возраста, породы и состояния здоровья вашего питомца',
 			hero_button_label: 'получить консультацию',
 			hero_mobile_label: 'Выбрать рацион',
+			hero_image: 'imgs/bg/main-img2.png',
 			consult_title: 'Вам нужна консультация если у Вас:',
 			consult_items: [
 				{ icon: 'imgs/bg/consultation__img1.svg', text: 'Щенок' },
@@ -369,6 +370,14 @@
 			return '';
 		}
 
+		if ( /^\d+$/.test( String( path ) ) && data && data.select ) {
+			var media = data.select( 'core' ).getMedia( parseInt( path, 10 ) );
+
+			if ( media && media.source_url ) {
+				return media.source_url;
+			}
+		}
+
 		if ( 0 === path.indexOf( 'http://' ) || 0 === path.indexOf( 'https://' ) ) {
 			return path;
 		}
@@ -398,10 +407,10 @@
 			el( MediaUploadCheck, null,
 				el( MediaUpload, {
 					onSelect: function ( media ) {
-						onChange( media && media.url ? media.url : '' );
+						onChange( media && media.id ? String( media.id ) : ( media && media.url ? media.url : '' ) );
 					},
 					allowedTypes: [ 'image' ],
-					value: value,
+					value: /^\d+$/.test( String( value || '' ) ) ? parseInt( value, 10 ) : undefined,
 					render: function ( mediaProps ) {
 						return el( 'div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } }, [
 							el( Button, {
@@ -445,6 +454,7 @@
 		var setAttributes = props.setAttributes;
 
 		return box( 'Главный экран', [
+			imageControl( 'Изображение', val( attrs, 'home-hero', 'image' ), function ( value ) { setAttributes( { image: value } ); } ),
 			panel( 'Тексты', [
 				el( TextControl, {
 					label: 'Надзаголовок',
@@ -501,6 +511,7 @@
 			} ),
 			cards.map( function ( card, index ) {
 				return panel( panelTitle( 'Карточка', index, card.title ), [
+					imageControl( 'Иконка', card.icon, function ( value ) { setCard( index, 'icon', value ); } ),
 					el( TextControl, {
 						label: 'Заголовок карточки',
 						value: card.title,
@@ -520,6 +531,7 @@
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
 		return box( 'Регулярные доставки рациона', [
+			imageControl( 'Изображение', val( attrs, 'home-delivery', 'image' ), function ( value ) { setAttributes( { image: value } ); } ),
 			panel( 'Заголовки', [
 				el( TextControl, {
 					label: 'Заголовок',
@@ -593,6 +605,7 @@
 			} ),
 			steps.map( function ( step, index ) {
 				return panel( panelTitle( 'Шаг', index, step.title ), [
+					imageControl( 'Изображение шага', step.image, function ( value ) { setStep( index, 'image', value ); } ),
 					el( TextControl, {
 						label: 'Заголовок шага',
 						value: step.title,
@@ -619,6 +632,7 @@
 
 		return box( 'Что получает ваша собака', [
 			panel( 'Заголовок и ссылка', [
+				imageControl( 'Изображение в центре', val( attrs, 'home-about-food', 'image' ), function ( value ) { setAttributes( { image: value } ); } ),
 				el( TextControl, {
 					label: 'Заголовок',
 					value: val( attrs, 'home-about-food', 'title' ),
@@ -642,6 +656,7 @@
 			], true ),
 			items.map( function ( item, index ) {
 				return panel( panelTitle( 'Элемент', index, item.title ), [
+					imageControl( 'Иконка', item.icon, function ( value ) { setItemField( index, 'icon', value ); } ),
 					el( TextControl, {
 						label: 'Название',
 						value: item.title,
@@ -663,6 +678,7 @@
 
 		return box( 'Составим индивидуальный план питания', [
 			panel( 'Специалист', [
+				imageControl( 'Фото специалиста', val( attrs, 'home-plan', 'image' ), function ( value ) { setAttributes( { image: value } ); } ),
 				el( TextControl, {
 					label: 'Имя',
 					value: val( attrs, 'home-plan', 'person_name' ),
@@ -748,6 +764,7 @@
 
 		return el( element.Fragment, null, [
 			box( 'Главный экран', [
+				imageControl( 'Изображение', val( attrs, 'dietology', 'hero_image' ), function ( value ) { setAttributes( { hero_image: value } ); } ),
 				el( TextControl, {
 					label: 'Заголовок',
 					value: val( attrs, 'dietology', 'hero_title' ),
@@ -1353,6 +1370,7 @@
 		var setAttributes = props.setAttributes;
 
 		return box( 'Скидка - 30% на первый заказ', [
+			imageControl( 'Изображение', val( attrs, 'sale', 'image' ), function ( value ) { setAttributes( { image: value } ); } ),
 			panel( 'Тексты', [
 				el( TextControl, {
 					label: 'Заголовок',
@@ -1456,6 +1474,7 @@
 				text: { type: 'string' },
 				button_label: { type: 'string' },
 				button_url: { type: 'string' },
+				image: { type: 'string' },
 			},
 			edit: heroEdit,
 		},
@@ -1478,6 +1497,7 @@
 				text_second: { type: 'string' },
 				button_label: { type: 'string' },
 				button_url: { type: 'string' },
+				image: { type: 'string' },
 			},
 			edit: deliveryEdit,
 		},
@@ -1501,6 +1521,7 @@
 				text: { type: 'string' },
 				link_label: { type: 'string' },
 				link_url: { type: 'string' },
+				image: { type: 'string' },
 				items: { type: 'array', default: defaults['home-about-food'].items },
 			},
 			edit: aboutFoodEdit,
@@ -1516,6 +1537,7 @@
 				price: { type: 'string' },
 				text: { type: 'string' },
 				button_label: { type: 'string' },
+				image: { type: 'string' },
 			},
 			edit: planEdit,
 		},
@@ -1528,6 +1550,7 @@
 				hero_text: { type: 'string' },
 				hero_button_label: { type: 'string' },
 				hero_mobile_label: { type: 'string' },
+				hero_image: { type: 'string' },
 				consult_title: { type: 'string' },
 				consult_items: { type: 'array', default: defaults.dietology.consult_items },
 				plan_person_name: { type: 'string' },
@@ -1626,6 +1649,7 @@
 				text: { type: 'string' },
 				button_label: { type: 'string' },
 				button_url: { type: 'string' },
+				image: { type: 'string' },
 			},
 			edit: saleEdit,
 		},
@@ -1658,7 +1682,7 @@
 			icon: block.icon,
 			category: 'dicey',
 			attributes: block.attributes,
-			supports: { html: false, align: [ 'wide', 'full' ] },
+			supports: { html: false, align: false, customClassName: false, reusable: false },
 			edit: block.edit,
 			save: function () {
 				return null;
@@ -1666,32 +1690,4 @@
 		} );
 	} );
 
-	[
-		[ 'dicey/home-legacy', __( 'Домашняя страница', 'dicey' ), 'layout' ],
-		[ 'dicey/works', __( 'Шаги оформления заказа', 'dicey' ), 'list-view' ],
-	].forEach( function ( block ) {
-		blocks.registerBlockType( block[0], {
-			apiVersion: 2,
-			title: block[1],
-			icon: block[2],
-			category: 'dicey',
-			supports: { html: false, align: [ 'wide', 'full' ] },
-			edit: function ( props ) {
-				return box(
-					block[1],
-					el(
-						'p',
-						{ style: { margin: 0, color: '#646970' } },
-						__( 'Эта секция пока подключена как готовый блок верстки.', 'dicey' )
-					)
-					,
-					false,
-					isFirstDiceyBlock( props )
-				);
-			},
-			save: function () {
-				return null;
-			},
-		} );
-	} );
 } )( window.wp.blocks, window.wp.element, window.wp.components, window.wp.i18n, window.wp.data, window.wp.blockEditor );

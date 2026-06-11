@@ -182,7 +182,7 @@ function dicey_render_product_card( $post_id ) {
 			</div>
 			<div class="popularity__head">
 				<p class="popularity__name"><?php echo esc_html( dicey_product_title_for_card( $post_id ) ); ?></p>
-				<p class="popularity__calories"><?php echo esc_html( $meta['calories'] ); ?></p>
+				<?php if ( '' !== trim( $meta['calories'] ) ) : ?><p class="popularity__calories"><?php echo esc_html( $meta['calories'] ); ?></p><?php endif; ?>
 			</div>
 			<?php $price = dicey_product_price_for_card( $post_id, $meta ); ?>
 			<?php if ( '' !== trim( $price ) ) : ?>

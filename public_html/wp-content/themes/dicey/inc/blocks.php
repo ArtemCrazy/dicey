@@ -45,10 +45,6 @@ function dicey_register_blocks() {
 	);
 
 	$blocks = array(
-		'home-legacy' => array(
-			'title'    => __( 'Домашняя страница', 'dicey' ),
-			'template' => 'template-parts/pages/front-page',
-		),
 		'home-hero' => array(
 			'title'    => __( 'Главный экран', 'dicey' ),
 			'template' => 'template-parts/blocks/home-hero',
@@ -60,6 +56,7 @@ function dicey_register_blocks() {
 				'text' => array( 'type' => 'string' ),
 				'button_label' => array( 'type' => 'string' ),
 				'button_url' => array( 'type' => 'string' ),
+				'image' => array( 'type' => 'string' ),
 			),
 		),
 		'home-conveniences' => array(
@@ -85,6 +82,7 @@ function dicey_register_blocks() {
 				'text_second' => array( 'type' => 'string' ),
 				'button_label' => array( 'type' => 'string' ),
 				'button_url' => array( 'type' => 'string' ),
+				'image' => array( 'type' => 'string' ),
 			),
 		),
 		'home-about-food' => array(
@@ -96,6 +94,7 @@ function dicey_register_blocks() {
 				'text' => array( 'type' => 'string' ),
 				'link_label' => array( 'type' => 'string' ),
 				'link_url' => array( 'type' => 'string' ),
+				'image' => array( 'type' => 'string' ),
 				'items' => array(
 					'type' => 'array',
 					'default' => dicey_home_about_food_defaults()['items'],
@@ -114,6 +113,7 @@ function dicey_register_blocks() {
 				'price' => array( 'type' => 'string' ),
 				'text' => array( 'type' => 'string' ),
 				'button_label' => array( 'type' => 'string' ),
+				'image' => array( 'type' => 'string' ),
 			),
 		),
 		'home-works' => array(
@@ -153,6 +153,7 @@ function dicey_register_blocks() {
 				'hero_text' => array( 'type' => 'string' ),
 				'hero_button_label' => array( 'type' => 'string' ),
 				'hero_mobile_label' => array( 'type' => 'string' ),
+				'hero_image' => array( 'type' => 'string' ),
 				'consult_title' => array( 'type' => 'string' ),
 				'consult_items' => array(
 					'type' => 'array',
@@ -280,10 +281,6 @@ function dicey_register_blocks() {
 				'company_info' => array( 'type' => 'string' ),
 			),
 		),
-		'works'       => array(
-			'title'    => __( 'Шаги оформления заказа', 'dicey' ),
-			'template' => 'template-parts/blocks/works',
-		),
 		'shipping'    => array(
 			'title'    => __( 'Бесплатная доставка', 'dicey' ),
 			'template' => 'template-parts/blocks/shipping',
@@ -306,6 +303,7 @@ function dicey_register_blocks() {
 				'text' => array( 'type' => 'string' ),
 				'button_label' => array( 'type' => 'string' ),
 				'button_url' => array( 'type' => 'string' ),
+				'image' => array( 'type' => 'string' ),
 			),
 		),
 		'why'         => array(
@@ -335,8 +333,10 @@ function dicey_register_blocks() {
 				'attributes'      => isset( $block['attributes'] ) ? $block['attributes'] : array(),
 				'render_callback' => $render_callback,
 				'supports'        => array(
-					'align' => array( 'wide', 'full' ),
-					'html'  => false,
+					'align'           => false,
+					'customClassName' => false,
+					'html'            => false,
+					'reusable'        => false,
 				),
 			)
 		);

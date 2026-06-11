@@ -18,6 +18,7 @@ function dicey_dietology_defaults() {
 		'hero_text'         => 'Подберем и приготовим рацион с учётом возраста, породы и состояния здоровья вашего питомца',
 		'hero_button_label' => 'получить консультацию',
 		'hero_mobile_label' => 'Выбрать рацион',
+		'hero_image'        => 'imgs/bg/main-img2.png',
 		'consult_title'     => 'Вам нужна консультация если у Вас:',
 		'consult_items'     => array(
 			array( 'icon' => 'imgs/bg/consultation__img1.svg', 'text' => 'Щенок' ),
@@ -77,91 +78,117 @@ function dicey_dietology_defaults() {
 
 function dicey_render_dietology( $attrs = array() ) {
 	$data = dicey_merge_block_attrs( $attrs, dicey_dietology_defaults() );
+	$consult_items     = dicey_non_empty_items( $data['consult_items'] );
+	$certificates      = dicey_non_empty_items( $data['plan_certificates'] );
+	$advisory_steps    = dicey_non_empty_items( $data['advisory_steps'] );
+	$advantages        = dicey_non_empty_items( $data['advantages'] );
+	$prices            = dicey_non_empty_items( $data['prices'] );
+	$faq_items         = dicey_non_empty_items( $data['faq_items'] );
+
+	if ( ! dicey_has_value( $data ) ) {
+		return '';
+	}
+
 	ob_start();
 	?>
 	<main>
-		<section class="main main2">
-			<div class="container">
-				<div class="main-wr">
-					<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Диетология</p></div>
-					<h1 class="main__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?> <span><?php echo dicey_kses_inline( $data['hero_accent'] ); ?></span></h1>
-					<p class="main__text"><?php echo dicey_kses_inline( $data['hero_text'] ); ?></p>
-					<button data-fancybox data-src="#consult-modal" class="main__link xs-hide"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></button>
-				</div>
-				<img src="<?php echo esc_url( dicey_asset_img( 'imgs/bg/main-img2.png' ) ); ?>" alt="" class="main__img">
-				<button data-fancybox data-src="#consult-modal" class="main__link xs-show"><?php echo esc_html( $data['hero_mobile_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></button>
-			</div>
-		</section>
-		<section class="consultation">
-			<div class="container">
-				<h2 class="conveniences__title"><?php echo dicey_kses_inline( $data['consult_title'] ); ?></h2>
-				<div class="consultation__blocks">
-					<?php foreach ( $data['consult_items'] as $item ) : ?>
-						<div class="consultation__block">
-							<?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="consultation__img<?php echo ! empty( $item['icon_mobile'] ) ? ' xs-hide' : ''; ?>"><?php endif; ?>
-							<?php if ( ! empty( $item['icon_mobile'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon_mobile'] ) ); ?>" alt="" class="consultation__img xs-show"><?php endif; ?>
-							<p class="consultation__text"><?php echo dicey_kses_inline( $item['text'] ); ?></p>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</section>
-		<section class="plan plan2">
-			<div class="container">
-				<div class="plan__img-wr">
-					<?php if ( ! empty( $data['plan_person_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['plan_person_image'] ) ); ?>" alt="" class="plan__img-people"><?php endif; ?>
-					<div class="plan__img-shadow"></div>
-					<div class="plan__img-info"><p class="plan__img-name"><?php echo esc_html( $data['plan_person_name'] ); ?></p><p class="plan__img-text"><?php echo dicey_kses_inline( $data['plan_person_role'] ); ?></p></div>
-				</div>
-				<div class="plan__wr">
-					<h2 class="plan__title"><?php echo dicey_kses_inline( $data['plan_title'] ); ?></h2>
-					<p class="plan__subname"><?php echo dicey_kses_inline( $data['plan_subtitle'] ); ?></p>
-					<p class="plan__text"><?php echo dicey_kses_inline( $data['plan_text'] ); ?></p>
-					<div class="plan__imgs">
-						<?php foreach ( $data['plan_certificates'] as $certificate ) : ?>
-							<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
-						<?php endforeach; ?>
+		<?php if ( '' !== trim( $data['hero_title'] ) || '' !== trim( $data['hero_accent'] ) || '' !== trim( $data['hero_text'] ) || ! empty( $data['hero_image'] ) ) : ?>
+			<section class="main main2">
+				<div class="container">
+					<div class="main-wr">
+						<div class="standart-nav"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a><p>Диетология</p></div>
+						<?php if ( '' !== trim( $data['hero_title'] ) || '' !== trim( $data['hero_accent'] ) ) : ?><h1 class="main__title"><?php echo dicey_kses_inline( $data['hero_title'] ); ?><?php if ( '' !== trim( $data['hero_accent'] ) ) : ?> <span><?php echo dicey_kses_inline( $data['hero_accent'] ); ?></span><?php endif; ?></h1><?php endif; ?>
+						<?php if ( '' !== trim( $data['hero_text'] ) ) : ?><p class="main__text"><?php echo dicey_kses_inline( $data['hero_text'] ); ?></p><?php endif; ?>
+						<?php if ( '' !== trim( $data['hero_button_label'] ) ) : ?><button data-fancybox data-src="#consult-modal" class="main__link xs-hide"><?php echo esc_html( $data['hero_button_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></button><?php endif; ?>
 					</div>
-					<a href="#" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a>
+					<?php if ( ! empty( $data['hero_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['hero_image'] ) ); ?>" alt="" class="main__img"><?php endif; ?>
+					<?php if ( '' !== trim( $data['hero_mobile_label'] ) ) : ?><button data-fancybox data-src="#consult-modal" class="main__link xs-show"><?php echo esc_html( $data['hero_mobile_label'] ); ?><?php echo dicey_cta_icon_svg(); ?></button><?php endif; ?>
 				</div>
-			</div>
-		</section>
-		<section class="advisory">
-			<div class="container">
-				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['advisory_title'] ); ?></h2>
-				<div class="advisory__blocks">
-					<?php foreach ( $data['advisory_steps'] as $step ) : ?>
-						<div class="advisory__block"><span class="works__block-number"></span><div class="advisory__info"><p class="advisory__name"><?php echo dicey_kses_inline( $step['title'] ); ?></p><p class="advisory__text"><?php echo dicey_kses_inline( $step['text'] ); ?></p><?php if ( ! empty( $step['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $step['icon'] ) ); ?>" alt="" class="advisory__icon"><?php endif; ?></div><?php if ( ! empty( $step['button'] ) ) : ?><button class="advisory__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $step['button'] ); ?></button><?php endif; ?></div>
-					<?php endforeach; ?>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['consult_title'] ) || $consult_items ) : ?>
+			<section class="consultation">
+				<div class="container">
+					<?php if ( '' !== trim( $data['consult_title'] ) ) : ?><h2 class="conveniences__title"><?php echo dicey_kses_inline( $data['consult_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $consult_items ) : ?><div class="consultation__blocks">
+						<?php foreach ( $consult_items as $item ) : ?>
+							<div class="consultation__block">
+								<?php if ( ! empty( $item['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon'] ) ); ?>" alt="" class="consultation__img<?php echo ! empty( $item['icon_mobile'] ) ? ' xs-hide' : ''; ?>"><?php endif; ?>
+								<?php if ( ! empty( $item['icon_mobile'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['icon_mobile'] ) ); ?>" alt="" class="consultation__img xs-show"><?php endif; ?>
+								<?php if ( ! empty( $item['text'] ) ) : ?><p class="consultation__text"><?php echo dicey_kses_inline( $item['text'] ); ?></p><?php endif; ?>
+							</div>
+						<?php endforeach; ?>
+					</div><?php endif; ?>
 				</div>
-			</div>
-		</section>
-		<section class="advantages">
-			<div class="container">
-				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['advantages_title'] ); ?></h2>
-				<div class="advantages__blocks">
-					<?php foreach ( $data['advantages'] as $item ) : ?><div class="advantages__block"><?php if ( ! empty( $item['image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['image'] ) ); ?>" alt="" class="advantages__img"><?php endif; ?><p class="advantages__name"><?php echo dicey_kses_inline( $item['title'] ); ?></p></div><?php endforeach; ?>
+			</section>
+		<?php endif; ?>
+		<?php if ( ! empty( $data['plan_person_image'] ) || '' !== trim( $data['plan_person_name'] ) || '' !== trim( $data['plan_person_role'] ) || '' !== trim( $data['plan_title'] ) || '' !== trim( $data['plan_subtitle'] ) || '' !== trim( $data['plan_text'] ) || $certificates ) : ?>
+			<section class="plan plan2">
+				<div class="container">
+					<div class="plan__img-wr">
+						<?php if ( ! empty( $data['plan_person_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['plan_person_image'] ) ); ?>" alt="" class="plan__img-people"><?php endif; ?>
+						<div class="plan__img-shadow"></div>
+						<?php if ( '' !== trim( $data['plan_person_name'] ) || '' !== trim( $data['plan_person_role'] ) ) : ?><div class="plan__img-info"><?php if ( '' !== trim( $data['plan_person_name'] ) ) : ?><p class="plan__img-name"><?php echo esc_html( $data['plan_person_name'] ); ?></p><?php endif; ?><?php if ( '' !== trim( $data['plan_person_role'] ) ) : ?><p class="plan__img-text"><?php echo dicey_kses_inline( $data['plan_person_role'] ); ?></p><?php endif; ?></div><?php endif; ?>
+					</div>
+					<div class="plan__wr">
+						<?php if ( '' !== trim( $data['plan_title'] ) ) : ?><h2 class="plan__title"><?php echo dicey_kses_inline( $data['plan_title'] ); ?></h2><?php endif; ?>
+						<?php if ( '' !== trim( $data['plan_subtitle'] ) ) : ?><p class="plan__subname"><?php echo dicey_kses_inline( $data['plan_subtitle'] ); ?></p><?php endif; ?>
+						<?php if ( '' !== trim( $data['plan_text'] ) ) : ?><p class="plan__text"><?php echo dicey_kses_inline( $data['plan_text'] ); ?></p><?php endif; ?>
+						<?php if ( $certificates ) : ?><div class="plan__imgs">
+							<?php foreach ( $certificates as $certificate ) : ?>
+								<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
+							<?php endforeach; ?>
+						</div><?php endif; ?>
+						<?php if ( '' !== trim( $data['plan_link_label'] ) ) : ?><a href="#" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a><?php endif; ?>
+					</div>
 				</div>
-			</div>
-		</section>
-		<section class="price">
-			<div class="container">
-				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['price_title'] ); ?></h2>
-				<div class="price__blocks">
-					<?php foreach ( $data['prices'] as $card ) : ?>
-						<div class="price__block"><div class="price__head"><h3 class="price__title"><?php echo dicey_kses_inline( $card['title'] ); ?></h3><p class="price__text"><?php echo dicey_kses_inline( $card['text'] ); ?></p></div><div class="price__info"><div class="price__list"><ul><?php foreach ( $card['items'] as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul></div><button class="price__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $card['button'] ); ?></button></div></div>
-					<?php endforeach; ?>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['advisory_title'] ) || $advisory_steps ) : ?>
+			<section class="advisory">
+				<div class="container">
+					<?php if ( '' !== trim( $data['advisory_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['advisory_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $advisory_steps ) : ?><div class="advisory__blocks">
+						<?php foreach ( $advisory_steps as $step ) : ?>
+							<div class="advisory__block"><span class="works__block-number"></span><?php if ( ! empty( $step['title'] ) || ! empty( $step['text'] ) || ! empty( $step['icon'] ) ) : ?><div class="advisory__info"><?php if ( ! empty( $step['title'] ) ) : ?><p class="advisory__name"><?php echo dicey_kses_inline( $step['title'] ); ?></p><?php endif; ?><?php if ( ! empty( $step['text'] ) ) : ?><p class="advisory__text"><?php echo dicey_kses_inline( $step['text'] ); ?></p><?php endif; ?><?php if ( ! empty( $step['icon'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $step['icon'] ) ); ?>" alt="" class="advisory__icon"><?php endif; ?></div><?php endif; ?><?php if ( ! empty( $step['button'] ) ) : ?><button class="advisory__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $step['button'] ); ?></button><?php endif; ?></div>
+						<?php endforeach; ?>
+					</div><?php endif; ?>
 				</div>
-			</div>
-		</section>
-		<section class="questions2">
-			<div class="container">
-				<h2 class="popularity__title"><?php echo dicey_kses_inline( $data['faq_title'] ); ?></h2>
-				<div class="questions__blocks">
-					<?php foreach ( $data['faq_items'] as $item_index => $item ) : ?><div class="questions__block"><div class="questions__top"><p><?php echo esc_html( $item['question'] ); ?></p><?php echo dicey_faq_icon_svg(); ?></div><div class="questions__content" style="display: none;"><p><?php echo dicey_kses_inline( $item['answer'] ); ?></p></div></div><?php endforeach; ?>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['advantages_title'] ) || $advantages ) : ?>
+			<section class="advantages">
+				<div class="container">
+					<?php if ( '' !== trim( $data['advantages_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['advantages_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $advantages ) : ?><div class="advantages__blocks">
+						<?php foreach ( $advantages as $item ) : ?><div class="advantages__block"><?php if ( ! empty( $item['image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $item['image'] ) ); ?>" alt="" class="advantages__img"><?php endif; ?><?php if ( ! empty( $item['title'] ) ) : ?><p class="advantages__name"><?php echo dicey_kses_inline( $item['title'] ); ?></p><?php endif; ?></div><?php endforeach; ?>
+					</div><?php endif; ?>
 				</div>
-			</div>
-		</section>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['price_title'] ) || $prices ) : ?>
+			<section class="price">
+				<div class="container">
+					<?php if ( '' !== trim( $data['price_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['price_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $prices ) : ?><div class="price__blocks">
+						<?php foreach ( $prices as $card ) : ?>
+							<?php $items = dicey_non_empty_items( isset( $card['items'] ) ? $card['items'] : array() ); ?>
+							<div class="price__block"><?php if ( ! empty( $card['title'] ) || ! empty( $card['text'] ) ) : ?><div class="price__head"><?php if ( ! empty( $card['title'] ) ) : ?><h3 class="price__title"><?php echo dicey_kses_inline( $card['title'] ); ?></h3><?php endif; ?><?php if ( ! empty( $card['text'] ) ) : ?><p class="price__text"><?php echo dicey_kses_inline( $card['text'] ); ?></p><?php endif; ?></div><?php endif; ?><?php if ( $items || ! empty( $card['button'] ) ) : ?><div class="price__info"><?php if ( $items ) : ?><div class="price__list"><ul><?php foreach ( $items as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul></div><?php endif; ?><?php if ( ! empty( $card['button'] ) ) : ?><button class="price__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $card['button'] ); ?></button><?php endif; ?></div><?php endif; ?></div>
+						<?php endforeach; ?>
+					</div><?php endif; ?>
+				</div>
+			</section>
+		<?php endif; ?>
+		<?php if ( '' !== trim( $data['faq_title'] ) || $faq_items ) : ?>
+			<section class="questions2">
+				<div class="container">
+					<?php if ( '' !== trim( $data['faq_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['faq_title'] ); ?></h2><?php endif; ?>
+					<?php if ( $faq_items ) : ?><div class="questions__blocks">
+						<?php foreach ( $faq_items as $item ) : ?><div class="questions__block"><div class="questions__top"><?php if ( ! empty( $item['question'] ) ) : ?><p><?php echo esc_html( $item['question'] ); ?></p><?php endif; ?><?php echo dicey_faq_icon_svg(); ?></div><?php if ( ! empty( $item['answer'] ) ) : ?><div class="questions__content" style="display: none;"><p><?php echo dicey_kses_inline( $item['answer'] ); ?></p></div><?php endif; ?></div><?php endforeach; ?>
+					</div><?php endif; ?>
+				</div>
+			</section>
+		<?php endif; ?>
 	</main>
 	<?php
 	return ob_get_clean();
