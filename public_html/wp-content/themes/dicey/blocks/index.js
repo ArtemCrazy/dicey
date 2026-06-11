@@ -66,6 +66,62 @@
 			text: 'Для щенков, беременных/кормящих собак, для питомцев с избыточной/недостаточной массой тела, для питомцев с заболеванием (ЖКТ заболевания, болезнь почек, мочекаменная болезнь, пищевая аллергия и т.д).',
 			button_label: 'начать',
 		},
+		'dietology': {
+			hero_title: 'Правильное питание',
+			hero_accent: '- основа здоровья собаки',
+			hero_text: 'Подберем и приготовим рацион с учётом возраста, породы и состояния здоровья вашего питомца',
+			hero_button_label: 'получить консультацию',
+			hero_mobile_label: 'Выбрать рацион',
+			consult_title: 'Вам нужна консультация если у Вас:',
+			consult_items: [
+				{ icon: 'imgs/bg/consultation__img1.svg', text: 'Щенок' },
+				{ icon: 'imgs/bg/consultation__img2.svg', text: 'Беременная или лактирующая собака' },
+				{ icon: 'imgs/bg/consultation__img3.svg', text: 'Питомец с лишним или недостаточным весом' },
+				{ icon: 'imgs/bg/consultation__img4.svg', text: 'У собаки есть заболевания' },
+				{ icon: 'imgs/bg/consultation__img5.svg', icon_mobile: 'imgs/bg/consultation__img7.svg', text: 'Собака с пищевой аллергия или непереносимостью' },
+				{ icon: 'imgs/bg/consultation__img6.svg', text: 'Ваш хвостик привередлив в еде' },
+			],
+			plan_person_name: 'Босунова Наталья',
+			plan_person_role: 'Главный ветеринар-диетолог <br> компании',
+			plan_title: 'Составление рациона питания',
+			plan_subtitle: 'ветеринарным врачом-диетологом',
+			plan_text: 'Поможем разобраться в рационе и подобрать питание с учётом особенностей собаки. Рекомендации подходят для ежедневного кормления и легко применяются на практике',
+			plan_link_label: 'Смотреть все сертификаты',
+			advisory_title: 'Как проходит консультация',
+			advisory_steps: [
+				{ title: 'Заполняете заявку и оплачиваете консультацию', text: 'Оставляете контактные данные, <br> чтобы мы могли связаться с вами', button: 'Получить консультацию' },
+				{ title: 'Заполняете анкету о вашей собаке', text: 'После оплаты вы получаете на почту короткую анкету (3-5 минут). После её заполнения мы свяжемся с вами и согласуем время онлайн-консультации с диетологом', icon: 'imgs/icons/advisory__icon.svg' },
+				{ title: 'Диетолог проводит консультацию', text: 'Изучаем особенности вашей собаки, отвечаем на вопросы и уточняетм все особенности питания собаки', icon: 'imgs/icons/advisory__icon2.svg' },
+				{ title: 'Мы составляем рацион', text: 'Составляем подходящее меню по результатам консультации', icon: 'imgs/icons/advisory__icon3.svg' },
+				{ title: 'Передаём план питания', text: 'и при необходимости оформляем доставку', icon: 'imgs/icons/advisory__icon4.svg' },
+			],
+			advantages_title: 'Что вы получите после <br> консультации',
+			advantages: [
+				{ image: 'imgs/bg/advantages__img1.png', title: 'Понятный <br> план питания' },
+				{ image: 'imgs/bg/advantages__img.png', title: 'Подходящий <br> рацион' },
+				{ image: 'imgs/bg/advantages__img3.svg', title: 'Рекомендации <br> по кормлению' },
+				{ image: 'imgs/bg/advantages__img4.png', title: 'Уверенность <br> в выборе питания' },
+			],
+			price_title: 'Стоимость консультаций',
+			prices: [
+				{ title: 'Консультация ветеринарного врача диетолога/гастроэнтеролога', text: 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 1500 руб.', items: [ 'Ответы на вопросы', 'Разбор анализов и дополнительных исследований', 'Рекомендации по лечению' ], button: 'Заказать консультацию и подобрать рацион' },
+				{ title: 'Подбор рациона для здорового питомца', text: 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 3000 руб.', items: [ 'Составление индивидуального рациона питания', 'Ответы на вопросы по рациону', 'Рекомендации по лечению' ], button: 'Заказать консультацию и подобрать рацион' },
+				{ title: 'Подбор рациона для питомца с заболеванием', text: 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 3500 руб.', items: [ 'Индивидуальное составление рациона питания при заболевании', 'Ответы на вопросы по рациону', 'Рекомендации по кормлению' ], button: 'Заказать консультацию и подобрать рацион' },
+				{ title: 'Ведение', text: 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 2500 руб.', items: [ 'Необходимо для питомцев с заболеваниями, чтобы контролировать состояние питомца и по необходимости корректировать лечение', 'Ответы на вопросы по рациону', 'Рекомендации по кормлению' ], button: 'Заказать консультацию и подобрать рацион' },
+			],
+			faq_title: 'часто задаваемые вопросы',
+			faq_items: [
+				{ question: 'Что входит в консультацию?', answer: '' },
+				{ question: 'Кто проводит консультацию?', answer: '' },
+				{ question: 'Консультация проходит онлайн или офлайн?', answer: '' },
+				{ question: 'Можно задать любые вопросы по питанию?', answer: '' },
+				{ question: 'Вы подбираете рацион под мою собаку?', answer: '' },
+				{ question: 'Можно ли перейти с сухого корма?', answer: '' },
+				{ question: 'Это питание на каждый день?', answer: '' },
+				{ question: 'Можно кормить данными рационами если у моей собаки пищевая аллергия или чувствительное пищеварение?', answer: '' },
+				{ question: 'Подойдет ли рацион моему питомцу?', answer: '' },
+			],
+		},
 		'shipping': {
 			title: 'Бесплатная доставка',
 			tabs: [
@@ -104,6 +160,11 @@
 		'Это полностью заменяет сухой корм?',
 		'Как перейти с сухого корма на натуральное питание?',
 	];
+
+	defaults.dietology.faq_items = defaults.dietology.faq_items.map( function ( item ) {
+		item.answer = item.answer || defaultAnswer;
+		return item;
+	} );
 
 	defaults['home-questions'].tabs = defaults['home-questions'].tabs.map( function ( tab ) {
 		tab.items = defaultQuestions.map( function ( question ) {
@@ -486,6 +547,214 @@
 		], true, isFirstDiceyBlock( props ) );
 	}
 
+	function dietologyEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var consultItems = arr( attrs, 'dietology', 'consult_items' );
+		var advisorySteps = arr( attrs, 'dietology', 'advisory_steps' );
+		var advantages = arr( attrs, 'dietology', 'advantages' );
+		var prices = arr( attrs, 'dietology', 'prices' );
+		var faqItems = arr( attrs, 'dietology', 'faq_items' );
+
+		function setConsultItem( index, value ) {
+			setArrayItem( consultItems, setAttributes, 'consult_items', index, 'text', value );
+		}
+
+		function setAdvisoryStep( index, key, value ) {
+			setArrayItem( advisorySteps, setAttributes, 'advisory_steps', index, key, value );
+		}
+
+		function setAdvantage( index, value ) {
+			setArrayItem( advantages, setAttributes, 'advantages', index, 'title', value );
+		}
+
+		function setPrice( index, key, value ) {
+			setArrayItem( prices, setAttributes, 'prices', index, key, value );
+		}
+
+		function setPriceItem( index, itemIndex, value ) {
+			setNestedArrayItem( prices, setAttributes, 'prices', index, 'items', itemIndex, value );
+		}
+
+		function setFaq( index, key, value ) {
+			setArrayItem( faqItems, setAttributes, 'faq_items', index, key, value );
+		}
+
+		return box( 'Диетология', [
+			panel( 'Главный экран', [
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'dietology', 'hero_title' ),
+					onChange: function ( value ) { setAttributes( { hero_title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Выделенная часть заголовка',
+					value: val( attrs, 'dietology', 'hero_accent' ),
+					onChange: function ( value ) { setAttributes( { hero_accent: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'dietology', 'hero_text' ),
+					onChange: function ( value ) { setAttributes( { hero_text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'dietology', 'hero_button_label' ),
+					onChange: function ( value ) { setAttributes( { hero_button_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст кнопки на мобильной версии',
+					value: val( attrs, 'dietology', 'hero_mobile_label' ),
+					onChange: function ( value ) { setAttributes( { hero_mobile_label: value } ); },
+				} ),
+			], true ),
+			panel( 'Вам нужна консультация если у Вас', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'dietology', 'consult_title' ),
+					onChange: function ( value ) { setAttributes( { consult_title: value } ); },
+				} ),
+				consultItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Карточка', index, item.text ), [
+						el( TextareaControl, {
+							label: 'Текст карточки',
+							value: item.text,
+							onChange: function ( value ) { setConsultItem( index, value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			panel( 'Составление рациона питания', [
+				el( TextControl, {
+					label: 'Имя специалиста',
+					value: val( attrs, 'dietology', 'plan_person_name' ),
+					onChange: function ( value ) { setAttributes( { plan_person_name: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Должность специалиста',
+					value: val( attrs, 'dietology', 'plan_person_role' ),
+					onChange: function ( value ) { setAttributes( { plan_person_role: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'dietology', 'plan_title' ),
+					onChange: function ( value ) { setAttributes( { plan_title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Подзаголовок',
+					value: val( attrs, 'dietology', 'plan_subtitle' ),
+					onChange: function ( value ) { setAttributes( { plan_subtitle: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'dietology', 'plan_text' ),
+					onChange: function ( value ) { setAttributes( { plan_text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст ссылки на сертификаты',
+					value: val( attrs, 'dietology', 'plan_link_label' ),
+					onChange: function ( value ) { setAttributes( { plan_link_label: value } ); },
+				} ),
+			], false ),
+			panel( 'Как проходит консультация', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'dietology', 'advisory_title' ),
+					onChange: function ( value ) { setAttributes( { advisory_title: value } ); },
+				} ),
+				advisorySteps.map( function ( step, index ) {
+					return panel( panelTitle( 'Шаг', index, step.title ), [
+						el( TextControl, {
+							label: 'Заголовок шага',
+							value: step.title,
+							onChange: function ( value ) { setAdvisoryStep( index, 'title', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Текст шага',
+							value: step.text,
+							onChange: function ( value ) { setAdvisoryStep( index, 'text', value ); },
+						} ),
+						el( TextControl, {
+							label: 'Текст кнопки',
+							value: step.button || '',
+							onChange: function ( value ) { setAdvisoryStep( index, 'button', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			panel( 'Что вы получите после консультации', [
+				el( TextareaControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'dietology', 'advantages_title' ),
+					onChange: function ( value ) { setAttributes( { advantages_title: value } ); },
+				} ),
+				advantages.map( function ( item, index ) {
+					return panel( panelTitle( 'Пункт', index, item.title ), [
+						el( TextareaControl, {
+							label: 'Текст пункта',
+							value: item.title,
+							onChange: function ( value ) { setAdvantage( index, value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			panel( 'Стоимость консультаций', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'dietology', 'price_title' ),
+					onChange: function ( value ) { setAttributes( { price_title: value } ); },
+				} ),
+				prices.map( function ( price, index ) {
+					return panel( panelTitle( 'Карточка', index, price.title ), [
+						el( TextControl, {
+							label: 'Название консультации',
+							value: price.title,
+							onChange: function ( value ) { setPrice( index, 'title', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Описание',
+							value: price.text,
+							onChange: function ( value ) { setPrice( index, 'text', value ); },
+						} ),
+						price.items.map( function ( item, itemIndex ) {
+							return el( TextareaControl, {
+								label: 'Пункт ' + ( itemIndex + 1 ),
+								value: item,
+								onChange: function ( value ) { setPriceItem( index, itemIndex, value ); },
+							} );
+						} ),
+						el( TextControl, {
+							label: 'Текст кнопки',
+							value: price.button,
+							onChange: function ( value ) { setPrice( index, 'button', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			panel( 'Часто задаваемые вопросы', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'dietology', 'faq_title' ),
+					onChange: function ( value ) { setAttributes( { faq_title: value } ); },
+				} ),
+				faqItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Вопрос', index, item.question ), [
+						el( TextControl, {
+							label: 'Вопрос',
+							value: item.question,
+							onChange: function ( value ) { setFaq( index, 'question', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Ответ',
+							value: item.answer,
+							onChange: function ( value ) { setFaq( index, 'answer', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
 	function shippingEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
@@ -712,6 +981,34 @@
 				button_label: { type: 'string' },
 			},
 			edit: planEdit,
+		},
+		'dicey/dietology': {
+			title: __( 'Диетология', 'dicey' ),
+			icon: 'heart',
+			attributes: {
+				hero_title: { type: 'string' },
+				hero_accent: { type: 'string' },
+				hero_text: { type: 'string' },
+				hero_button_label: { type: 'string' },
+				hero_mobile_label: { type: 'string' },
+				consult_title: { type: 'string' },
+				consult_items: { type: 'array', default: defaults.dietology.consult_items },
+				plan_person_name: { type: 'string' },
+				plan_person_role: { type: 'string' },
+				plan_title: { type: 'string' },
+				plan_subtitle: { type: 'string' },
+				plan_text: { type: 'string' },
+				plan_link_label: { type: 'string' },
+				advisory_title: { type: 'string' },
+				advisory_steps: { type: 'array', default: defaults.dietology.advisory_steps },
+				advantages_title: { type: 'string' },
+				advantages: { type: 'array', default: defaults.dietology.advantages },
+				price_title: { type: 'string' },
+				prices: { type: 'array', default: defaults.dietology.prices },
+				faq_title: { type: 'string' },
+				faq_items: { type: 'array', default: defaults.dietology.faq_items },
+			},
+			edit: dietologyEdit,
 		},
 		'dicey/shipping': {
 			title: __( 'Бесплатная доставка', 'dicey' ),
