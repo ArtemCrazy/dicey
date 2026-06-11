@@ -27,6 +27,8 @@ function dicey_rewrite_legacy_html( $html ) {
 		'href="/#'           => 'href="' . esc_url( home_url( '/#' ) ),
 		"href='/#"           => "href='" . esc_url( home_url( '/#' ) ),
 		'href="/"'           => 'href="' . esc_url( home_url( '/' ) ) . '"',
+		'href="index.php"'   => 'href="' . esc_url( home_url( '/' ) ) . '"',
+		"href='index.php'"   => "href='" . esc_url( home_url( '/' ) ) . "'",
 		'href="/index.php"'  => 'href="' . esc_url( home_url( '/' ) ) . '"',
 		'href="/shop.php"'   => 'href="' . esc_url( home_url( '/shop/' ) ) . '"',
 		'href="/about.php"'  => 'href="' . esc_url( home_url( '/about/' ) ) . '"',
