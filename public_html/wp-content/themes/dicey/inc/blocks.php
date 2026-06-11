@@ -261,6 +261,25 @@ function dicey_register_blocks() {
 				),
 			),
 		),
+		'contacts-page' => array(
+			'title'    => __( 'Контакты', 'dicey' ),
+			'template' => 'template-parts/static/contacts',
+			'callback' => 'dicey_render_contacts_page',
+			'attributes' => array(
+				'hero_title' => array( 'type' => 'string' ),
+				'hero_image' => array( 'type' => 'string' ),
+				'apply_title' => array( 'type' => 'string' ),
+				'apply_items' => array(
+					'type' => 'array',
+					'default' => dicey_contacts_defaults()['apply_items'],
+				),
+				'contact_items' => array(
+					'type' => 'array',
+					'default' => dicey_contacts_defaults()['contact_items'],
+				),
+				'company_info' => array( 'type' => 'string' ),
+			),
+		),
 		'works'       => array(
 			'title'    => __( 'Шаги оформления заказа', 'dicey' ),
 			'template' => 'template-parts/blocks/works',

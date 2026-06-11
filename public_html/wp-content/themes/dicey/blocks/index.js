@@ -201,6 +201,23 @@
 				{ question: 'На сколько дней хватает набора?', answer: '' },
 			],
 		},
+		'contacts-page': {
+			hero_title: 'Контакты',
+			hero_image: 'imgs/bg/about-banner___img2.png',
+			apply_title: 'по каким вопросам к нам <br> можно обратиться?',
+			apply_items: [
+				{ icon: 'imgs/icons/apply__icon1.svg', text: 'Подбор рациона' },
+				{ icon: 'imgs/icons/apply__icon2.svg', text: 'Вопросы по заказу' },
+				{ icon: 'imgs/icons/apply__icon3.svg', text: 'Уточнение доставки' },
+				{ icon: 'imgs/icons/apply__icon4.svg', text: 'Консультация диетолога' },
+			],
+			contact_items: [
+				{ icon: 'imgs/icons/contacts__icon1.svg', label: '+1 (555) 000-0000', url: 'tel:+15550000000' },
+				{ icon: 'imgs/icons/contacts__icon2.svg', label: 'info@mail.ru', url: 'mailto:info@mail.ru' },
+				{ icon: 'imgs/icons/contacts__icon3.svg', label: '+1 (555) 000-0000', url: 'tel:+15550000000' },
+			],
+			company_info: 'ООО «ДАЙСИ», 192171, город Санкт-Петербург, ул Седова, д.. 70 литера. А <br> ОГРН 1267800025283 / ИНН 7811815173 / КПП 781101001',
+		},
 		'shipping': {
 			title: 'Бесплатная доставка',
 			tabs: [
@@ -1222,6 +1239,71 @@
 		] );
 	}
 
+	function contactsPageEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var applyItems = arr( attrs, 'contacts-page', 'apply_items' );
+		var contactItems = arr( attrs, 'contacts-page', 'contact_items' );
+
+		function setApplyItem( index, key, value ) {
+			setArrayItem( applyItems, setAttributes, 'apply_items', index, key, value );
+		}
+
+		function setContactItem( index, key, value ) {
+			setArrayItem( contactItems, setAttributes, 'contact_items', index, key, value );
+		}
+
+		return el( element.Fragment, null, [
+			box( 'Главный экран', [
+				imageControl( 'Изображение', val( attrs, 'contacts-page', 'hero_image' ), function ( value ) { setAttributes( { hero_image: value } ); } ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'contacts-page', 'hero_title' ),
+					onChange: function ( value ) { setAttributes( { hero_title: value } ); },
+				} ),
+			], true, isFirstDiceyBlock( props ) ),
+			box( 'По каким вопросам к нам можно обратиться', [
+				el( TextareaControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'contacts-page', 'apply_title' ),
+					onChange: function ( value ) { setAttributes( { apply_title: value } ); },
+				} ),
+				applyItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Пункт', index, item.text ), [
+						imageControl( 'Иконка', item.icon, function ( value ) { setApplyItem( index, 'icon', value ); } ),
+						el( TextareaControl, {
+							label: 'Текст пункта',
+							value: item.text,
+							onChange: function ( value ) { setApplyItem( index, 'text', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			box( 'Контактные данные', [
+				contactItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Контакт', index, item.label ), [
+						imageControl( 'Иконка', item.icon, function ( value ) { setContactItem( index, 'icon', value ); } ),
+						el( TextControl, {
+							label: 'Текст ссылки',
+							value: item.label,
+							onChange: function ( value ) { setContactItem( index, 'label', value ); },
+						} ),
+						el( TextControl, {
+							label: 'URL ссылки',
+							value: item.url,
+							onChange: function ( value ) { setContactItem( index, 'url', value ); },
+						} ),
+					], false );
+				} ),
+				el( TextareaControl, {
+					label: 'Юридическая информация',
+					value: val( attrs, 'contacts-page', 'company_info' ),
+					onChange: function ( value ) { setAttributes( { company_info: value } ); },
+				} ),
+			], false ),
+		] );
+	}
+
 	function shippingEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
@@ -1512,6 +1594,19 @@
 				faq_items: { type: 'array', default: defaults['delivery-page'].faq_items },
 			},
 			edit: deliveryPageEdit,
+		},
+		'dicey/contacts-page': {
+			title: __( 'Контакты', 'dicey' ),
+			icon: 'phone',
+			attributes: {
+				hero_title: { type: 'string' },
+				hero_image: { type: 'string' },
+				apply_title: { type: 'string' },
+				apply_items: { type: 'array', default: defaults['contacts-page'].apply_items },
+				contact_items: { type: 'array', default: defaults['contacts-page'].contact_items },
+				company_info: { type: 'string' },
+			},
+			edit: contactsPageEdit,
 		},
 		'dicey/shipping': {
 			title: __( 'Бесплатная доставка', 'dicey' ),

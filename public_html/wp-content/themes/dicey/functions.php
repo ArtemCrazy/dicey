@@ -19,6 +19,7 @@ require DICEY_THEME_DIR . '/inc/home-block-renderers.php';
 require DICEY_THEME_DIR . '/inc/dietology-renderers.php';
 require DICEY_THEME_DIR . '/inc/about-renderers.php';
 require DICEY_THEME_DIR . '/inc/delivery-renderers.php';
+require DICEY_THEME_DIR . '/inc/contacts-renderers.php';
 require DICEY_THEME_DIR . '/inc/settings.php';
 require DICEY_THEME_DIR . '/inc/assets.php';
 require DICEY_THEME_DIR . '/inc/blocks.php';
