@@ -65,10 +65,6 @@ function dicey_register_blocks() {
 				),
 			),
 		),
-		'home-popularity' => array(
-			'title'    => __( 'Заказывают чаще всего', 'dicey' ),
-			'template' => 'template-parts/blocks/home-popularity',
-		),
 		'home-delivery' => array(
 			'title'    => __( 'Регулярные доставки рациона', 'dicey' ),
 			'template' => 'template-parts/blocks/home-delivery',

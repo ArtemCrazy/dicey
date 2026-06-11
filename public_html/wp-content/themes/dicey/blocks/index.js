@@ -773,7 +773,6 @@
 
 	[
 		[ 'dicey/home-legacy', __( 'Домашняя страница', 'dicey' ), 'layout' ],
-		[ 'dicey/home-popularity', __( 'Заказывают чаще всего', 'dicey' ), 'products' ],
 		[ 'dicey/works', __( 'Шаги оформления заказа', 'dicey' ), 'list-view' ],
 	].forEach( function ( block ) {
 		blocks.registerBlockType( block[0], {
