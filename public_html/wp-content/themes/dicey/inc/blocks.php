@@ -39,7 +39,8 @@ function dicey_register_blocks() {
 		'dicey-blocks-editor',
 		'diceyBlocks',
 		array(
-			'assetsUrl' => DICEY_ASSETS_URI,
+			'assetsUrl'   => DICEY_ASSETS_URI,
+			'settingsUrl' => admin_url( 'admin.php?page=dicey-settings' ),
 		)
 	);
 

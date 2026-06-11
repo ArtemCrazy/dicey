@@ -917,25 +917,13 @@
 	}
 
 	function whyEdit( props ) {
-		var attrs = props.attributes;
-		var setAttributes = props.setAttributes;
-
 		return box( 'Остались вопросы по питанию?', [
-			el( TextareaControl, {
-				label: 'Заголовок',
-				value: val( attrs, 'why', 'title' ),
-				onChange: function ( value ) { setAttributes( { title: value } ); },
-			} ),
-			el( TextareaControl, {
-				label: 'Текст',
-				value: val( attrs, 'why', 'text' ),
-				onChange: function ( value ) { setAttributes( { text: value } ); },
-			} ),
-			el( TextControl, {
-				label: 'Текст кнопки',
-				value: val( attrs, 'why', 'button_label' ),
-				onChange: function ( value ) { setAttributes( { button_label: value } ); },
-			} ),
+			el( 'p', { style: { margin: '0 0 8px', color: '#1d2327' } }, 'Глобальный блок. Текст, кнопку и изображения нужно менять один раз в разделе админки «Дайси».' ),
+			el( 'a', {
+				href: window.diceyBlocks && window.diceyBlocks.settingsUrl ? window.diceyBlocks.settingsUrl : '#',
+				target: '_blank',
+				rel: 'noreferrer',
+			}, 'Открыть глобальные настройки' ),
 		], true, isFirstDiceyBlock( props ) );
 	}
 

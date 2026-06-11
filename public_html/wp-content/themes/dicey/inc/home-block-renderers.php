@@ -563,7 +563,7 @@ function dicey_render_sale( $attrs = array() ) {
 }
 
 function dicey_render_why( $attrs = array() ) {
-	$data = dicey_merge_block_attrs( $attrs, dicey_why_defaults() );
+	$data = function_exists( 'dicey_get_global_why_settings' ) ? dicey_get_global_why_settings() : dicey_merge_block_attrs( $attrs, dicey_why_defaults() );
 	ob_start();
 	?>
 	<section class="why">

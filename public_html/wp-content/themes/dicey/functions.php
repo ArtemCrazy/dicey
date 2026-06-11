@@ -17,6 +17,7 @@ define( 'DICEY_VERSION', '0.1.0' );
 require DICEY_THEME_DIR . '/inc/helpers.php';
 require DICEY_THEME_DIR . '/inc/home-block-renderers.php';
 require DICEY_THEME_DIR . '/inc/dietology-renderers.php';
+require DICEY_THEME_DIR . '/inc/settings.php';
 require DICEY_THEME_DIR . '/inc/assets.php';
 require DICEY_THEME_DIR . '/inc/blocks.php';
 
