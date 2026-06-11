@@ -1129,7 +1129,7 @@
 
 	function whyEdit( props ) {
 		return box( 'Остались вопросы по питанию?', [
-			el( 'p', { style: { margin: '0 0 8px', color: '#1d2327' } }, 'Глобальный блок. Текст, кнопку и изображения нужно менять один раз в разделе админки «Дайси».' ),
+			el( 'p', { style: { margin: '0 0 8px', color: '#1d2327' } }, 'Глобальный блок. Текст, кнопку и изображения нужно менять один раз в разделе админки «Остались вопросы».' ),
 			el( 'a', {
 				href: window.diceyBlocks && window.diceyBlocks.settingsUrl ? window.diceyBlocks.settingsUrl : '#',
 				target: '_blank',

@@ -20,8 +20,8 @@ function dicey_get_global_why_settings() {
 
 function dicey_register_settings_page() {
 	add_menu_page(
-		__( 'Дайси', 'dicey' ),
-		__( 'Дайси', 'dicey' ),
+		__( 'Остались вопросы', 'dicey' ),
+		__( 'Остались вопросы', 'dicey' ),
 		'manage_options',
 		'dicey-settings',
 		'dicey_render_settings_page',
@@ -65,7 +65,7 @@ function dicey_render_settings_page() {
 	$settings = dicey_get_global_why_settings();
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Дайси', 'dicey' ); ?></h1>
+		<h1><?php esc_html_e( 'Остались вопросы', 'dicey' ); ?></h1>
 		<form method="post">
 			<?php wp_nonce_field( 'dicey_save_global_why', 'dicey_global_why_nonce' ); ?>
 			<div class="postbox" style="max-width: 920px; padding: 20px;">
