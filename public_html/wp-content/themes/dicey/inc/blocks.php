@@ -159,10 +159,15 @@ function dicey_register_blocks() {
 				),
 				'plan_person_name' => array( 'type' => 'string' ),
 				'plan_person_role' => array( 'type' => 'string' ),
+				'plan_person_image' => array( 'type' => 'string' ),
 				'plan_title' => array( 'type' => 'string' ),
 				'plan_subtitle' => array( 'type' => 'string' ),
 				'plan_text' => array( 'type' => 'string' ),
 				'plan_link_label' => array( 'type' => 'string' ),
+				'plan_certificates' => array(
+					'type' => 'array',
+					'default' => dicey_dietology_defaults()['plan_certificates'],
+				),
 				'advisory_title' => array( 'type' => 'string' ),
 				'advisory_steps' => array(
 					'type' => 'array',

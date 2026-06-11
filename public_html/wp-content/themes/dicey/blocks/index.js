@@ -86,10 +86,15 @@
 			],
 			plan_person_name: 'Босунова Наталья',
 			plan_person_role: 'Главный ветеринар-диетолог <br> компании',
+			plan_person_image: 'imgs/bg/plan__img2.png',
 			plan_title: 'Составление рациона питания',
 			plan_subtitle: 'ветеринарным врачом-диетологом',
 			plan_text: 'Поможем разобраться в рационе и подобрать питание с учётом особенностей собаки. Рекомендации подходят для ежедневного кормления и легко применяются на практике',
 			plan_link_label: 'Смотреть все сертификаты',
+			plan_certificates: [
+				{ image: 'imgs/bg/plan__img1.png' },
+				{ image: 'imgs/bg/plan__img3.png' },
+			],
 			advisory_title: 'Как проходит консультация',
 			advisory_steps: [
 				{ title: 'Заполняете заявку и оплачиваете консультацию', text: 'Оставляете контактные данные, <br> чтобы мы могли связаться с вами', button: 'Получить консультацию' },
@@ -610,6 +615,7 @@
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
 		var consultItems = arr( attrs, 'dietology', 'consult_items' );
+		var planCertificates = arr( attrs, 'dietology', 'plan_certificates' );
 		var advisorySteps = arr( attrs, 'dietology', 'advisory_steps' );
 		var advantages = arr( attrs, 'dietology', 'advantages' );
 		var prices = arr( attrs, 'dietology', 'prices' );
@@ -621,6 +627,10 @@
 
 		function setConsultImage( index, key, value ) {
 			setArrayItem( consultItems, setAttributes, 'consult_items', index, key, value );
+		}
+
+		function setPlanCertificate( index, value ) {
+			setArrayItem( planCertificates, setAttributes, 'plan_certificates', index, 'image', value );
 		}
 
 		function setAdvisoryStep( index, key, value ) {
@@ -690,6 +700,7 @@
 				} ),
 			], false ),
 			box( 'Составление рациона питания', [
+				imageControl( 'Фото Натальи', val( attrs, 'dietology', 'plan_person_image' ), function ( value ) { setAttributes( { plan_person_image: value } ); } ),
 				el( TextControl, {
 					label: 'Имя специалиста',
 					value: val( attrs, 'dietology', 'plan_person_name' ),
@@ -719,6 +730,9 @@
 					label: 'Текст ссылки на сертификаты',
 					value: val( attrs, 'dietology', 'plan_link_label' ),
 					onChange: function ( value ) { setAttributes( { plan_link_label: value } ); },
+				} ),
+				planCertificates.map( function ( certificate, index ) {
+					return imageControl( 'Сертификат ' + ( index + 1 ), certificate.image, function ( value ) { setPlanCertificate( index, value ); } );
 				} ),
 			], false ),
 			box( 'Как проходит консультация', [
@@ -1060,10 +1074,12 @@
 				consult_items: { type: 'array', default: defaults.dietology.consult_items },
 				plan_person_name: { type: 'string' },
 				plan_person_role: { type: 'string' },
+				plan_person_image: { type: 'string' },
 				plan_title: { type: 'string' },
 				plan_subtitle: { type: 'string' },
 				plan_text: { type: 'string' },
 				plan_link_label: { type: 'string' },
+				plan_certificates: { type: 'array', default: defaults.dietology.plan_certificates },
 				advisory_title: { type: 'string' },
 				advisory_steps: { type: 'array', default: defaults.dietology.advisory_steps },
 				advantages_title: { type: 'string' },

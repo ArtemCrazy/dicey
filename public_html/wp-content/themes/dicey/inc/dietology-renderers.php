@@ -29,10 +29,15 @@ function dicey_dietology_defaults() {
 		),
 		'plan_person_name'  => 'Босунова Наталья',
 		'plan_person_role'  => 'Главный ветеринар-диетолог <br> компании',
+		'plan_person_image' => 'imgs/bg/plan__img2.png',
 		'plan_title'        => 'Составление рациона питания',
 		'plan_subtitle'     => 'ветеринарным врачом-диетологом',
 		'plan_text'         => 'Поможем разобраться в рационе и подобрать питание с учётом особенностей собаки. Рекомендации подходят для ежедневного кормления и легко применяются на практике',
 		'plan_link_label'   => 'Смотреть все сертификаты',
+		'plan_certificates' => array(
+			array( 'image' => 'imgs/bg/plan__img1.png' ),
+			array( 'image' => 'imgs/bg/plan__img3.png' ),
+		),
 		'advisory_title'    => 'Как проходит консультация',
 		'advisory_steps'    => array(
 			array( 'title' => 'Заполняете заявку и оплачиваете консультацию', 'text' => 'Оставляете контактные данные, <br> чтобы мы могли связаться с вами', 'button' => 'Получить консультацию' ),
@@ -104,7 +109,7 @@ function dicey_render_dietology( $attrs = array() ) {
 		<section class="plan plan2">
 			<div class="container">
 				<div class="plan__img-wr">
-					<img src="<?php echo esc_url( dicey_asset_img( 'imgs/bg/plan__img2.png' ) ); ?>" alt="" class="plan__img-people">
+					<?php if ( ! empty( $data['plan_person_image'] ) ) : ?><img src="<?php echo esc_url( dicey_asset_img( $data['plan_person_image'] ) ); ?>" alt="" class="plan__img-people"><?php endif; ?>
 					<div class="plan__img-shadow"></div>
 					<div class="plan__img-info"><p class="plan__img-name"><?php echo esc_html( $data['plan_person_name'] ); ?></p><p class="plan__img-text"><?php echo dicey_kses_inline( $data['plan_person_role'] ); ?></p></div>
 				</div>
@@ -113,8 +118,9 @@ function dicey_render_dietology( $attrs = array() ) {
 					<p class="plan__subname"><?php echo dicey_kses_inline( $data['plan_subtitle'] ); ?></p>
 					<p class="plan__text"><?php echo dicey_kses_inline( $data['plan_text'] ); ?></p>
 					<div class="plan__imgs">
-						<a href="<?php echo esc_url( dicey_asset_img( 'imgs/bg/plan__img1.png' ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( 'imgs/bg/plan__img1.png' ) ); ?>" alt=""></a>
-						<a href="<?php echo esc_url( dicey_asset_img( 'imgs/bg/plan__img3.png' ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( 'imgs/bg/plan__img3.png' ) ); ?>" alt=""></a>
+						<?php foreach ( $data['plan_certificates'] as $certificate ) : ?>
+							<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
+						<?php endforeach; ?>
 					</div>
 					<a href="#" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a>
 				</div>
