@@ -1,6 +1,6 @@
 <?php
 /**
- * Legacy single product template.
+ * WooCommerce single product template.
  *
  * @package Dicey
  */

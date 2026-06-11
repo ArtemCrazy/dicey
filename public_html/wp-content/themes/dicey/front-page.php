@@ -14,12 +14,11 @@ if ( have_posts() ) :
 		if ( trim( get_the_content() ) ) {
 			the_content();
 		} else {
-			echo dicey_get_template_html( 'template-parts/pages/front-page' );
+			echo dicey_missing_content_notice( 'Главная страница' );
 		}
 	endwhile;
 else :
-	echo dicey_get_template_html( 'template-parts/pages/front-page' );
+	echo dicey_missing_content_notice( 'Главная страница' );
 endif;
 
 get_footer();
-

@@ -10,6 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function dicey_register_product_post_type() {
+	if ( post_type_exists( 'product' ) ) {
+		return;
+	}
+
 	$labels = array(
 		'name'               => 'Товары',
 		'singular_name'      => 'Товар',
@@ -47,6 +51,10 @@ function dicey_register_product_post_type() {
 
 add_action( 'init', 'dicey_register_product_post_type' );
 
+function dicey_product_post_type() {
+	return post_type_exists( 'product' ) ? 'product' : 'dicey_product';
+}
+
 function dicey_product_meta_defaults() {
 	return array(
 		'card_title'        => '',
@@ -78,7 +86,16 @@ function dicey_get_product_meta( $post_id ) {
 	$data     = array();
 
 	foreach ( $defaults as $key => $default ) {
-		$value        = get_post_meta( $post_id, '_dicey_product_' . $key, true );
+		$value = '';
+
+		if ( function_exists( 'carbon_get_post_meta' ) ) {
+			$value = carbon_get_post_meta( $post_id, 'dicey_product_' . $key );
+		}
+
+		if ( '' === $value || null === $value ) {
+			$value = get_post_meta( $post_id, '_dicey_product_' . $key, true );
+		}
+
 		$data[ $key ] = '' === $value ? $default : $value;
 	}
 
@@ -129,6 +146,23 @@ function dicey_product_title_for_card( $post_id ) {
 	return '' !== trim( $meta['card_title'] ) ? $meta['card_title'] : get_the_title( $post_id );
 }
 
+function dicey_product_price_for_card( $post_id, $meta = null ) {
+	$meta = null === $meta ? dicey_get_product_meta( $post_id ) : $meta;
+
+	if ( '' !== trim( $meta['price'] ) ) {
+		return $meta['price'];
+	}
+
+	if ( function_exists( 'wc_get_product' ) ) {
+		$product = wc_get_product( $post_id );
+		if ( $product ) {
+			return wp_strip_all_tags( $product->get_price_html() );
+		}
+	}
+
+	return '';
+}
+
 function dicey_render_product_card( $post_id ) {
 	$meta = dicey_get_product_meta( $post_id );
 	$tags = dicey_product_lines( $meta['tags'] );
@@ -150,7 +184,10 @@ function dicey_render_product_card( $post_id ) {
 				<p class="popularity__name"><?php echo esc_html( dicey_product_title_for_card( $post_id ) ); ?></p>
 				<p class="popularity__calories"><?php echo esc_html( $meta['calories'] ); ?></p>
 			</div>
-			<p class="popularity__price"><?php echo esc_html( $meta['price'] ); ?></p>
+			<?php $price = dicey_product_price_for_card( $post_id, $meta ); ?>
+			<?php if ( '' !== trim( $price ) ) : ?>
+				<p class="popularity__price"><?php echo esc_html( $price ); ?></p>
+			<?php endif; ?>
 		</a>
 		<div class="popularity__btn">В корзину</div>
 	</div>
@@ -159,7 +196,7 @@ function dicey_render_product_card( $post_id ) {
 
 function dicey_get_products_query( $args = array() ) {
 	$defaults = array(
-		'post_type'           => 'dicey_product',
+		'post_type'           => dicey_product_post_type(),
 		'post_status'         => 'publish',
 		'posts_per_page'      => -1,
 		'orderby'             => array( 'menu_order' => 'ASC', 'date' => 'DESC' ),
@@ -287,7 +324,11 @@ function dicey_product_faq_items( $value ) {
 }
 
 function dicey_add_product_meta_box() {
-	add_meta_box( 'dicey-product-data', 'Карточка товара', 'dicey_render_product_meta_box', 'dicey_product', 'normal', 'high' );
+	if ( function_exists( 'carbon_get_post_meta' ) && 'product' === dicey_product_post_type() ) {
+		return;
+	}
+
+	add_meta_box( 'dicey-product-data', 'Карточка товара', 'dicey_render_product_meta_box', dicey_product_post_type(), 'normal', 'high' );
 }
 
 add_action( 'add_meta_boxes', 'dicey_add_product_meta_box' );
@@ -347,11 +388,14 @@ function dicey_save_product_meta( $post_id ) {
 }
 
 add_action( 'save_post_dicey_product', 'dicey_save_product_meta' );
+add_action( 'save_post_product', 'dicey_save_product_meta' );
 
 function dicey_products_import_demo() {
 	if ( get_option( 'dicey_products_demo_imported' ) || dicey_has_products() ) {
 		return;
 	}
+
+	$post_type = dicey_product_post_type();
 
 	$products = array(
 		array( 'title' => 'С кроликом и крупой, для собак весом 3 кг', 'price' => '5 000 ₽', 'calories' => 'КБЖУ: 450 / 52 / 6 / 38', 'card_image' => 'imgs/bg/popularity__img.png', 'tags' => 'Мальтипу', 'home' => '1' ),
@@ -363,7 +407,7 @@ function dicey_products_import_demo() {
 	foreach ( $products as $index => $product ) {
 		$post_id = wp_insert_post(
 			array(
-				'post_type'    => 'dicey_product',
+				'post_type'    => $post_type,
 				'post_status'  => 'publish',
 				'post_title'   => $product['title'],
 				'post_excerpt' => $product['calories'],
@@ -382,6 +426,15 @@ function dicey_products_import_demo() {
 		update_post_meta( $post_id, '_dicey_product_tags', $product['tags'] );
 		update_post_meta( $post_id, '_dicey_product_show_on_home', $product['home'] );
 		update_post_meta( $post_id, '_dicey_product_is_vip', isset( $product['vip'] ) ? $product['vip'] : '' );
+
+		if ( 'product' === $post_type ) {
+			$woo_price = preg_replace( '/[^\d.,]/', '', $product['price'] );
+			wp_set_object_terms( $post_id, 'simple', 'product_type' );
+			update_post_meta( $post_id, '_regular_price', $woo_price );
+			update_post_meta( $post_id, '_price', $woo_price );
+			update_post_meta( $post_id, '_stock_status', 'instock' );
+			update_post_meta( $post_id, '_manage_stock', 'no' );
+		}
 	}
 
 	update_option( 'dicey_products_demo_imported', 1 );

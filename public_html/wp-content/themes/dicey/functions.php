@@ -19,6 +19,8 @@ require DICEY_THEME_DIR . '/inc/city.php';
 require DICEY_THEME_DIR . '/inc/blog.php';
 require DICEY_THEME_DIR . '/inc/products.php';
 require DICEY_THEME_DIR . '/inc/seo.php';
+require DICEY_THEME_DIR . '/inc/editor.php';
+require DICEY_THEME_DIR . '/inc/carbon-fields.php';
 require DICEY_THEME_DIR . '/inc/home-block-renderers.php';
 require DICEY_THEME_DIR . '/inc/dietology-renderers.php';
 require DICEY_THEME_DIR . '/inc/about-renderers.php';
@@ -40,6 +42,7 @@ function dicey_theme_setup() {
 	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'wp-block-styles' );
 	add_theme_support( 'editor-styles' );
+	add_theme_support( 'woocommerce' );
 	add_editor_style( 'assets/styles/main.css' );
 	add_editor_style( 'assets/styles/editor.css' );
 
