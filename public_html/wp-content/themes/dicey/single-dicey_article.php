@@ -1,6 +1,6 @@
 <?php
 /**
- * Single post template.
+ * Single blog article template.
  *
  * @package Dicey
  */
@@ -35,7 +35,7 @@ while ( have_posts() ) :
 		<?php
 		$related = new WP_Query(
 			array(
-				'post_type'           => get_post_type(),
+				'post_type'           => 'dicey_article',
 				'post_status'         => 'publish',
 				'posts_per_page'      => 3,
 				'post__not_in'        => array( get_the_ID() ),

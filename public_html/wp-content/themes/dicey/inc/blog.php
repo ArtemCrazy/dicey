@@ -10,14 +10,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function dicey_blog_page_url() {
-	$page = get_page_by_path( 'blog' );
+	$link = get_post_type_archive_link( 'dicey_article' );
 
-	if ( $page ) {
-		return get_permalink( $page );
+	if ( $link ) {
+		return $link;
 	}
 
 	return home_url( '/blog/' );
 }
+
+function dicey_register_blog_post_type() {
+	$labels = array(
+		'name'               => 'Статьи',
+		'singular_name'      => 'Статья',
+		'menu_name'          => 'Блог',
+		'name_admin_bar'     => 'Статью',
+		'add_new'            => 'Добавить статью',
+		'add_new_item'       => 'Добавить статью',
+		'edit_item'          => 'Редактировать статью',
+		'new_item'           => 'Новая статья',
+		'view_item'          => 'Посмотреть статью',
+		'view_items'         => 'Посмотреть статьи',
+		'search_items'       => 'Найти статьи',
+		'not_found'          => 'Статьи не найдены',
+		'not_found_in_trash' => 'В корзине статей нет',
+		'all_items'          => 'Все статьи',
+	);
+
+	register_post_type(
+		'dicey_article',
+		array(
+			'labels'        => $labels,
+			'public'        => true,
+			'show_in_rest'  => true,
+			'menu_position' => 20,
+			'menu_icon'     => 'dashicons-welcome-write-blog',
+			'has_archive'   => 'blog',
+			'rewrite'       => array(
+				'slug'       => 'blog',
+				'with_front' => false,
+			),
+			'supports'      => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
+		)
+	);
+}
+
+add_action( 'init', 'dicey_register_blog_post_type' );
 
 function dicey_blog_fallback_images() {
 	return array(
@@ -73,7 +111,12 @@ function dicey_render_blog_card( $post_id, $index = 0 ) {
 }
 
 function dicey_blog_import_posts() {
-	if ( get_option( 'dicey_blog_demo_imported' ) ) {
+	if ( get_option( 'dicey_blog_cpt_imported' ) ) {
+		return;
+	}
+
+	if ( get_posts( array( 'post_type' => 'dicey_article', 'post_status' => 'any', 'numberposts' => 1 ) ) ) {
+		update_option( 'dicey_blog_cpt_imported', 1 );
 		return;
 	}
 
@@ -93,7 +136,27 @@ function dicey_blog_import_posts() {
 	);
 
 	if ( $content_posts ) {
-		update_option( 'dicey_blog_demo_imported', 1 );
+		foreach ( $content_posts as $post ) {
+			wp_update_post(
+				array(
+					'ID'        => $post->ID,
+					'post_type' => 'dicey_article',
+				)
+			);
+		}
+
+		foreach ( $existing_posts as $post ) {
+			if ( 'Привет, мир!' === $post->post_title ) {
+				wp_update_post(
+					array(
+						'ID'          => $post->ID,
+						'post_status' => 'draft',
+					)
+				);
+			}
+		}
+
+		update_option( 'dicey_blog_cpt_imported', 1 );
 		return;
 	}
 
@@ -142,7 +205,7 @@ function dicey_blog_import_posts() {
 	foreach ( $posts as $index => $post ) {
 		wp_insert_post(
 			array(
-				'post_type'    => 'post',
+				'post_type'    => 'dicey_article',
 				'post_status'  => 'publish',
 				'post_title'   => $post['title'],
 				'post_excerpt' => $post['excerpt'],
@@ -152,34 +215,23 @@ function dicey_blog_import_posts() {
 		);
 	}
 
-	update_option( 'dicey_blog_demo_imported', 1 );
+	update_option( 'dicey_blog_cpt_imported', 1 );
 }
 
-add_action( 'after_switch_theme', 'dicey_blog_import_posts' );
+add_action( 'init', 'dicey_blog_import_posts', 20 );
 
-function dicey_blog_update_post_labels() {
-	global $wp_post_types;
-
-	if ( empty( $wp_post_types['post'] ) ) {
+function dicey_blog_archive_posts_per_page( $query ) {
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_post_type_archive( 'dicey_article' ) ) {
 		return;
 	}
 
-	$labels = $wp_post_types['post']->labels;
-
-	$labels->name               = 'Статьи';
-	$labels->singular_name      = 'Статья';
-	$labels->menu_name          = 'Блог';
-	$labels->name_admin_bar     = 'Статью';
-	$labels->add_new            = 'Добавить статью';
-	$labels->add_new_item       = 'Добавить статью';
-	$labels->edit_item          = 'Редактировать статью';
-	$labels->new_item           = 'Новая статья';
-	$labels->view_item          = 'Посмотреть статью';
-	$labels->view_items         = 'Посмотреть статьи';
-	$labels->search_items       = 'Найти статьи';
-	$labels->not_found          = 'Статьи не найдены';
-	$labels->not_found_in_trash = 'В корзине статей нет';
-	$labels->all_items          = 'Все статьи';
+	$query->set( 'posts_per_page', 12 );
 }
 
-add_action( 'init', 'dicey_blog_update_post_labels' );
+add_action( 'pre_get_posts', 'dicey_blog_archive_posts_per_page' );
+
+function dicey_hide_default_posts_menu() {
+	remove_menu_page( 'edit.php' );
+}
+
+add_action( 'admin_menu', 'dicey_hide_default_posts_menu' );
