@@ -490,7 +490,18 @@ function dicey_render_home_plan( $attrs = array() ) {
 }
 
 function dicey_render_shipping( $attrs = array() ) {
-	$data = dicey_merge_block_attrs( $attrs, dicey_shipping_defaults() );
+	$data        = dicey_merge_block_attrs( $attrs, dicey_shipping_defaults() );
+	$active_city = function_exists( 'dicey_get_detected_city_key' ) ? dicey_get_detected_city_key() : 'moscow';
+
+	$active_index = 0;
+	foreach ( $data['tabs'] as $tab_index => $tab ) {
+		$tab_id = ! empty( $tab['id'] ) ? sanitize_key( $tab['id'] ) : 'city-' . $tab_index;
+		if ( $tab_id === $active_city ) {
+			$active_index = $tab_index;
+			break;
+		}
+	}
+
 	ob_start();
 	?>
 	<section class="shipping">
@@ -498,13 +509,14 @@ function dicey_render_shipping( $attrs = array() ) {
 			<h2 class="shipping__title"><?php echo dicey_kses_inline( $data['title'] ); ?></h2>
 			<div class="shipping__tabs">
 				<?php foreach ( $data['tabs'] as $tab_index => $tab ) : ?>
-					<div class="shipping__tab standart__tab <?php echo 0 === $tab_index ? 'active' : ''; ?>"><?php echo esc_html( $tab['title'] ); ?></div>
+					<?php $tab_id = ! empty( $tab['id'] ) ? sanitize_key( $tab['id'] ) : 'city-' . $tab_index; ?>
+					<div class="shipping__tab standart__tab <?php echo $active_index === $tab_index ? 'active' : ''; ?>" data-city-key="<?php echo esc_attr( $tab_id ); ?>"><?php echo esc_html( $tab['title'] ); ?></div>
 				<?php endforeach; ?>
 			</div>
 			<div class="shipping__wr">
 				<?php foreach ( $data['tabs'] as $tab_index => $tab ) : ?>
 					<?php $tab_id = ! empty( $tab['id'] ) ? sanitize_key( $tab['id'] ) : 'city-' . $tab_index; ?>
-					<div class="standart__tabcontent" style="<?php echo 0 === $tab_index ? 'display: block;' : ''; ?>">
+					<div class="standart__tabcontent" data-city-key="<?php echo esc_attr( $tab_id ); ?>" style="<?php echo $active_index === $tab_index ? 'display: block;' : ''; ?>">
 						<div class="shipping__variant">
 							<div class="shipping__map">
 								<div id="shipping-map-<?php echo esc_attr( $tab_id ); ?>" style="width:560px;height:400px;"></div>

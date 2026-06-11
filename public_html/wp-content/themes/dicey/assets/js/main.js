@@ -431,6 +431,97 @@ $(document).on("change blur", ".shop__weight-input", function () {
 	shopSetWeight($(this), shopParseWeight($(this).val()))
 })
 
+// ===== Visitor City =====
+;(function ($) {
+	var CITY_LABELS = {
+		moscow: "Москва",
+		spb: "Санкт-Петербург"
+	}
+
+	function normalizeCityKey(key) {
+		return key === "spb" ? "spb" : "moscow"
+	}
+
+	function getThemeCity() {
+		var city = window.diceyTheme && window.diceyTheme.city ? window.diceyTheme.city : {}
+		var key = normalizeCityKey(city.key)
+
+		return {
+			key: key,
+			label: city.label || CITY_LABELS[key]
+		}
+	}
+
+	function setThemeCity(city) {
+		if (!window.diceyTheme) {
+			window.diceyTheme = {}
+		}
+
+		var key = normalizeCityKey(city && city.key)
+		window.diceyTheme.city = {
+			key: key,
+			label: city && city.label ? city.label : CITY_LABELS[key]
+		}
+	}
+
+	function activateShippingCity(key) {
+		key = normalizeCityKey(key)
+
+		$(".shipping").each(function () {
+			var $shipping = $(this)
+			var $tab = $shipping.find('.shipping__tab[data-city-key="' + key + '"]').first()
+
+			if (!$tab.length) {
+				return
+			}
+
+			if (!$tab.hasClass("active")) {
+				$tab.trigger("click")
+				return
+			}
+
+			var index = $shipping.find(".shipping__tab").index($tab)
+			$shipping.find(".standart__tabcontent").hide().removeClass("active")
+			$shipping.find(".standart__tabcontent").eq(index).show().addClass("active")
+		})
+	}
+
+	function applyCity(city) {
+		setThemeCity(city)
+
+		var current = getThemeCity()
+		$(".header-city__label").text(current.label)
+		$("body").attr("data-dicey-city", current.key)
+		activateShippingCity(current.key)
+	}
+
+	window.diceyGetCityKey = function () {
+		return getThemeCity().key
+	}
+
+	window.diceyApplyCity = applyCity
+
+	$(function () {
+		applyCity(getThemeCity())
+
+		if (!window.diceyTheme || !window.diceyTheme.ajaxUrl) {
+			return
+		}
+
+		$.ajax({
+			url: window.diceyTheme.ajaxUrl,
+			type: "POST",
+			dataType: "json",
+			data: { action: "dicey_detect_city" },
+			success: function (res) {
+				if (res && res.success && res.data) {
+					applyCity(res.data)
+				}
+			}
+		})
+	})
+}(jQuery))
+
 // ===== Shipping Maps =====
 ;(function ($) {
     var YMAPS_KEY  = 'eee5455e-2d4c-4174-b71d-e53e2c579428';
@@ -599,11 +690,11 @@ $(document).on("change blur", ".shop__weight-input", function () {
             success: function (text) {
                 ZONES = (new Function('return (' + text + ')'))();
                 loadYmaps(function () {
-                    initMap('moscow');
+                    initMap(window.diceyGetCityKey ? window.diceyGetCityKey() : 'moscow');
                     bindInputs();
                     $(document).on('click', '.shipping__tabs .standart__tab', function () {
-                        var idx = $(this).closest('.shipping__tabs').find('.standart__tab').index(this);
-                        if (idx === 1) setTimeout(function () { initMap('spb'); }, 80);
+                        var key = $(this).data('city-key') || 'moscow';
+                        setTimeout(function () { initMap(key); }, 80);
                     });
                 });
             }

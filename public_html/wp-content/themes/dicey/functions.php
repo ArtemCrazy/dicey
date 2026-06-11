@@ -15,6 +15,7 @@ define( 'DICEY_ASSETS_URI', DICEY_THEME_URI . '/assets' );
 define( 'DICEY_VERSION', '0.1.0' );
 
 require DICEY_THEME_DIR . '/inc/helpers.php';
+require DICEY_THEME_DIR . '/inc/city.php';
 require DICEY_THEME_DIR . '/inc/home-block-renderers.php';
 require DICEY_THEME_DIR . '/inc/dietology-renderers.php';
 require DICEY_THEME_DIR . '/inc/about-renderers.php';

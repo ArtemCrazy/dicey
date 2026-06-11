@@ -13,6 +13,11 @@ add_action( 'wp_enqueue_scripts', 'dicey_enqueue_assets' );
 add_action( 'enqueue_block_editor_assets', 'dicey_enqueue_editor_assets' );
 
 function dicey_enqueue_assets() {
+	$city = function_exists( 'dicey_get_detected_city' ) ? dicey_get_detected_city() : array(
+		'key'   => 'moscow',
+		'label' => 'Москва',
+	);
+
 	wp_enqueue_style(
 		'dicey-main',
 		DICEY_ASSETS_URI . '/styles/main.css',
@@ -42,6 +47,11 @@ function dicey_enqueue_assets() {
 		array(
 			'assetsUrl' => DICEY_ASSETS_URI,
 			'homeUrl'   => home_url( '/' ),
+			'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+			'city'      => array(
+				'key'   => $city['key'],
+				'label' => $city['label'],
+			),
 		)
 	);
 }
