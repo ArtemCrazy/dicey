@@ -41,7 +41,7 @@ function dicey_allowed_block_types( $allowed_block_types, $editor_context ) {
 			'dietology' => array( 'dicey/dietology', 'dicey/why' ),
 			'about'     => array( 'dicey/about' ),
 			'delivery'  => array( 'dicey/delivery-page', 'dicey/shipping', 'dicey/why' ),
-			'contacts'  => array(),
+			'contacts'  => array( 'dicey/contacts-page', 'dicey/why' ),
 		);
 
 		$slug = $editor_context->post->post_name;

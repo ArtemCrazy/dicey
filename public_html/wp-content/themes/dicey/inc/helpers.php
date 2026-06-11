@@ -70,3 +70,23 @@ function dicey_asset_version( $relative_path ) {
 
 	return file_exists( $file ) ? (string) filemtime( $file ) : DICEY_VERSION;
 }
+
+function dicey_image_url( $value, $size = 'full' ) {
+	if ( is_numeric( $value ) ) {
+		$image = wp_get_attachment_image_url( absint( $value ), $size );
+
+		if ( $image ) {
+			return $image;
+		}
+	}
+
+	if ( ! is_string( $value ) || '' === trim( $value ) ) {
+		return '';
+	}
+
+	if ( 0 === strpos( $value, 'http://' ) || 0 === strpos( $value, 'https://' ) ) {
+		return $value;
+	}
+
+	return DICEY_ASSETS_URI . '/' . ltrim( $value, '/' );
+}

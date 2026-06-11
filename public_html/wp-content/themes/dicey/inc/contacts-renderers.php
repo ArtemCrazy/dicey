@@ -29,61 +29,7 @@ function dicey_contacts_defaults() {
 	);
 }
 
-function dicey_contacts_clean_complex_items( $items, $keys ) {
-	if ( ! is_array( $items ) ) {
-		return array();
-	}
-
-	$clean = array();
-
-	foreach ( $items as $item ) {
-		if ( ! is_array( $item ) ) {
-			continue;
-		}
-
-		$row = array();
-		foreach ( $keys as $key ) {
-			$row[ $key ] = isset( $item[ $key ] ) ? $item[ $key ] : '';
-		}
-
-		if ( array_filter( $row ) ) {
-			$clean[] = $row;
-		}
-	}
-
-	return $clean;
-}
-
-function dicey_contacts_carbon_data( $post_id ) {
-	if ( ! $post_id || ! function_exists( 'carbon_get_post_meta' ) ) {
-		return array();
-	}
-
-	$data = array(
-		'hero_title'    => carbon_get_post_meta( $post_id, 'dicey_contacts_hero_title' ),
-		'hero_image'    => carbon_get_post_meta( $post_id, 'dicey_contacts_hero_image' ),
-		'apply_title'   => carbon_get_post_meta( $post_id, 'dicey_contacts_apply_title' ),
-		'apply_items'   => dicey_contacts_clean_complex_items( carbon_get_post_meta( $post_id, 'dicey_contacts_apply_items' ), array( 'icon', 'text' ) ),
-		'contact_items' => dicey_contacts_clean_complex_items( carbon_get_post_meta( $post_id, 'dicey_contacts_contact_items' ), array( 'icon', 'label', 'url' ) ),
-		'company_info'  => carbon_get_post_meta( $post_id, 'dicey_contacts_company_info' ),
-	);
-
-	return array_filter(
-		$data,
-		static function ( $value ) {
-			return is_array( $value ) ? ! empty( $value ) : '' !== trim( (string) $value );
-		}
-	);
-}
-
 function dicey_contacts_data( $attrs = array() ) {
-	$post_id = is_singular( 'page' ) ? get_queried_object_id() : 0;
-	$carbon  = dicey_contacts_carbon_data( $post_id );
-
-	if ( $carbon ) {
-		return dicey_merge_block_attrs( $carbon, dicey_contacts_defaults() );
-	}
-
 	return dicey_merge_block_attrs( $attrs, dicey_contacts_defaults() );
 }
 

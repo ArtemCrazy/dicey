@@ -123,7 +123,7 @@ function dicey_render_media_field( $name, $value ) {
 	?>
 	<div class="dicey-media-field">
 		<img src="<?php echo esc_url( $src ); ?>" alt="" style="<?php echo esc_attr( $value ? 'display: block;' : 'display: none;' ); ?> max-width: 220px; max-height: 140px; object-fit: contain; margin-bottom: 10px; background: #f6f7f7; border: 1px solid #dcdcde;">
-		<input type="text" name="<?php echo esc_attr( $name ); ?>" class="regular-text" value="<?php echo esc_attr( $value ); ?>">
+		<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>">
 		<button type="button" class="button dicey-media-select"><?php esc_html_e( 'Выбрать изображение', 'dicey' ); ?></button>
 		<button type="button" class="button-link-delete dicey-media-clear" style="margin-left: 8px;"><?php esc_html_e( 'Очистить', 'dicey' ); ?></button>
 	</div>

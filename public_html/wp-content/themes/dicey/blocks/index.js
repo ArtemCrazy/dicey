@@ -279,7 +279,7 @@
 	}
 
 	function val( attrs, block, key ) {
-		return attrs[ key ] !== undefined && attrs[ key ] !== null && attrs[ key ] !== '' ? attrs[ key ] : defaults[ block ][ key ];
+		return attrs[ key ] !== undefined && attrs[ key ] !== null ? attrs[ key ] : defaults[ block ][ key ];
 	}
 
 	function arr( attrs, block, key ) {

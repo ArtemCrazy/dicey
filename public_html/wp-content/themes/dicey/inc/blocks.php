@@ -18,7 +18,7 @@ function dicey_register_block_category( $categories ) {
 		$categories,
 		array(
 			'slug'  => 'dicey',
-			'title' => __( 'Dicey', 'dicey' ),
+			'title' => __( 'Дайси', 'dicey' ),
 			'icon'  => null,
 		)
 	);
@@ -351,14 +351,14 @@ function dicey_register_patterns() {
 	register_block_pattern_category(
 		'dicey',
 		array(
-			'label' => __( 'Dicey', 'dicey' ),
+			'label' => __( 'Дайси', 'dicey' ),
 		)
 	);
 
 	register_block_pattern(
 		'dicey/home-page',
 		array(
-			'title'      => __( 'Dicey home page', 'dicey' ),
+			'title'      => __( 'Домашняя страница Дайси', 'dicey' ),
 			'categories' => array( 'dicey' ),
 			'content'    => '<!-- wp:dicey/home-hero /--><!-- wp:dicey/home-conveniences /--><!-- wp:dicey/home-delivery /--><!-- wp:dicey/home-about-food /--><!-- wp:dicey/home-plan /--><!-- wp:dicey/home-works /--><!-- wp:dicey/shipping /--><!-- wp:dicey/sale /--><!-- wp:dicey/home-questions /--><!-- wp:dicey/why /-->',
 		)
