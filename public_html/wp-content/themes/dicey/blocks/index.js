@@ -130,6 +130,49 @@
 				{ question: 'Подойдет ли рацион моему питомцу?', answer: '' },
 			],
 		},
+		'about': {
+			hero_title: 'Заботимся <br class="xs-show"> о питании <br> <span>вашей собаки</span>',
+			hero_image: 'imgs/bg/about-banner___img.png',
+			nutrition_title: 'Почему мы это делаем ?',
+			nutrition_text: 'Подобрать правильное питание для собаки — не так просто. <br> Не хватает времени, сложно разобраться в составе и нет уверенности, что рацион подходит. <br> Мы создали подход, где всё уже продумано — остаётся только кормить собаку',
+			nutrition_items: [
+				{ icon: 'imgs/icons/nutrition-item1.svg', icon_class: 'nutrition-icon', icon_second: 'imgs/icons/nutrition-item4.svg', icon_second_class: 'nutrition-icon2', text: 'Опираемся на исследования <br> по питанию собак' },
+				{ icon: 'imgs/icons/nutrition-item2.svg', icon_class: 'nutrition-icon3', text: 'Учитываем вес, возраст и особенности' },
+				{ icon: 'imgs/icons/nutrition-item3.svg', icon_class: 'nutrition-icon4', text: 'Рационы проходят <br> термическую обработку' },
+				{ text: 'Подбираем рацион по составу <br> и калорийности для каждой породы <br> собаки индивидуально' },
+			],
+			acquaintances_title: 'Давай знакомиться?',
+			acquaintances_lead: 'Кожаные называют мою породу Акита-ину, а мне больше нравится когда меня зовут по моей кличке — Дайси',
+			acquaintances_paragraphs: [
+				'Вообще я парень простой: люблю гулять, играть и, конечно, поесть. Особенно то, что ест мой хозяин. У него всегда самое вкусное, но делится он редко — говорит, мне вредно. Ну да, конечно.',
+				'Я намекал. Сначала взглядом. Потом просто сидел рядом. Потом очень долго смотрел. И это сработало. Мой хозяин задумался и сделал сервис правильного питания. И назвал его в мою честь — Дайси.',
+				'Теперь вкусно питаться смогу не только я, но и другие хвостатые с нашего двора… и даже всего города. Так что да — это я всё придумал. Ну, почти.',
+			],
+			acquaintances_image: 'imgs/bg/acquaintances__img.png',
+			team_title: 'Кто работает над рационами',
+			team_items: [
+				{ image: 'imgs/bg/job__img1.png', name: 'Лукьянов Валентин', text: 'Мой хозяин. Главный по идеям, коробкам и доставке' },
+				{ image: 'imgs/bg/job__img2.png', name: 'Босунова Наталья', text: 'Ветеринарный врач-диетолог. Следит, чтобы мне было вкусно, а не «просто можно»' },
+			],
+			choice_title: 'Почему выбирают наши рационы',
+			choice_items: [
+				{ icon: 'imgs/icons/conveniences2-icon1.svg', title: 'Натуральные <br> ингредиенты', text: 'Полностью натуральные <br> продукты высокого качества' },
+				{ icon: 'imgs/icons/conveniences2-icon2.svg', title: 'Сбалансированный состав', text: 'Мы используем добавки, благодаря чему собака получит все необходимые витамины и минералы' },
+				{ icon: 'imgs/icons/conveniences2-icon3.svg', title: 'Приятный вкус даже для приверед', text: 'Рационы имеет приятный вкус и аромат, привлекающий даже привередливых животных' },
+				{ icon: 'imgs/icons/conveniences2-icon4.svg', title: 'Безопасная обработка продуктов', text: 'Тщательная обработка продуктов гарантирует безопасность и минимизирует риск инфекций' },
+			],
+			nature_image: 'imgs/bg/nature__img.png',
+			nature_title: 'Заботимся о природе',
+			nature_paragraphs: [
+				'Мы не только готовим питание, но и думаем о том, как снизить влияние на окружающую среду.',
+				'Мы используем качественные продукты и выстраиваем процессы так, чтобы минимизировать отходы на всех этапах — от приготовления до доставки. Упаковка изготавливается из экологичных материалов, а логистика выстроена с учётом снижения лишних перемещений.',
+			],
+			partnership_title: 'Открыты к партнёрству',
+			partnership_subtitle: 'и совместным проектам',
+			partnership_text: 'Готовы рассмотреть разные форматы сотрудничества — от работы с питомниками и ветеринарными специалистами до партнёрств с блогерами и сервисами для владельцев собак',
+			partnership_button_label: 'Узнать подробнее',
+			partnership_image: 'imgs/bg/partnership-img.png',
+		},
 		'shipping': {
 			title: 'Бесплатная доставка',
 			tabs: [
@@ -835,6 +878,174 @@
 		] );
 	}
 
+	function aboutEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var nutritionItems = arr( attrs, 'about', 'nutrition_items' );
+		var acquaintancesParagraphs = arr( attrs, 'about', 'acquaintances_paragraphs' );
+		var teamItems = arr( attrs, 'about', 'team_items' );
+		var choiceItems = arr( attrs, 'about', 'choice_items' );
+		var natureParagraphs = arr( attrs, 'about', 'nature_paragraphs' );
+
+		function setNutritionItem( index, key, value ) {
+			setArrayItem( nutritionItems, setAttributes, 'nutrition_items', index, key, value );
+		}
+
+		function setParagraph( source, attrName, index, value ) {
+			var next = clone( source );
+			next[ index ] = value;
+			setAttributes( ( function () {
+				var nextAttrs = {};
+				nextAttrs[ attrName ] = next;
+				return nextAttrs;
+			} )() );
+		}
+
+		function setTeamItem( index, key, value ) {
+			setArrayItem( teamItems, setAttributes, 'team_items', index, key, value );
+		}
+
+		function setChoiceItem( index, key, value ) {
+			setArrayItem( choiceItems, setAttributes, 'choice_items', index, key, value );
+		}
+
+		return el( element.Fragment, null, [
+			box( 'Главный экран', [
+				imageControl( 'Изображение', val( attrs, 'about', 'hero_image' ), function ( value ) { setAttributes( { hero_image: value } ); } ),
+				el( TextareaControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'about', 'hero_title' ),
+					onChange: function ( value ) { setAttributes( { hero_title: value } ); },
+				} ),
+			], true, isFirstDiceyBlock( props ) ),
+			box( 'Почему мы это делаем', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'about', 'nutrition_title' ),
+					onChange: function ( value ) { setAttributes( { nutrition_title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'about', 'nutrition_text' ),
+					onChange: function ( value ) { setAttributes( { nutrition_text: value } ); },
+				} ),
+				nutritionItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Пункт', index, item.text ), [
+						imageControl( 'Иконка', item.icon || '', function ( value ) { setNutritionItem( index, 'icon', value ); } ),
+						item.icon_second ? imageControl( 'Дополнительная иконка', item.icon_second, function ( value ) { setNutritionItem( index, 'icon_second', value ); } ) : null,
+						el( TextareaControl, {
+							label: 'Текст пункта',
+							value: item.text,
+							onChange: function ( value ) { setNutritionItem( index, 'text', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			box( 'Давай знакомиться', [
+				imageControl( 'Изображение', val( attrs, 'about', 'acquaintances_image' ), function ( value ) { setAttributes( { acquaintances_image: value } ); } ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'about', 'acquaintances_title' ),
+					onChange: function ( value ) { setAttributes( { acquaintances_title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Крупный текст',
+					value: val( attrs, 'about', 'acquaintances_lead' ),
+					onChange: function ( value ) { setAttributes( { acquaintances_lead: value } ); },
+				} ),
+				acquaintancesParagraphs.map( function ( paragraph, index ) {
+					return el( TextareaControl, {
+						label: 'Абзац ' + ( index + 1 ),
+						value: paragraph,
+						onChange: function ( value ) { setParagraph( acquaintancesParagraphs, 'acquaintances_paragraphs', index, value ); },
+					} );
+				} ),
+			], false ),
+			box( 'Кто работает над рационами', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'about', 'team_title' ),
+					onChange: function ( value ) { setAttributes( { team_title: value } ); },
+				} ),
+				teamItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Сотрудник', index, item.name ), [
+						imageControl( 'Фото', item.image, function ( value ) { setTeamItem( index, 'image', value ); } ),
+						el( TextControl, {
+							label: 'Имя',
+							value: item.name,
+							onChange: function ( value ) { setTeamItem( index, 'name', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Описание',
+							value: item.text,
+							onChange: function ( value ) { setTeamItem( index, 'text', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			box( 'Почему выбирают наши рационы', [
+				el( TextControl, {
+					label: 'Заголовок секции',
+					value: val( attrs, 'about', 'choice_title' ),
+					onChange: function ( value ) { setAttributes( { choice_title: value } ); },
+				} ),
+				choiceItems.map( function ( item, index ) {
+					return panel( panelTitle( 'Карточка', index, item.title ), [
+						imageControl( 'Иконка', item.icon, function ( value ) { setChoiceItem( index, 'icon', value ); } ),
+						el( TextareaControl, {
+							label: 'Заголовок карточки',
+							value: item.title,
+							onChange: function ( value ) { setChoiceItem( index, 'title', value ); },
+						} ),
+						el( TextareaControl, {
+							label: 'Текст карточки',
+							value: item.text,
+							onChange: function ( value ) { setChoiceItem( index, 'text', value ); },
+						} ),
+					], false );
+				} ),
+			], false ),
+			box( 'Заботимся о природе', [
+				imageControl( 'Изображение', val( attrs, 'about', 'nature_image' ), function ( value ) { setAttributes( { nature_image: value } ); } ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'about', 'nature_title' ),
+					onChange: function ( value ) { setAttributes( { nature_title: value } ); },
+				} ),
+				natureParagraphs.map( function ( paragraph, index ) {
+					return el( TextareaControl, {
+						label: 'Абзац ' + ( index + 1 ),
+						value: paragraph,
+						onChange: function ( value ) { setParagraph( natureParagraphs, 'nature_paragraphs', index, value ); },
+					} );
+				} ),
+			], false ),
+			box( 'Открыты к партнерству', [
+				imageControl( 'Изображение', val( attrs, 'about', 'partnership_image' ), function ( value ) { setAttributes( { partnership_image: value } ); } ),
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'about', 'partnership_title' ),
+					onChange: function ( value ) { setAttributes( { partnership_title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Подзаголовок',
+					value: val( attrs, 'about', 'partnership_subtitle' ),
+					onChange: function ( value ) { setAttributes( { partnership_subtitle: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'about', 'partnership_text' ),
+					onChange: function ( value ) { setAttributes( { partnership_text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'about', 'partnership_button_label' ),
+					onChange: function ( value ) { setAttributes( { partnership_button_label: value } ); },
+				} ),
+			], false ),
+		] );
+	}
+
 	function shippingEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
@@ -1079,6 +1290,34 @@
 				faq_items: { type: 'array', default: defaults.dietology.faq_items },
 			},
 			edit: dietologyEdit,
+		},
+		'dicey/about': {
+			title: __( 'О нас', 'dicey' ),
+			icon: 'groups',
+			attributes: {
+				hero_title: { type: 'string' },
+				hero_image: { type: 'string' },
+				nutrition_title: { type: 'string' },
+				nutrition_text: { type: 'string' },
+				nutrition_items: { type: 'array', default: defaults.about.nutrition_items },
+				acquaintances_title: { type: 'string' },
+				acquaintances_lead: { type: 'string' },
+				acquaintances_paragraphs: { type: 'array', default: defaults.about.acquaintances_paragraphs },
+				acquaintances_image: { type: 'string' },
+				team_title: { type: 'string' },
+				team_items: { type: 'array', default: defaults.about.team_items },
+				choice_title: { type: 'string' },
+				choice_items: { type: 'array', default: defaults.about.choice_items },
+				nature_image: { type: 'string' },
+				nature_title: { type: 'string' },
+				nature_paragraphs: { type: 'array', default: defaults.about.nature_paragraphs },
+				partnership_title: { type: 'string' },
+				partnership_subtitle: { type: 'string' },
+				partnership_text: { type: 'string' },
+				partnership_button_label: { type: 'string' },
+				partnership_image: { type: 'string' },
+			},
+			edit: aboutEdit,
 		},
 		'dicey/shipping': {
 			title: __( 'Бесплатная доставка', 'dicey' ),
