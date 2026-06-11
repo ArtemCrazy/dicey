@@ -580,8 +580,8 @@
 			setArrayItem( faqItems, setAttributes, 'faq_items', index, key, value );
 		}
 
-		return box( 'Диетология', [
-			panel( 'Главный экран', [
+		return el( element.Fragment, null, [
+			box( 'Главный экран', [
 				el( TextControl, {
 					label: 'Заголовок',
 					value: val( attrs, 'dietology', 'hero_title' ),
@@ -607,8 +607,8 @@
 					value: val( attrs, 'dietology', 'hero_mobile_label' ),
 					onChange: function ( value ) { setAttributes( { hero_mobile_label: value } ); },
 				} ),
-			], true ),
-			panel( 'Вам нужна консультация если у Вас', [
+			], true, isFirstDiceyBlock( props ) ),
+			box( 'Вам нужна консультация если у Вас', [
 				el( TextControl, {
 					label: 'Заголовок секции',
 					value: val( attrs, 'dietology', 'consult_title' ),
@@ -624,7 +624,7 @@
 					], false );
 				} ),
 			], false ),
-			panel( 'Составление рациона питания', [
+			box( 'Составление рациона питания', [
 				el( TextControl, {
 					label: 'Имя специалиста',
 					value: val( attrs, 'dietology', 'plan_person_name' ),
@@ -656,7 +656,7 @@
 					onChange: function ( value ) { setAttributes( { plan_link_label: value } ); },
 				} ),
 			], false ),
-			panel( 'Как проходит консультация', [
+			box( 'Как проходит консультация', [
 				el( TextControl, {
 					label: 'Заголовок секции',
 					value: val( attrs, 'dietology', 'advisory_title' ),
@@ -682,7 +682,7 @@
 					], false );
 				} ),
 			], false ),
-			panel( 'Что вы получите после консультации', [
+			box( 'Что вы получите после консультации', [
 				el( TextareaControl, {
 					label: 'Заголовок секции',
 					value: val( attrs, 'dietology', 'advantages_title' ),
@@ -698,7 +698,7 @@
 					], false );
 				} ),
 			], false ),
-			panel( 'Стоимость консультаций', [
+			box( 'Стоимость консультаций', [
 				el( TextControl, {
 					label: 'Заголовок секции',
 					value: val( attrs, 'dietology', 'price_title' ),
@@ -731,7 +731,7 @@
 					], false );
 				} ),
 			], false ),
-			panel( 'Часто задаваемые вопросы', [
+			box( 'Часто задаваемые вопросы', [
 				el( TextControl, {
 					label: 'Заголовок секции',
 					value: val( attrs, 'dietology', 'faq_title' ),
@@ -752,7 +752,7 @@
 					], false );
 				} ),
 			], false ),
-		], true, isFirstDiceyBlock( props ) );
+		] );
 	}
 
 	function shippingEdit( props ) {
