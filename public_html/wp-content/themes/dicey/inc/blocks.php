@@ -85,10 +85,31 @@ function dicey_register_blocks() {
 		'home-about-food' => array(
 			'title'    => __( 'Что получает ваша собака', 'dicey' ),
 			'template' => 'template-parts/blocks/home-about-food',
+			'callback' => 'dicey_render_home_about_food',
+			'attributes' => array(
+				'title' => array( 'type' => 'string' ),
+				'text' => array( 'type' => 'string' ),
+				'link_label' => array( 'type' => 'string' ),
+				'link_url' => array( 'type' => 'string' ),
+				'items' => array(
+					'type' => 'array',
+					'default' => dicey_home_about_food_defaults()['items'],
+				),
+			),
 		),
 		'home-plan' => array(
 			'title'    => __( 'Составим индивидуальный план питания', 'dicey' ),
 			'template' => 'template-parts/blocks/home-plan',
+			'callback' => 'dicey_render_home_plan',
+			'attributes' => array(
+				'person_name' => array( 'type' => 'string' ),
+				'person_role' => array( 'type' => 'string' ),
+				'title' => array( 'type' => 'string' ),
+				'subtitle' => array( 'type' => 'string' ),
+				'price' => array( 'type' => 'string' ),
+				'text' => array( 'type' => 'string' ),
+				'button_label' => array( 'type' => 'string' ),
+			),
 		),
 		'home-works' => array(
 			'title'    => __( 'Как это работает', 'dicey' ),
@@ -124,14 +145,36 @@ function dicey_register_blocks() {
 		'shipping'    => array(
 			'title'    => __( 'Бесплатная доставка', 'dicey' ),
 			'template' => 'template-parts/blocks/shipping',
+			'callback' => 'dicey_render_shipping',
+			'attributes' => array(
+				'title' => array( 'type' => 'string' ),
+				'tabs' => array(
+					'type' => 'array',
+					'default' => dicey_shipping_defaults()['tabs'],
+				),
+			),
 		),
 		'sale'        => array(
 			'title'    => __( 'Скидка - 30% на первый заказ', 'dicey' ),
 			'template' => 'template-parts/blocks/sale',
+			'callback' => 'dicey_render_sale',
+			'attributes' => array(
+				'title' => array( 'type' => 'string' ),
+				'subtitle' => array( 'type' => 'string' ),
+				'text' => array( 'type' => 'string' ),
+				'button_label' => array( 'type' => 'string' ),
+				'button_url' => array( 'type' => 'string' ),
+			),
 		),
 		'why'         => array(
 			'title'    => __( 'Остались вопросы по питанию?', 'dicey' ),
 			'template' => 'template-parts/blocks/why',
+			'callback' => 'dicey_render_why',
+			'attributes' => array(
+				'title' => array( 'type' => 'string' ),
+				'text' => array( 'type' => 'string' ),
+				'button_label' => array( 'type' => 'string' ),
+			),
 		),
 	);
 

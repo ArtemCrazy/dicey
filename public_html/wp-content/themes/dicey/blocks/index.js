@@ -43,6 +43,48 @@
 				{ title: 'Вам остаётся только покормить собаку', text: 'Без расчётов рационов, закупок продуктов и готовки — всё уже продумано за Вас', image: 'imgs/bg/works__block-img4.svg', color: '#FAF4FF' },
 			],
 		},
+		'home-about-food': {
+			title: 'Что получает ваша собака',
+			text: 'Мы рассчитываем питание с учётом потребностей собаки и используем безопасную технологию приготовления. Вы получаете сбалансированные рационы из свежих ингредиентов — без лишних рисков и сомнений.',
+			link_label: 'Подробнее',
+			link_url: '#',
+			items: [
+				{ icon: 'imgs/icons/about-food-icon1.svg', title: 'Белки', text: 'Строительный материал для клеток, тканей и органов' },
+				{ icon: 'imgs/icons/about-food-icon2.svg', title: 'Минералы', text: 'Необходимы для костей, <br> мышц и работы нервной <br> системы' },
+				{ icon: 'imgs/icons/about-food-icon3.svg', title: 'Витамины', text: 'Участвуют в обмене веществ <br> и поддерживают иммунитет' },
+				{ icon: 'imgs/icons/about-food-icon4.svg', title: 'Углеводы', text: 'Обеспечивают энергией на каждый день' },
+				{ icon: 'imgs/icons/about-food-icon5.svg', title: 'Жирные кислоты', text: 'Поддерживают кожу, шерсть и нормальную работу организма' },
+				{ icon: 'imgs/icons/about-food-icon6.svg', title: 'Клетчатка', text: 'Поддерживает пищеварение и здоровье кишечника' },
+			],
+		},
+		'home-plan': {
+			person_name: 'Босунова Наталья',
+			person_role: 'Главный ветеринар-диетолог <br> компании',
+			title: 'Составим индивидуальный план питания',
+			subtitle: 'для вашего питомца',
+			price: 'Стоимость: от 1 500 ₽ (в зависимости от выбранной консультации)',
+			text: 'Для щенков, беременных/кормящих собак, для питомцев с избыточной/недостаточной массой тела, для питомцев с заболеванием (ЖКТ заболевания, болезнь почек, мочекаменная болезнь, пищевая аллергия и т.д).',
+			button_label: 'начать',
+		},
+		'shipping': {
+			title: 'Бесплатная доставка',
+			tabs: [
+				{ id: 'moscow', title: 'Москва', label: 'Введите адрес', placeholder: 'Улица, дом, корп', items: [ 'Бесплатная доставка по Москве в пределах оранжевой зоны', 'График доставки: ежедневно', 'Интервал доставки: с 6-00 до 11-00 утром' ] },
+				{ id: 'spb', title: 'Санкт-Петербург', label: 'Введите адрес', placeholder: 'Улица, дом, корп', items: [ 'Бесплатная доставка по Санкт-Петербургу в пределах оранжевой зоны', 'График доставки: ежедневно', 'Интервал доставки: с 6-00 до 11-00 утром' ] },
+			],
+		},
+		'sale': {
+			title: 'скидка — 30% на первый заказ',
+			subtitle: 'начните кормить своего <br> питомца по-новому',
+			text: '<span>Для новых клиентов</span> <br> Скидка -30% на первый заказ по промокоду <strong>СТАРТ</strong>',
+			button_label: 'Выбрать рацион',
+			button_url: '/shop/',
+		},
+		'why': {
+			title: 'Остались вопросы <br> по питанию?',
+			text: 'Оставьте контакты — поможем <br> подобрать рацион и всё объясним',
+			button_label: 'связаться',
+		},
 		'home-questions': {
 			title: 'часто задаваемые вопросы',
 			tabs: [
@@ -158,6 +200,26 @@
 			},
 			el( 'div', { style: { paddingTop: '8px' } }, children )
 		);
+	}
+
+	function setArrayItem( source, setAttributes, attrName, index, key, value ) {
+		var next = clone( source );
+		next[ index ][ key ] = value;
+		setAttributes( ( function () {
+			var attrs = {};
+			attrs[ attrName ] = next;
+			return attrs;
+		} )() );
+	}
+
+	function setNestedArrayItem( source, setAttributes, attrName, index, nestedName, nestedIndex, value ) {
+		var next = clone( source );
+		next[ index ][ nestedName ][ nestedIndex ] = value;
+		setAttributes( ( function () {
+			var attrs = {};
+			attrs[ attrName ] = next;
+			return attrs;
+		} )() );
 	}
 
 	function heroEdit( props ) {
@@ -328,6 +390,206 @@
 		], true, isFirstDiceyBlock( props ) );
 	}
 
+	function aboutFoodEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var items = arr( attrs, 'home-about-food', 'items' );
+
+		function setItemField( index, key, value ) {
+			setArrayItem( items, setAttributes, 'items', index, key, value );
+		}
+
+		return box( 'Что получает ваша собака', [
+			panel( 'Заголовок и ссылка', [
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'home-about-food', 'title' ),
+					onChange: function ( value ) { setAttributes( { title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'home-about-food', 'text' ),
+					onChange: function ( value ) { setAttributes( { text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст ссылки',
+					value: val( attrs, 'home-about-food', 'link_label' ),
+					onChange: function ( value ) { setAttributes( { link_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'URL ссылки',
+					value: val( attrs, 'home-about-food', 'link_url' ),
+					onChange: function ( value ) { setAttributes( { link_url: value } ); },
+				} ),
+			], true ),
+			items.map( function ( item, index ) {
+				return panel( panelTitle( 'Элемент', index, item.title ), [
+					el( TextControl, {
+						label: 'Название',
+						value: item.title,
+						onChange: function ( value ) { setItemField( index, 'title', value ); },
+					} ),
+					el( TextareaControl, {
+						label: 'Описание',
+						value: item.text,
+						onChange: function ( value ) { setItemField( index, 'text', value ); },
+					} ),
+				], false );
+			} ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
+	function planEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+
+		return box( 'Составим индивидуальный план питания', [
+			panel( 'Специалист', [
+				el( TextControl, {
+					label: 'Имя',
+					value: val( attrs, 'home-plan', 'person_name' ),
+					onChange: function ( value ) { setAttributes( { person_name: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Должность',
+					value: val( attrs, 'home-plan', 'person_role' ),
+					onChange: function ( value ) { setAttributes( { person_role: value } ); },
+				} ),
+			], true ),
+			panel( 'Тексты', [
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'home-plan', 'title' ),
+					onChange: function ( value ) { setAttributes( { title: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Подзаголовок',
+					value: val( attrs, 'home-plan', 'subtitle' ),
+					onChange: function ( value ) { setAttributes( { subtitle: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Стоимость',
+					value: val( attrs, 'home-plan', 'price' ),
+					onChange: function ( value ) { setAttributes( { price: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Описание',
+					value: val( attrs, 'home-plan', 'text' ),
+					onChange: function ( value ) { setAttributes( { text: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'home-plan', 'button_label' ),
+					onChange: function ( value ) { setAttributes( { button_label: value } ); },
+				} ),
+			], false ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
+	function shippingEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+		var tabs = arr( attrs, 'shipping', 'tabs' );
+
+		function setTabField( index, key, value ) {
+			setArrayItem( tabs, setAttributes, 'tabs', index, key, value );
+		}
+
+		return box( 'Бесплатная доставка', [
+			el( TextControl, {
+				label: 'Заголовок',
+				value: val( attrs, 'shipping', 'title' ),
+				onChange: function ( value ) { setAttributes( { title: value } ); },
+			} ),
+			tabs.map( function ( tab, tabIndex ) {
+				return panel( panelTitle( 'Город', tabIndex, tab.title ), [
+					el( TextControl, {
+						label: 'Название вкладки',
+						value: tab.title,
+						onChange: function ( value ) { setTabField( tabIndex, 'title', value ); },
+					} ),
+					el( TextControl, {
+						label: 'Подпись поля адреса',
+						value: tab.label,
+						onChange: function ( value ) { setTabField( tabIndex, 'label', value ); },
+					} ),
+					el( TextControl, {
+						label: 'Подсказка в поле адреса',
+						value: tab.placeholder,
+						onChange: function ( value ) { setTabField( tabIndex, 'placeholder', value ); },
+					} ),
+					tab.items.map( function ( item, itemIndex ) {
+						return el( TextareaControl, {
+							label: 'Пункт ' + ( itemIndex + 1 ),
+							value: item,
+							onChange: function ( value ) { setNestedArrayItem( tabs, setAttributes, 'tabs', tabIndex, 'items', itemIndex, value ); },
+						} );
+					} ),
+				], 0 === tabIndex );
+			} ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
+	function saleEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+
+		return box( 'Скидка - 30% на первый заказ', [
+			panel( 'Тексты', [
+				el( TextControl, {
+					label: 'Заголовок',
+					value: val( attrs, 'sale', 'title' ),
+					onChange: function ( value ) { setAttributes( { title: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Подзаголовок',
+					value: val( attrs, 'sale', 'subtitle' ),
+					onChange: function ( value ) { setAttributes( { subtitle: value } ); },
+				} ),
+				el( TextareaControl, {
+					label: 'Текст акции',
+					value: val( attrs, 'sale', 'text' ),
+					onChange: function ( value ) { setAttributes( { text: value } ); },
+				} ),
+			], true ),
+			panel( 'Кнопка', [
+				el( TextControl, {
+					label: 'Текст кнопки',
+					value: val( attrs, 'sale', 'button_label' ),
+					onChange: function ( value ) { setAttributes( { button_label: value } ); },
+				} ),
+				el( TextControl, {
+					label: 'Ссылка кнопки',
+					value: val( attrs, 'sale', 'button_url' ),
+					onChange: function ( value ) { setAttributes( { button_url: value } ); },
+				} ),
+			], false ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
+	function whyEdit( props ) {
+		var attrs = props.attributes;
+		var setAttributes = props.setAttributes;
+
+		return box( 'Остались вопросы по питанию?', [
+			el( TextareaControl, {
+				label: 'Заголовок',
+				value: val( attrs, 'why', 'title' ),
+				onChange: function ( value ) { setAttributes( { title: value } ); },
+			} ),
+			el( TextareaControl, {
+				label: 'Текст',
+				value: val( attrs, 'why', 'text' ),
+				onChange: function ( value ) { setAttributes( { text: value } ); },
+			} ),
+			el( TextControl, {
+				label: 'Текст кнопки',
+				value: val( attrs, 'why', 'button_label' ),
+				onChange: function ( value ) { setAttributes( { button_label: value } ); },
+			} ),
+		], true, isFirstDiceyBlock( props ) );
+	}
+
 	function questionsEdit( props ) {
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
@@ -425,6 +687,63 @@
 			},
 			edit: worksEdit,
 		},
+		'dicey/home-about-food': {
+			title: __( 'Что получает ваша собака', 'dicey' ),
+			icon: 'food',
+			attributes: {
+				title: { type: 'string' },
+				text: { type: 'string' },
+				link_label: { type: 'string' },
+				link_url: { type: 'string' },
+				items: { type: 'array', default: defaults['home-about-food'].items },
+			},
+			edit: aboutFoodEdit,
+		},
+		'dicey/home-plan': {
+			title: __( 'Составим индивидуальный план питания', 'dicey' ),
+			icon: 'id',
+			attributes: {
+				person_name: { type: 'string' },
+				person_role: { type: 'string' },
+				title: { type: 'string' },
+				subtitle: { type: 'string' },
+				price: { type: 'string' },
+				text: { type: 'string' },
+				button_label: { type: 'string' },
+			},
+			edit: planEdit,
+		},
+		'dicey/shipping': {
+			title: __( 'Бесплатная доставка', 'dicey' ),
+			icon: 'location-alt',
+			attributes: {
+				title: { type: 'string' },
+				tabs: { type: 'array', default: defaults.shipping.tabs },
+			},
+			edit: shippingEdit,
+		},
+		'dicey/sale': {
+			title: __( 'Скидка - 30% на первый заказ', 'dicey' ),
+			icon: 'tag',
+			attributes: {
+				title: { type: 'string' },
+				subtitle: { type: 'string' },
+				text: { type: 'string' },
+				button_label: { type: 'string' },
+				button_url: { type: 'string' },
+			},
+			edit: saleEdit,
+		},
+		'dicey/why': {
+			title: __( 'Остались вопросы по питанию?', 'dicey' ),
+			icon: 'email-alt',
+			attributes: {
+				title: { type: 'string' },
+				text: { type: 'string' },
+				button_label: { type: 'string' },
+			},
+			edit: whyEdit,
+		},
 		'dicey/home-questions': {
 			title: __( 'Часто задаваемые вопросы', 'dicey' ),
 			icon: 'editor-help',
@@ -455,11 +774,6 @@
 	[
 		[ 'dicey/home-legacy', __( 'Домашняя страница', 'dicey' ), 'layout' ],
 		[ 'dicey/home-popularity', __( 'Заказывают чаще всего', 'dicey' ), 'products' ],
-		[ 'dicey/home-about-food', __( 'Что получает ваша собака', 'dicey' ), 'food' ],
-		[ 'dicey/home-plan', __( 'Составим индивидуальный план питания', 'dicey' ), 'id' ],
-		[ 'dicey/shipping', __( 'Бесплатная доставка', 'dicey' ), 'location-alt' ],
-		[ 'dicey/sale', __( 'Скидка - 30% на первый заказ', 'dicey' ), 'tag' ],
-		[ 'dicey/why', __( 'Остались вопросы по питанию?', 'dicey' ), 'email-alt' ],
 		[ 'dicey/works', __( 'Шаги оформления заказа', 'dicey' ), 'list-view' ],
 	].forEach( function ( block ) {
 		blocks.registerBlockType( block[0], {
