@@ -149,18 +149,80 @@ function dicey_product_title_for_card( $post_id ) {
 function dicey_product_price_for_card( $post_id, $meta = null ) {
 	$meta = null === $meta ? dicey_get_product_meta( $post_id ) : $meta;
 
+	if ( function_exists( 'wc_get_product' ) ) {
+		$product = wc_get_product( $post_id );
+		if ( $product ) {
+			$price_html = wp_strip_all_tags( $product->get_price_html() );
+			if ( '' !== trim( $price_html ) ) {
+				return $price_html;
+			}
+		}
+	}
+
 	if ( '' !== trim( $meta['price'] ) ) {
 		return $meta['price'];
 	}
 
-	if ( function_exists( 'wc_get_product' ) ) {
-		$product = wc_get_product( $post_id );
-		if ( $product ) {
-			return wp_strip_all_tags( $product->get_price_html() );
+	return '';
+}
+
+function dicey_product_variation_label( $attribute_name, $attribute_value ) {
+	$attribute_name  = preg_replace( '/^attribute_/', '', (string) $attribute_name );
+	$attribute_value = (string) $attribute_value;
+
+	if ( taxonomy_exists( $attribute_name ) ) {
+		$term = get_term_by( 'slug', $attribute_value, $attribute_name );
+		if ( $term && ! is_wp_error( $term ) ) {
+			return $term->name;
 		}
 	}
 
-	return '';
+	return $attribute_value;
+}
+
+function dicey_get_wc_product_period_options( $post_id ) {
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return array();
+	}
+
+	$product = wc_get_product( $post_id );
+	if ( ! $product || ! $product->is_type( 'variable' ) ) {
+		return array();
+	}
+
+	$options = array();
+	foreach ( $product->get_children() as $variation_id ) {
+		$variation = wc_get_product( $variation_id );
+		if ( ! $variation || ! $variation->exists() || ! $variation->is_purchasable() || ! $variation->is_in_stock() ) {
+			continue;
+		}
+
+		$attributes = $variation->get_variation_attributes();
+		if ( empty( $attributes ) ) {
+			continue;
+		}
+
+		$period_key   = '';
+		$period_value = '';
+		foreach ( $attributes as $attribute_key => $attribute_value ) {
+			$period_key   = $attribute_key;
+			$period_value = $attribute_value;
+			break;
+		}
+
+		if ( '' === $period_key ) {
+			continue;
+		}
+
+		$options[] = array(
+			'variation_id' => $variation_id,
+			'label'        => dicey_product_variation_label( $period_key, $period_value ),
+			'price'        => wp_strip_all_tags( $variation->get_price_html() ),
+			'attributes'   => $attributes,
+		);
+	}
+
+	return $options;
 }
 
 function dicey_render_product_card( $post_id ) {
@@ -189,7 +251,7 @@ function dicey_render_product_card( $post_id ) {
 				<p class="popularity__price"><?php echo esc_html( $price ); ?></p>
 			<?php endif; ?>
 		</a>
-		<div class="popularity__btn">В корзину</div>
+		<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" class="popularity__btn">Смотреть</a>
 	</div>
 	<?php
 }

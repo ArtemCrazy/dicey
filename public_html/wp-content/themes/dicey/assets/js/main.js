@@ -179,6 +179,39 @@ $(".product__imgs img").click(function () {
 	$(this).addClass("active");
 });
 
+$(document).on("click", ".product__term-tab", function () {
+	var $tab = $(this)
+	var $product = $tab.closest(".product")
+	var price = $tab.attr("data-variation-price")
+	var variationId = $tab.attr("data-variation-id")
+	var attributes = $tab.attr("data-variation-attributes")
+
+	$tab.siblings(".product__term-tab").removeClass("active")
+	$tab.addClass("active")
+
+	if (price) {
+		$product.find("[data-product-price]").text(price)
+	}
+
+	if (variationId) {
+		$product.find("[data-variation-id-input]").val(variationId)
+	}
+
+	if (attributes) {
+		try {
+			var parsed = JSON.parse(attributes)
+			Object.keys(parsed).forEach(function (name) {
+				var $input = $product.find('.dicey-product-variation-attribute[name="' + name + '"]')
+				if (!$input.length) {
+					$input = $('<input type="hidden" class="dicey-product-variation-attribute">').attr("name", name)
+					$product.find(".dicey-product-cart").append($input)
+				}
+				$input.val(parsed[name])
+			})
+		} catch (e) {}
+	}
+});
+
 $(document).on("click", ".shop__block", function () {
 	var $wr = $(this).closest(".shop__wr")
 	if ($wr.data("drag-moved")) {

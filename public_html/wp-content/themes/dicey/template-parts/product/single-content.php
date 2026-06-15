@@ -8,9 +8,10 @@
 $meta    = dicey_get_product_meta( get_the_ID() );
 $gallery = dicey_product_lines( $meta['gallery'] );
 $thumbs  = dicey_product_lines( $meta['gallery_thumbs'] );
-$terms   = dicey_product_lines( $meta['terms'] );
+$variation_options = function_exists( 'dicey_get_wc_product_period_options' ) ? dicey_get_wc_product_period_options( get_the_ID() ) : array();
+$terms   = $variation_options ? wp_list_pluck( $variation_options, 'label' ) : dicey_product_lines( $meta['terms'] );
 $faq     = dicey_product_faq_items( $meta['faq'] );
-$price   = dicey_product_price_for_card( get_the_ID(), $meta );
+$price   = $variation_options && ! empty( $variation_options[0]['price'] ) ? $variation_options[0]['price'] : dicey_product_price_for_card( get_the_ID(), $meta );
 
 if ( ! $gallery ) {
 	$gallery = array( 'imgs/bg/product-img1.png' );
@@ -45,15 +46,27 @@ if ( ! $thumbs ) {
 				</div>
 				<h1 class="product__title"><?php the_title(); ?></h1>
 				<?php if ( '' !== trim( $price ) ) : ?>
-					<p class="product__price"><?php echo esc_html( $price ); ?></p>
+					<p class="product__price" data-product-price><?php echo esc_html( $price ); ?></p>
 				<?php endif; ?>
 				<?php if ( $terms ) : ?>
 					<div class="product__term">
 						<p class="product__term-name">Срок</p>
 						<div class="product__term-tabs">
-							<?php foreach ( $terms as $term_index => $term ) : ?>
-								<div class="product__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>"><?php echo esc_html( $term ); ?></div>
-							<?php endforeach; ?>
+							<?php if ( $variation_options ) : ?>
+								<?php foreach ( $variation_options as $term_index => $option ) : ?>
+									<button
+										type="button"
+										class="product__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>"
+										data-variation-id="<?php echo esc_attr( $option['variation_id'] ); ?>"
+										data-variation-price="<?php echo esc_attr( $option['price'] ); ?>"
+										data-variation-attributes="<?php echo esc_attr( wp_json_encode( $option['attributes'] ) ); ?>"
+									><?php echo esc_html( $option['label'] ); ?></button>
+								<?php endforeach; ?>
+							<?php else : ?>
+								<?php foreach ( $terms as $term_index => $term ) : ?>
+									<button type="button" class="product__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>"><?php echo esc_html( $term ); ?></button>
+								<?php endforeach; ?>
+							<?php endif; ?>
 						</div>
 					</div>
 				<?php endif; ?>
@@ -71,10 +84,26 @@ if ( ! $thumbs ) {
 						<?php echo wpautop( wp_kses_post( $meta['kbju_text'] ) ); ?>
 					<?php endif; ?>
 				</div>
-				<div class="shop__btns">
-					<a href="<?php echo esc_url( home_url( '/decoration/' ) ); ?>" class="shop__btn-clear">Перейти к оформлению</a>
-					<div class="shop__btn-apply2">В корзину</div>
-				</div>
+				<?php
+				$default_variation = $variation_options ? $variation_options[0] : null;
+				$form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/basket/' );
+				$checkout_url      = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/decoration/' );
+				?>
+				<form class="dicey-product-cart" method="post" action="<?php echo esc_url( $form_action ); ?>">
+					<input type="hidden" name="add-to-cart" value="<?php echo esc_attr( get_the_ID() ); ?>">
+					<input type="hidden" name="product_id" value="<?php echo esc_attr( get_the_ID() ); ?>">
+					<input type="hidden" name="quantity" value="1">
+					<?php if ( $default_variation ) : ?>
+						<input type="hidden" name="variation_id" value="<?php echo esc_attr( $default_variation['variation_id'] ); ?>" data-variation-id-input>
+						<?php foreach ( $default_variation['attributes'] as $attribute_key => $attribute_value ) : ?>
+							<input type="hidden" class="dicey-product-variation-attribute" name="<?php echo esc_attr( $attribute_key ); ?>" value="<?php echo esc_attr( $attribute_value ); ?>">
+						<?php endforeach; ?>
+					<?php endif; ?>
+					<div class="shop__btns">
+						<a href="<?php echo esc_url( $checkout_url ); ?>" class="shop__btn-clear">Перейти к оформлению</a>
+						<button type="submit" class="shop__btn-apply2">В корзину</button>
+					</div>
+				</form>
 				<?php if ( $faq ) : ?>
 					<div class="questions__blocks">
 						<?php foreach ( $faq as $item ) : ?>

@@ -3230,6 +3230,7 @@ footer::before {
 }
 
 .shop__btn-apply2 {
+	appearance: none;
 	border: 1px solid #5182A6;
 	background: #5182A6;
 	color: #F5F9FF;
@@ -3530,6 +3531,7 @@ footer::before {
 }
 
 .product__term-tab {
+	appearance: none;
 	display: flex;
 	align-items: center;
 	justify-content: center;
