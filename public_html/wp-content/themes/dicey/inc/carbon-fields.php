@@ -29,6 +29,28 @@ function dicey_register_carbon_product_fields() {
 					->set_help_text( 'На главную выводится максимум 4 товара.' ),
 				\Carbon_Fields\Field::make( 'checkbox', 'dicey_product_is_vip', 'ВИП-рацион' )
 					->set_option_value( '1' ),
+				\Carbon_Fields\Field::make( 'separator', 'dicey_product_matching_separator', 'Логика подбора рациона' ),
+				\Carbon_Fields\Field::make( 'set', 'dicey_product_match_age_groups', 'Возраст собаки' )
+					->set_help_text( 'Если ничего не выбрано, рацион считается подходящим для любого возраста.' )
+					->add_options(
+						array(
+							'adult'  => '1-10 лет',
+							'senior' => '> 10 лет',
+						)
+					),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_match_weight_min', 'Вес от, кг' )
+					->set_help_text( 'Можно указать дробное значение через точку или запятую, например 2.5.' )
+					->set_attribute( 'type', 'number' )
+					->set_attribute( 'step', '0.5' )
+					->set_attribute( 'min', '0' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_match_weight_max', 'Вес до, кг' )
+					->set_help_text( 'Если пусто, верхняя граница не ограничена.' )
+					->set_attribute( 'type', 'number' )
+					->set_attribute( 'step', '0.5' )
+					->set_attribute( 'min', '0' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_match_breeds', 'Породы для подбора' )
+					->set_help_text( 'Каждая порода с новой строки. Если пусто, рацион подходит для любой породы. Для универсального варианта используйте «Другая порода».' )
+					->set_rows( 4 ),
 				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_tags', 'Теги карточки' )
 					->set_help_text( 'Каждый тег с новой строки.' )
 					->set_rows( 4 ),

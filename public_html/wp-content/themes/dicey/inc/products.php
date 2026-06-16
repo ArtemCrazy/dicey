@@ -66,6 +66,10 @@ function dicey_product_meta_defaults() {
 		'tags'              => '',
 		'is_vip'            => '',
 		'show_on_home'      => '',
+		'match_age_groups'  => '',
+		'match_weight_min'  => '',
+		'match_weight_max'  => '',
+		'match_breeds'      => '',
 		'terms'             => "3 дня\n5 дней\n1 месяц\n3 месяца\n6 месяцев",
 		'composition_title' => 'Состав',
 		'composition_text'  => 'Курица, куриные сердечки/куриные желудки , рис/гречка , овощи',
@@ -103,6 +107,12 @@ function dicey_get_product_meta( $post_id ) {
 }
 
 function dicey_product_lines( $value ) {
+	if ( is_array( $value ) ) {
+		$lines = array_map( 'trim', $value );
+
+		return array_values( array_filter( $lines, static function ( $line ) { return '' !== $line; } ) );
+	}
+
 	$lines = preg_split( '/\r\n|\r|\n/', (string) $value );
 	$lines = array_map( 'trim', $lines );
 
@@ -226,10 +236,14 @@ function dicey_get_wc_product_period_options( $post_id ) {
 }
 
 function dicey_render_product_card( $post_id ) {
-	$meta = dicey_get_product_meta( $post_id );
-	$tags = dicey_product_lines( $meta['tags'] );
+	$meta        = dicey_get_product_meta( $post_id );
+	$tags        = dicey_product_lines( $meta['tags'] );
+	$age_groups  = dicey_product_lines( $meta['match_age_groups'] );
+	$breeds      = dicey_product_lines( $meta['match_breeds'] );
+	$weight_min  = '' !== trim( $meta['match_weight_min'] ) ? (float) str_replace( ',', '.', $meta['match_weight_min'] ) : '';
+	$weight_max  = '' !== trim( $meta['match_weight_max'] ) ? (float) str_replace( ',', '.', $meta['match_weight_max'] ) : '';
 	?>
-	<div class="popularity__block">
+	<div class="popularity__block" data-dicey-product="1" data-age-groups="<?php echo esc_attr( implode( ',', $age_groups ) ); ?>" data-weight-min="<?php echo esc_attr( $weight_min ); ?>" data-weight-max="<?php echo esc_attr( $weight_max ); ?>" data-breeds="<?php echo esc_attr( implode( ',', $breeds ) ); ?>" data-vip="<?php echo esc_attr( $meta['is_vip'] ? '1' : '0' ); ?>">
 		<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" class="popularity__link">
 			<div class="popularity__img-wr">
 				<?php if ( $tags || $meta['is_vip'] ) : ?>
@@ -421,6 +435,16 @@ function dicey_render_product_meta_box( $post ) {
 		<div class="dicey-product-field"><label>Изображение карточки</label><input type="text" name="dicey_product[card_image]" value="<?php echo esc_attr( $meta['card_image'] ); ?>"><p class="dicey-product-note">Можно использовать «Изображение записи» справа или путь/URL здесь.</p></div>
 		<div class="dicey-product-field"><label><input type="checkbox" name="dicey_product[show_on_home]" value="1" <?php checked( $meta['show_on_home'], '1' ); ?>> Показывать на главной</label><p class="dicey-product-note">На главную выводится максимум 4 товара.</p></div>
 		<div class="dicey-product-field"><label><input type="checkbox" name="dicey_product[is_vip]" value="1" <?php checked( $meta['is_vip'], '1' ); ?>> ВИП-рацион</label></div>
+		<div class="dicey-product-field dicey-product-wide"><strong>Логика подбора рациона</strong><p class="dicey-product-note">Если поля ниже пустые, товар считается подходящим всем. Реальные значения нужно заполнить после получения таблицы от заказчика.</p></div>
+		<div class="dicey-product-field">
+			<label>Возраст собаки</label>
+			<?php $selected_age_groups = dicey_product_lines( $meta['match_age_groups'] ); ?>
+			<label><input type="checkbox" name="dicey_product[match_age_groups][]" value="adult" <?php checked( in_array( 'adult', $selected_age_groups, true ) ); ?>> 1-10 лет</label>
+			<label><input type="checkbox" name="dicey_product[match_age_groups][]" value="senior" <?php checked( in_array( 'senior', $selected_age_groups, true ) ); ?>> &gt; 10 лет</label>
+		</div>
+		<div class="dicey-product-field"><label>Вес от, кг</label><input type="text" name="dicey_product[match_weight_min]" value="<?php echo esc_attr( $meta['match_weight_min'] ); ?>"><p class="dicey-product-note">Например: 2.5</p></div>
+		<div class="dicey-product-field"><label>Вес до, кг</label><input type="text" name="dicey_product[match_weight_max]" value="<?php echo esc_attr( $meta['match_weight_max'] ); ?>"><p class="dicey-product-note">Если пусто, верхняя граница не ограничена.</p></div>
+		<div class="dicey-product-field dicey-product-wide"><label>Породы для подбора, каждая с новой строки</label><textarea name="dicey_product[match_breeds]"><?php echo esc_textarea( is_array( $meta['match_breeds'] ) ? implode( "\n", $meta['match_breeds'] ) : $meta['match_breeds'] ); ?></textarea><p class="dicey-product-note">Если пусто, рацион подходит для любой породы.</p></div>
 		<div class="dicey-product-field dicey-product-wide"><label>Теги карточки, каждый с новой строки</label><textarea name="dicey_product[tags]"><?php echo esc_textarea( $meta['tags'] ); ?></textarea></div>
 		<div class="dicey-product-field"><label>Сроки, каждый с новой строки</label><textarea name="dicey_product[terms]"><?php echo esc_textarea( $meta['terms'] ); ?></textarea></div>
 		<div class="dicey-product-field"><label>Галерея, каждый URL/путь с новой строки</label><textarea name="dicey_product[gallery]"><?php echo esc_textarea( $meta['gallery'] ); ?></textarea></div>
@@ -454,6 +478,8 @@ function dicey_save_product_meta( $post_id ) {
 		$value = isset( $raw[ $key ] ) ? $raw[ $key ] : '';
 		if ( in_array( $key, array( 'show_on_home', 'is_vip' ), true ) ) {
 			$value = $value ? '1' : '';
+		} elseif ( 'match_age_groups' === $key ) {
+			$value = is_array( $value ) ? implode( "\n", array_map( 'sanitize_key', $value ) ) : '';
 		} else {
 			$value = is_array( $value ) ? '' : wp_kses_post( $value );
 		}

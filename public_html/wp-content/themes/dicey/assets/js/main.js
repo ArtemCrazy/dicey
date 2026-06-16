@@ -218,7 +218,9 @@ $(document).on("click", ".shop__block", function () {
 		$wr.data("drag-moved", false)
 		return
 	}
-	$(this).toggleClass("active")
+	$(".shop__block").removeClass("active")
+	$(this).addClass("active")
+	updateShopApplyState()
 })
 $(".sort-dropdown__top").click(function () {
 	$(this).parent().toggleClass("active");
@@ -228,10 +230,14 @@ $(".sort-dropdown__item").click(function () {
 	$(this).parents(".sort-dropdown").find(".sort-dropdown__top span").text($(this).text());
 	$(this).parents(".sort-dropdown").removeClass("active");
 	$(this).parents(".sort-dropdown").find(".sort-dropdown__menu").slideUp();
+	if ($(".shop").data("primary-applied")) {
+		applyShopFilters()
+	}
 });
 $(".shop__nav-tab").click(function () {
 	$(this).siblings().removeClass("active");
 	$(this).addClass("active");
+	updateShopApplyState()
 });
 
 
@@ -448,6 +454,7 @@ function shopFormatWeight(n) {
 function shopSetWeight($input, n) {
 	n = Math.max(0, shopRoundWeight(n))
 	$input.val(n > 0 ? shopFormatWeight(n) : "")
+	updateShopApplyState()
 }
 
 $(document).on("click", ".shop__weight-btn--minus", function () {
@@ -462,6 +469,186 @@ $(document).on("click", ".shop__weight-btn--plus", function () {
 
 $(document).on("change blur", ".shop__weight-input", function () {
 	shopSetWeight($(this), shopParseWeight($(this).val()))
+})
+
+$(document).on("input", ".shop__weight-input", function () {
+	updateShopApplyState()
+})
+
+function shopNormalizeText(text) {
+	return String(text || "")
+		.toLowerCase()
+		.replace(/\s+/g, " ")
+		.replace(/<br\s*\/?>/g, " ")
+		.trim()
+}
+
+function shopGetAgeGroup() {
+	return $(".shop__nav-tab.active").data("age-group") || ""
+}
+
+function shopGetWeight() {
+	return shopParseWeight($(".shop__weight-input").val())
+}
+
+function shopGetBreed() {
+	var text = $(".shop__block.active .shop__block-name").text()
+	return shopNormalizeText(text || "Другая порода")
+}
+
+function shopCanApplyPrimary() {
+	return !!shopGetAgeGroup() && shopGetWeight() > 0
+}
+
+function updateShopApplyState() {
+	var canApply = shopCanApplyPrimary()
+	$(".shop__btn-apply, .shop__btn-apply2")
+		.prop("disabled", !canApply)
+		.toggleClass("disabled", !canApply)
+}
+
+function shopCsvIncludes(csv, value) {
+	var list = String(csv || "")
+		.split(",")
+		.map(function (item) { return shopNormalizeText(item) })
+		.filter(Boolean)
+
+	return !list.length || list.indexOf(shopNormalizeText(value)) !== -1
+}
+
+function shopCardMatchesPrimary($card) {
+	var age = shopGetAgeGroup()
+	var weight = shopGetWeight()
+	var breed = shopGetBreed()
+	var min = shopParseWeight($card.data("weight-min"))
+	var max = shopParseWeight($card.data("weight-max"))
+	var breedCsv = $card.attr("data-breeds") || ""
+
+	if (!shopCsvIncludes($card.attr("data-age-groups"), age)) {
+		return false
+	}
+
+	if (min > 0 && weight < min) {
+		return false
+	}
+
+	if (max > 0 && weight > max) {
+		return false
+	}
+
+	if (breedCsv && !shopCsvIncludes(breedCsv, breed)) {
+		return false
+	}
+
+	return true
+}
+
+function shopGetCompositionFilter() {
+	var text = $(".shop__filter-left .sort-dropdown").first().find(".sort-dropdown__top span").text()
+	text = shopNormalizeText(text)
+	return text === "состав" ? "" : text
+}
+
+function shopGetSortMode() {
+	return shopNormalizeText($(".shop__filter-right .sort-dropdown .sort-dropdown__top span").text())
+}
+
+function shopCardPrice($card) {
+	var text = $card.find(".popularity__price").first().text()
+	var match = text.replace(/\s/g, "").match(/\d+([,.]\d+)?/)
+	return match ? parseFloat(match[0].replace(",", ".")) : 0
+}
+
+function shopCardText($card) {
+	return shopNormalizeText($card.text())
+}
+
+function shopCardMatchesAdditional($card) {
+	var composition = shopGetCompositionFilter()
+	var vipOnly = $(".shop-checkbox__parent input[type='checkbox']").is(":checked")
+
+	if (composition && shopCardText($card).indexOf(composition) === -1) {
+		return false
+	}
+
+	if (vipOnly && String($card.data("vip")) !== "1") {
+		return false
+	}
+
+	return true
+}
+
+function sortShopCards($cards) {
+	var sortMode = shopGetSortMode()
+	var $container = $(".shop__blocks")
+	var cards = $cards.get()
+
+	if (sortMode === "по цене") {
+		cards.sort(function (a, b) { return shopCardPrice($(a)) - shopCardPrice($(b)) })
+	} else if (sortMode === "по новизне") {
+		cards.reverse()
+	}
+
+	cards.forEach(function (card) {
+		$container.append(card)
+	})
+}
+
+function applyShopFilters() {
+	if (!shopCanApplyPrimary()) {
+		return
+	}
+
+	var visibleCount = 0
+	var $cards = $(".shop__blocks .popularity__block")
+	$(".shop").data("primary-applied", true)
+	$(".shop__filter").css("display", "flex")
+
+	$cards.each(function () {
+		var $card = $(this)
+		var visible = shopCardMatchesPrimary($card) && shopCardMatchesAdditional($card)
+		$card.toggle(visible)
+		if (visible) {
+			visibleCount++
+		}
+	})
+
+	sortShopCards($cards)
+	$(".shop__empty").toggle(visibleCount === 0)
+	$(".shop__more-btn").toggle(visibleCount > 0)
+}
+
+function resetShopFilters() {
+	$(".shop").data("primary-applied", false)
+	$(".shop__weight-input").val("")
+	$(".shop__nav-tab").removeClass("active").first().addClass("active")
+	$(".shop__block").removeClass("active").first().addClass("active")
+	$(".shop__filter").hide()
+	$(".shop__blocks .popularity__block").show()
+	$(".shop__empty").hide()
+	$(".shop__more-btn").show()
+	$(".shop-checkbox__parent input[type='checkbox']").prop("checked", false)
+	$(".shop__filter-left .sort-dropdown").first().find(".sort-dropdown__top span").text("Состав")
+	$(".shop__filter-right .sort-dropdown").find(".sort-dropdown__top span").text("По популярности")
+	updateShopApplyState()
+}
+
+$(document).on("click", ".shop__btn-apply, .shop__btn-apply2", function () {
+	applyShopFilters()
+})
+
+$(document).on("click", ".shop__btn-clear", function () {
+	resetShopFilters()
+})
+
+$(document).on("change", ".shop-checkbox__parent input[type='checkbox']", function () {
+	if ($(".shop").data("primary-applied")) {
+		applyShopFilters()
+	}
+})
+
+$(function () {
+	updateShopApplyState()
 })
 
 // ===== Visitor City =====

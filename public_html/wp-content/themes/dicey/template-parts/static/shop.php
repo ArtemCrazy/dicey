@@ -14,8 +14,8 @@
                 <div class="shop__age">
                     <p class="shop__nav-name">Возраст собаки</p>
                     <div class="shop__nav-tabs">
-                        <div class="shop__nav-tab active">1-10 лет</div>
-                        <div class="shop__nav-tab">> 10 лет</div>
+                        <button type="button" class="shop__nav-tab active" data-age-group="adult">1-10 лет</button>
+                        <button type="button" class="shop__nav-tab" data-age-group="senior">&gt; 10 лет</button>
                     </div>
                 </div>
                 <div class="shop__weight">
@@ -25,7 +25,7 @@
                             <line x1="2" y1="7.5" x2="14" y2="7.5" stroke="#5182A6"/>
                             </svg>
                             </div>
-                        <input type="number" class="shop__weight-input" placeholder="0">
+                        <input type="number" class="shop__weight-input" placeholder="0" min="0" step="0.5">
                         <div class="shop__weight-btn  shop__weight-btn--plus"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line x1="1" y1="7.5" x2="14" y2="7.5" stroke="#5182A6"/>
                             <line x1="7.5" y1="1" x2="7.5" y2="14" stroke="#5182A6"/>
@@ -168,14 +168,14 @@
                 </div>
             </div>
           </div>
-          <button class="shop__btn-apply" style="display: none;">Применить</button>
+          <button type="button" class="shop__btn-apply" style="display: none;" disabled>Применить</button>
           <div class="shop__btns">
-            <buttom class="shop__btn-clear">
+            <button type="button" class="shop__btn-clear">
                 Сбросить
-            </buttom>
-            <buttom class="shop__btn-apply2">Применить</buttom>
+            </button>
+            <button type="button" class="shop__btn-apply2" disabled>Применить</button>
           </div>
-          <div class="shop__filter">
+          <div class="shop__filter" style="display: none;">
             <div class="shop__filter-left">
                 <div class="sort-dropdown">
                     <div class="sort-dropdown__top">
@@ -428,6 +428,7 @@
                 </div>
                 <?php endif; ?>
             </div>
+            <div class="shop__empty" style="display: none;">Подходящие рационы не найдены. Попробуйте изменить параметры подбора.</div>
           </div>
           <div class="shop__more-btn">Показать еще</div>
         </div>

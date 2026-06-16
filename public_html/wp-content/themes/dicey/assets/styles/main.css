@@ -3006,6 +3006,7 @@ footer::before {
 }
 
 .shop__nav-tab {
+	appearance: none;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -3175,6 +3176,8 @@ footer::before {
 }
 
 .shop__btn-apply {
+	appearance: none;
+	border: 0;
 	border-radius: 30px;
 	background: #86AFCC;
 	cursor: default;
@@ -3199,6 +3202,7 @@ footer::before {
 
 .shop__btn-clear,
 .shop__btn-apply2 {
+	appearance: none;
 	padding: 15px 30px;
 	border-radius: 30px;
 	display: flex;
@@ -3215,6 +3219,7 @@ footer::before {
 
 .shop__btn-clear {
 	border: 1px solid #5182A6;
+	background: transparent;
 	color: #5182A6;
 	text-align: center;
 	font-family: Mulish;
@@ -3244,6 +3249,26 @@ footer::before {
 
 .shop__btn-apply2:hover {
 	background: #295D82;
+}
+
+.shop__btn-apply:disabled,
+.shop__btn-apply.disabled,
+.shop__btn-apply2:disabled,
+.shop__btn-apply2.disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.shop__empty {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 140%;
+	text-align: center;
+	width: 100%;
+	padding: 40px 20px;
 }
 
 .shop__filter {
