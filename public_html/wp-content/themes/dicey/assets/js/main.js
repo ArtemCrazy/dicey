@@ -149,7 +149,7 @@ $(".select-box li").click(function () {
 	$(this).parents(".select-box").find("summary span").text($(this).text());
 
 	$(this).parents(".select-box").attr("open", false);
-	$(this).parents(".select-box").find("input[type='hidden']").val($(this).text());
+	$(this).parents(".select-box").find("input[type='hidden']").val($(this).text()).trigger("change");
 });
 
 $(".decoration__methods-block").click(function () {
@@ -557,8 +557,19 @@ $(document).on("change blur", ".shop__weight-input", function () {
 
 // ===== Shipping Maps =====
 ;(function ($) {
-    var YMAPS_KEY  = 'eee5455e-2d4c-4174-b71d-e53e2c579428';
-    var DADATA_KEY = '625ac2d6e333230dfb431316f21c5024f2229a70';
+    var deliverySettings = window.diceyTheme && window.diceyTheme.delivery ? window.diceyTheme.delivery : {};
+    var YMAPS_KEY  = deliverySettings.yandexMapsApiKey || '';
+    var DADATA_KEY = deliverySettings.dadataToken || '';
+
+    var messages = {
+        free: deliverySettings.freeMessage || 'Бесплатная доставка по вашему адресу',
+        paid: deliverySettings.paidMessage || 'Адрес входит в дополнительную зону доставки. Условия нужно уточнить у менеджера.',
+        outside: deliverySettings.outsideMessage || 'Адрес не входит в зону доставки. Оставьте заявку, и мы уточним возможные варианты.',
+        dadataMissing: deliverySettings.dadataMissingNotice || 'Для проверки адреса нужно добавить API-ключ DaData в админке.',
+        mapsMissing: deliverySettings.mapsMissingNotice || 'Для отображения карты нужно добавить API-ключ Яндекс.Карт в админке.',
+        coordsMissing: 'Координаты не определены',
+        serviceError: 'Не удалось проверить адрес. Попробуйте еще раз позже.'
+    };
 
     var ZONES = {};
 
@@ -582,6 +593,36 @@ $(document).on("change blur", ".shop__weight-input", function () {
         }
     };
 
+    function cityKeyFromLabel(label) {
+        label = (label || '').toLowerCase();
+        return label.indexOf('петербург') !== -1 || label.indexOf('спб') !== -1 ? 'spb' : 'moscow';
+    }
+
+    function setupCheckoutAddress() {
+        if (!document.getElementById('checkout-shipping-input')) return false;
+
+        var cityKey = cityKeyFromLabel($('input[name="billing_city"]').val());
+        state.checkout = { map: null, marker: null, ready: true };
+        cfg.checkout = {
+            inputId: 'checkout-shipping-input',
+            suggestId: 'checkout-shipping-suggest',
+            resultId: 'checkout-shipping-result',
+            zoneKey: cityKey,
+            dadataLocations: cfg[cityKey].dadataLocations
+        };
+        return true;
+    }
+
+    function updateCheckoutAddressCity() {
+        if (!cfg.checkout) return;
+
+        var cityKey = cityKeyFromLabel($('input[name="billing_city"]').val());
+        cfg.checkout.zoneKey = cityKey;
+        cfg.checkout.dadataLocations = cfg[cityKey].dadataLocations;
+        $('#checkout-shipping-zone-status, #checkout-shipping-normalized-address, #checkout-shipping-geo-lat, #checkout-shipping-geo-lon').val('');
+        setResult(cfg.checkout, 'shipping__check--err', '');
+    }
+
     function pointInPolygon(point, polygon) {
         var lat = point[0], lon = point[1], inside = false;
         for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -597,6 +638,13 @@ $(document).on("change blur", ".shop__weight-input", function () {
     function isInZone(point, rings) {
         if (!rings) return false;
         return rings.some(function (ring) { return pointInPolygon(point, ring); });
+    }
+
+    function setResult(c, className, text) {
+        var $result = $('#' + c.resultId).empty();
+        if (text) {
+            $result.append($('<span>').addClass(className).text(text));
+        }
     }
 
     function addFreeZone(coordinates, map) {
@@ -631,7 +679,7 @@ $(document).on("change blur", ".shop__weight-input", function () {
         ['geolocationControl','searchControl','trafficControl','typeSelector','fullscreenControl','rulerControl']
             .forEach(function(ctrl) { try { map.controls.remove(ctrl); } catch(e) {} });
 
-        var zones = ZONES[key];
+        var zones = ZONES[key] || {};
         if (zones.paid) addPaidZone(zones.paid, map);
         if (zones.free) addFreeZone(zones.free, map);
     }
@@ -639,12 +687,18 @@ $(document).on("change blur", ".shop__weight-input", function () {
     function suggestAddress(key, query) {
         var c = cfg[key];
         if (!query || query.length < 3) { $('#' + c.suggestId).hide().empty(); return; }
+        if (!DADATA_KEY) {
+            $('#' + c.suggestId).hide().empty();
+            setResult(c, 'shipping__check--err', messages.dadataMissing);
+            return;
+        }
         $.ajax({
             url: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address',
             type: 'POST', contentType: 'application/json',
             headers: { Authorization: 'Token ' + DADATA_KEY },
             data: JSON.stringify({ query: query, count: 5, restrict_value: false, locations: c.dadataLocations }),
-            success: function (res) { renderSuggestions(key, res.suggestions || []); }
+            success: function (res) { renderSuggestions(key, res.suggestions || []); },
+            error: function () { setResult(c, 'shipping__check--err', messages.serviceError); }
         });
     }
 
@@ -658,8 +712,13 @@ $(document).on("change blur", ".shop__weight-input", function () {
                 $list.hide();
                 var lat = s.data && parseFloat(s.data.geo_lat);
                 var lon = s.data && parseFloat(s.data.geo_lon);
+                if (key === 'checkout') {
+                    $('#checkout-shipping-normalized-address').val(s.value || '');
+                    $('#checkout-shipping-geo-lat').val(lat || '');
+                    $('#checkout-shipping-geo-lon').val(lon || '');
+                }
                 if (lat && lon) { checkPoint(key, lat, lon); }
-                else { $('#' + c.resultId).html('<span class="shipping__check--err">Координаты не определены</span>'); }
+                else { setResult(c, 'shipping__check--err', messages.coordsMissing); }
             }).appendTo($list);
         });
         $list.show();
@@ -669,6 +728,8 @@ $(document).on("change blur", ".shop__weight-input", function () {
         var s = state[key];
         var c = cfg[key];
         var coords = [lat, lon];
+        var zoneKey = c.zoneKey || key;
+        var status = 'outside';
 
         if (s.map) {
             if (s.marker) s.map.geoObjects.remove(s.marker);
@@ -677,19 +738,25 @@ $(document).on("change blur", ".shop__weight-input", function () {
             s.map.panTo(coords, { flying: true });
         }
 
-        var $res = $('#' + c.resultId);
-        var zones = ZONES[key];
+        var zones = ZONES[zoneKey] || {};
         if (isInZone(coords, zones.free)) {
-            $res.html('<span class="shipping__check--ok">✓ Бесплатная доставка по вашему адресу</span>');
+            status = 'free';
+            setResult(c, 'shipping__check--ok', messages.free);
         } else if (isInZone(coords, zones.paid)) {
-            $res.html('<span class="shipping__check--err">⚠ Адрес в платной зоне доставки</span>');
+            status = 'paid';
+            setResult(c, 'shipping__check--err', messages.paid);
         } else {
-            $res.html('<span class="shipping__check--err">✗ Адрес не входит в зону доставки</span>');
+            setResult(c, 'shipping__check--err', messages.outside);
+        }
+
+        if (key === 'checkout') {
+            $('#checkout-shipping-zone-status').val(status);
         }
     }
 
     function bindInputs() {
         $.each(cfg, function (key, c) {
+            if (!c.inputId) return;
             var timer;
             $(document).on('input', '#' + c.inputId, function () {
                 var val = $(this).val();
@@ -700,6 +767,7 @@ $(document).on("change blur", ".shop__weight-input", function () {
                 if (e.key === 'Escape') $('#' + c.suggestId).hide();
             });
         });
+        $(document).on('change', 'input[name="billing_city"]', updateCheckoutAddressCity);
         $(document).on('click', function (e) {
             if (!$(e.target).closest('.shipping__suggest-wr').length) {
                 $('.shipping__suggest-list').hide();
@@ -708,28 +776,60 @@ $(document).on("change blur", ".shop__weight-input", function () {
     }
 
     function loadYmaps(cb) {
+        if (!YMAPS_KEY) {
+            $.each(cfg, function (_, c) {
+                if (c.mapId) {
+                    $('#' + c.mapId).text(messages.mapsMissing);
+                }
+            });
+            return;
+        }
         if (window.ymaps) { ymaps.ready(cb); return; }
         var s = document.createElement('script');
-        s.src = 'https://api-maps.yandex.ru/2.1/?apikey=' + YMAPS_KEY + '&lang=ru_RU';
+        s.src = 'https://api-maps.yandex.ru/2.1/?apikey=' + encodeURIComponent(YMAPS_KEY) + '&lang=ru_RU';
         s.onload = function () { ymaps.ready(cb); };
+        s.onerror = function () {
+            $.each(cfg, function (_, c) {
+                if (c.mapId) {
+                    $('#' + c.mapId).text(messages.serviceError);
+                }
+            });
+        };
         document.head.appendChild(s);
     }
 
     $(function () {
-        if (!$('#shipping-map-moscow, #shipping-map-spb').length) return;
+        var hasShippingMaps = $('#shipping-map-moscow, #shipping-map-spb').length > 0;
+        var hasCheckoutAddress = setupCheckoutAddress();
+        if (!hasShippingMaps && !hasCheckoutAddress) return;
+
         $.ajax({
             url: (window.diceyTheme && window.diceyTheme.assetsUrl ? window.diceyTheme.assetsUrl : '') + '/js/zones.json',
             dataType: 'text',
             success: function (text) {
-                ZONES = (new Function('return (' + text + ')'))();
-                loadYmaps(function () {
-                    initMap(window.diceyGetCityKey ? window.diceyGetCityKey() : 'moscow');
-                    bindInputs();
-                    $(document).on('click', '.shipping__tabs .standart__tab', function () {
-                        var key = $(this).data('city-key') || 'moscow';
-                        setTimeout(function () { initMap(key); }, 80);
+                try {
+                    ZONES = (new Function('return (' + text + ')'))();
+                } catch (e) {
+                    ZONES = {};
+                }
+                bindInputs();
+                if (hasShippingMaps) {
+                    loadYmaps(function () {
+                        initMap(window.diceyGetCityKey ? window.diceyGetCityKey() : 'moscow');
+                        $(document).on('click', '.shipping__tabs .standart__tab', function () {
+                            var key = $(this).data('city-key') || 'moscow';
+                            setTimeout(function () { initMap(key); }, 80);
+                        });
                     });
-                });
+                }
+            },
+            error: function () {
+                bindInputs();
+                if (hasShippingMaps) {
+                    loadYmaps(function () {
+                        initMap(window.diceyGetCityKey ? window.diceyGetCityKey() : 'moscow');
+                    });
+                }
             }
         });
     });

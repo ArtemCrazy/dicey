@@ -7195,6 +7195,10 @@ footer::before {
 	margin-bottom: 24px;
 }
 
+.decoration__inputs .shipping__suggest-wr {
+	margin-bottom: 0;
+}
+
 .shipping__suggest-list {
 	display: none;
 	position: absolute;
@@ -7232,6 +7236,10 @@ footer::before {
 	margin-top: 0px;
 	font-size: 14px;
 	margin-bottom: 10px;
+}
+
+.decoration__inputs .shipping__check-result {
+	margin: -2px 0 0;
 }
 
 .shipping__check--ok {

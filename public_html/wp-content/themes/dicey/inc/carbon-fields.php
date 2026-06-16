@@ -72,6 +72,33 @@ function dicey_register_carbon_global_fields() {
 			)
 		);
 
+	\Carbon_Fields\Container::make( 'theme_options', 'Доставка и адреса' )
+		->add_fields(
+			array(
+				\Carbon_Fields\Field::make( 'html', 'dicey_delivery_keys_note' )
+					->set_html( '<p>Эти ключи используются на фронте для подсказок адреса и карты. В кабинетах DaData и Яндекс.Карт ограничьте их доменом сайта.</p>' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_dadata_token', 'API-ключ DaData для подсказок адреса' )
+					->set_help_text( 'Нужен публичный токен Suggestions API.' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_yandex_maps_api_key', 'API-ключ Яндекс.Карт' )
+					->set_help_text( 'Нужен браузерный ключ JavaScript API.' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_delivery_free_message', 'Сообщение: бесплатная зона' )
+					->set_rows( 2 )
+					->set_default_value( 'Бесплатная доставка по вашему адресу' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_delivery_paid_message', 'Сообщение: дополнительная зона' )
+					->set_rows( 2 )
+					->set_default_value( 'Адрес входит в дополнительную зону доставки. Условия нужно уточнить у менеджера.' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_delivery_outside_message', 'Сообщение: вне зоны доставки' )
+					->set_rows( 3 )
+					->set_default_value( 'Адрес не входит в зону доставки. Оставьте заявку, и мы уточним возможные варианты.' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_delivery_dadata_missing_notice', 'Сообщение: нет ключа DaData' )
+					->set_rows( 2 )
+					->set_default_value( 'Для проверки адреса нужно добавить API-ключ DaData в админке.' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_delivery_maps_missing_notice', 'Сообщение: нет ключа Яндекс.Карт' )
+					->set_rows( 2 )
+					->set_default_value( 'Для отображения карты нужно добавить API-ключ Яндекс.Карт в админке.' ),
+			)
+		);
+
 	\Carbon_Fields\Container::make( 'theme_options', 'Остались вопросы' )
 		->add_fields(
 			array(

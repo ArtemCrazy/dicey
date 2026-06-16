@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'template_redirect', 'dicey_handle_cart_period_change' );
 add_filter( 'woocommerce_checkout_fields', 'dicey_simplify_checkout_fields' );
 add_action( 'woocommerce_before_checkout_process', 'dicey_apply_checkout_coupon' );
+add_action( 'woocommerce_checkout_create_order', 'dicey_save_checkout_delivery_check', 10, 2 );
 
 function dicey_is_woocommerce_ready() {
 	return function_exists( 'WC' ) && WC()->cart;
@@ -214,6 +215,28 @@ function dicey_apply_checkout_coupon() {
 	}
 }
 
+function dicey_save_checkout_delivery_check( $order, $data ) {
+	unset( $data );
+
+	$fields = array(
+		'_dicey_delivery_zone_status'        => 'dicey_delivery_zone_status',
+		'_dicey_delivery_normalized_address' => 'dicey_delivery_normalized_address',
+		'_dicey_delivery_geo_lat'            => 'dicey_delivery_geo_lat',
+		'_dicey_delivery_geo_lon'            => 'dicey_delivery_geo_lon',
+	);
+
+	foreach ( $fields as $meta_key => $post_key ) {
+		if ( empty( $_POST[ $post_key ] ) ) {
+			continue;
+		}
+
+		$value = sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) );
+		if ( '' !== $value ) {
+			$order->update_meta_data( $meta_key, $value );
+		}
+	}
+}
+
 function dicey_render_checkout_payment_methods() {
 	$gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
@@ -340,7 +363,15 @@ function dicey_render_decoration_page() {
 									</ul>
 									<input type="hidden" name="billing_city" value="<?php echo esc_attr( $checkout->get_value( 'billing_city' ) ? $checkout->get_value( 'billing_city' ) : $city['label'] ); ?>">
 								</details>
-								<input type="text" name="billing_address_1" class="decoration__input" placeholder="Адрес" value="<?php echo esc_attr( $checkout->get_value( 'billing_address_1' ) ); ?>" required>
+								<div class="shipping__suggest-wr">
+									<input type="text" id="checkout-shipping-input" name="billing_address_1" class="decoration__input" placeholder="Адрес" value="<?php echo esc_attr( $checkout->get_value( 'billing_address_1' ) ); ?>" autocomplete="off" required>
+									<div class="shipping__suggest-list" id="checkout-shipping-suggest"></div>
+								</div>
+								<div class="shipping__check-result" id="checkout-shipping-result"></div>
+								<input type="hidden" name="dicey_delivery_zone_status" id="checkout-shipping-zone-status" value="">
+								<input type="hidden" name="dicey_delivery_normalized_address" id="checkout-shipping-normalized-address" value="">
+								<input type="hidden" name="dicey_delivery_geo_lat" id="checkout-shipping-geo-lat" value="">
+								<input type="hidden" name="dicey_delivery_geo_lon" id="checkout-shipping-geo-lon" value="">
 							</div>
 						</div>
 						<div class="decoration__block">
