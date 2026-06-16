@@ -5612,6 +5612,10 @@ footer::before {
 }
 
 .basket__del {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	padding: 0;
 	color: #5182A6;
 	text-align: right;
 	font-family: Mulish;
@@ -5724,6 +5728,7 @@ footer::before {
 	justify-content: center;
 	align-items: center;
 	cursor: pointer;
+	text-decoration: none;
 	-webkit-transition: all 0.6s;
 	-moz-transition: all 0.6s;
 	-ms-transition: all 0.6s;
@@ -5759,6 +5764,22 @@ footer::before {
 .basket__decoration:hover {
 	background: #295D82;
 	border-color: #295D82;
+}
+
+.dicey-cart-period-form {
+	margin: 0;
+}
+
+.basket__time-item {
+	appearance: none;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	text-align: left;
+}
+
+.decoration__methods-block input {
+	display: none;
 }
 
 .basket__wr {

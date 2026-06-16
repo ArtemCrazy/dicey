@@ -149,7 +149,7 @@ $(".select-box li").click(function () {
 	$(this).parents(".select-box").find("summary span").text($(this).text());
 
 	$(this).parents(".select-box").attr("open", false);
-	$(this).parents(".select-box").find("input[name='city']").val($(this).text());
+	$(this).parents(".select-box").find("input[type='hidden']").val($(this).text());
 });
 
 $(".decoration__methods-block").click(function () {
