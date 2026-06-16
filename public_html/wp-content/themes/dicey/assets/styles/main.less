@@ -5893,6 +5893,36 @@ footer::before {
   margin-bottom: 37px;
 }
 
+.lk__nav a,
+.lk__form-btn-cancel,
+.lk__cheque,
+.lk__repeat,
+.lk-vet__btn,
+.lk__address-btn {
+  text-decoration: none;
+}
+
+.dicey-account-auth .lk__contents {
+  width: 100%;
+}
+
+.dicey-account-auth__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px;
+  width: 100%;
+}
+
+.dicey-account-notice {
+  margin-bottom: 20px;
+  color: #5182A6;
+  font-family: Mulish;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+}
+
 .basket__empty {
   display: flex;
   flex-direction: column;
@@ -12367,5 +12397,8 @@ text-underline-position: from-font;
 }
 .lk-vet__btn{
   width: 100%;
+}
+.dicey-account-auth__grid {
+  grid-template-columns: 1fr;
 }
 }

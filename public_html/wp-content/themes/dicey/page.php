@@ -16,6 +16,8 @@ while ( have_posts() ) :
 		echo dicey_render_basket_page();
 	} elseif ( 'decoration' === $slug && function_exists( 'dicey_render_decoration_page' ) ) {
 		echo dicey_render_decoration_page();
+	} elseif ( 'lk' === $slug && function_exists( 'dicey_render_account_page' ) ) {
+		echo dicey_render_account_page();
 	} elseif ( '' !== trim( $content ) ) {
 		the_content();
 	} elseif ( function_exists( 'dicey_missing_content_notice' ) ) {

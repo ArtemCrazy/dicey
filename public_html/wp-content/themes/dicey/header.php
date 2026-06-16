@@ -11,6 +11,8 @@ ob_start();
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <?php $dicey_city = function_exists( 'dicey_get_detected_city' ) ? dicey_get_detected_city() : array( 'label' => 'Москва' ); ?>
+<?php $dicey_cart_count = function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0; ?>
+<?php $dicey_cart_url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/basket/' ); ?>
 
 <header>
   <div class="promo-line">
@@ -101,12 +103,12 @@ ob_start();
       </div>
       <button class="header__btn-consult" data-fancybox data-src="#consult-modal">Консультация диетолога</button>
       <div class="header__nav">
-        <div data-fancybox data-src="#authorization-modal" class="header__nav-link">
+        <a href="<?php echo esc_url( home_url( '/lk/' ) ); ?>" class="header__nav-link">
           <svg width="25" height="20" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0.550781 19.0278C2.30729 16.1799 6.157 14.2307 12.163 14.2307C18.1691 14.2307 22.0188 16.1799 23.7753 19.0278M16.934 5.18756C16.934 7.74882 14.798 9.82514 12.163 9.82514C9.52813 9.82514 7.39212 7.74882 7.39212 5.18756C7.39212 2.6263 9.52813 0.549988 12.163 0.549988C14.798 0.549988 16.934 2.6263 16.934 5.18756Z" stroke="#5182A6" stroke-width="1.1" stroke-linecap="round"/>
           </svg>            
-        </div>
-        <a href="/basket.php" class="header__nav-link">
+        </a>
+        <a href="<?php echo esc_url( $dicey_cart_url ); ?>" class="header__nav-link">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.902 7.98264H13.6035" stroke="#5182A6" stroke-width="1.09886" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M9.30469 7.98264H13.6033" stroke="#5182A6" stroke-width="1.09886" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
@@ -114,7 +116,7 @@ ob_start();
             <path d="M13.6035 24.8008H24.0829L21.987 7.98264H20.9099" stroke="#5182A6" stroke-width="1.09886" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M7.75391 10.7863V7.99997C7.75391 4.7362 10.3889 2.09039 13.6394 2.09039C16.8899 2.09039 19.525 4.7362 19.525 7.99997V10.7863" stroke="#5182A6" stroke-width="1.09886" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>   
-          <div class="header__nav-num">80</div>                   
+          <?php if ( $dicey_cart_count ) : ?><div class="header__nav-num"><?php echo esc_html( $dicey_cart_count ); ?></div><?php endif; ?>
         </a>
       </div>
     </div>
