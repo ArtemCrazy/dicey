@@ -157,6 +157,44 @@ $(".decoration__methods-block").click(function () {
 	$(this).siblings().removeClass("active");
 });
 
+$(document).on("submit", ".dicey-newsletter-form", function (e) {
+	e.preventDefault()
+
+	var $form = $(this)
+	var $message = $form.find(".footer__form-message")
+	var $button = $form.find(".footer__form-btn")
+	var settings = window.diceyTheme && window.diceyTheme.newsletter ? window.diceyTheme.newsletter : {}
+	var email = $form.find('input[name="email"]').val()
+	var consent = $form.find('input[name="consent"]').is(":checked") ? "1" : ""
+
+	$message.removeClass("is-error is-success").text(settings.pending || "Сохраняем...")
+	$button.prop("disabled", true).addClass("disabled")
+
+	$.ajax({
+		url: window.diceyTheme && window.diceyTheme.ajaxUrl ? window.diceyTheme.ajaxUrl : "",
+		type: "POST",
+		dataType: "json",
+		data: {
+			action: "dicey_subscribe_newsletter",
+			nonce: settings.nonce || "",
+			email: email,
+			consent: consent,
+		},
+		success: function (response) {
+			var text = response && response.data && response.data.message ? response.data.message : settings.success || "Спасибо! Мы сохранили вашу подписку."
+			$message.addClass("is-success").text(text)
+			$form[0].reset()
+		},
+		error: function (xhr) {
+			var text = xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : settings.error || "Не удалось сохранить подписку. Попробуйте позже."
+			$message.addClass("is-error").text(text)
+		},
+		complete: function () {
+			$button.prop("disabled", false).removeClass("disabled")
+		},
+	})
+})
+
 
 $(".product__img-slider").owlCarousel({
 	items: 1,

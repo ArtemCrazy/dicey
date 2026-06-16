@@ -80,6 +80,12 @@ function dicey_enqueue_assets() {
 			'assetsUrl' => DICEY_ASSETS_URI,
 			'homeUrl'   => home_url( '/' ),
 			'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+			'newsletter' => array(
+				'nonce'    => wp_create_nonce( 'dicey_newsletter' ),
+				'pending'  => 'Сохраняем...',
+				'success'  => 'Спасибо! Мы сохранили вашу подписку.',
+				'error'    => 'Не удалось сохранить подписку. Попробуйте позже.',
+			),
 			'city'      => array(
 				'key'   => $city['key'],
 				'label' => $city['label'],

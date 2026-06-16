@@ -1,2 +1,11 @@
 User-agent: *
-Disallow: /
+Disallow: /daysi/wp-admin/
+Allow: /daysi/wp-admin/admin-ajax.php
+Disallow: /daysi/basket/
+Disallow: /daysi/decoration/
+Disallow: /daysi/lk/
+Disallow: /daysi/gratitude/
+Disallow: /daysi/cookies/
+
+Sitemap: http://korovai.crazytest.ru/daysi/wp-sitemap.xml
+Sitemap: http://korovai.crazytest.ru/daysi/sitemap_index.xml

@@ -248,6 +248,18 @@ function dicey_render_account_profile() {
 	<?php
 }
 
+function dicey_render_account_empty_state( $title, $text, $button_label = '', $button_url = '' ) {
+	?>
+	<div class="dicey-account-empty">
+		<p class="dicey-account-empty__title"><?php echo esc_html( $title ); ?></p>
+		<p class="dicey-account-empty__text"><?php echo esc_html( $text ); ?></p>
+		<?php if ( $button_label && $button_url ) : ?>
+			<a href="<?php echo esc_url( $button_url ); ?>" class="lk-vet__btn"><?php echo esc_html( $button_label ); ?></a>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
 function dicey_render_account_orders() {
 	if ( ! function_exists( 'wc_get_orders' ) ) {
 		return;
@@ -263,8 +275,7 @@ function dicey_render_account_orders() {
 	);
 
 	if ( ! $orders ) {
-		echo '<p class="lk-vet__text">У вас пока нет заказов.</p>';
-		echo '<a href="' . esc_url( home_url( '/shop/' ) ) . '" class="lk-vet__btn">Перейти в магазин</a>';
+		dicey_render_account_empty_state( 'Заказов пока нет', 'Когда вы оформите первый рацион, он появится здесь вместе со статусом и деталями.', 'Перейти в магазин', home_url( '/shop/' ) );
 		return;
 	}
 
@@ -300,8 +311,7 @@ function dicey_render_account_orders() {
 	}
 
 	if ( ! $has_product_orders ) {
-		echo '<p class="lk-vet__text">У вас пока нет заказов рационов.</p>';
-		echo '<a href="' . esc_url( home_url( '/shop/' ) ) . '" class="lk-vet__btn">Перейти в магазин</a>';
+		dicey_render_account_empty_state( 'Рационов пока нет', 'Здесь будут отображаться только заказы рационов. Консультации вынесены в отдельный раздел.', 'Перейти в магазин', home_url( '/shop/' ) );
 	}
 }
 
@@ -311,6 +321,9 @@ function dicey_render_account_addresses() {
 	$address = get_user_meta( $user_id, 'billing_address_1', true );
 	?>
 	<?php if ( ! empty( $_GET['address_saved'] ) ) : ?><p class="dicey-account-notice">Адрес сохранен.</p><?php endif; ?>
+	<?php if ( '' === trim( $city ) && '' === trim( $address ) ) : ?>
+		<?php dicey_render_account_empty_state( 'Адрес не добавлен', 'Добавьте город и адрес доставки, чтобы быстрее оформлять следующие заказы.' ); ?>
+	<?php endif; ?>
 	<form method="post" class="lk__address-wr">
 		<input type="hidden" name="dicey_account_action" value="address">
 		<?php wp_nonce_field( 'dicey_save_account_address', 'dicey_account_nonce' ); ?>
@@ -334,7 +347,7 @@ function dicey_render_account_vet() {
 
 	if ( ! $consultations ) {
 		echo '<div class="lk-vet">';
-		echo '<p class="lk-vet__text">У вас еще нет консультаций у ветеринара</p>';
+		dicey_render_account_empty_state( 'Консультаций пока нет', 'Вы можете выбрать один из вариантов консультации ниже. После оплаты она появится в этом разделе.' );
 		echo function_exists( 'dicey_render_consultation_product_cards' ) ? dicey_render_consultation_product_cards() : '<a href="' . esc_url( home_url( '/dietology/' ) ) . '" class="lk-vet__btn">Получить консультацию</a>';
 		echo '</div>';
 		return;

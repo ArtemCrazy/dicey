@@ -13,9 +13,52 @@ add_action( 'template_redirect', 'dicey_handle_cart_period_change' );
 add_filter( 'woocommerce_checkout_fields', 'dicey_simplify_checkout_fields' );
 add_action( 'woocommerce_before_checkout_process', 'dicey_apply_checkout_coupon' );
 add_action( 'woocommerce_checkout_create_order', 'dicey_save_checkout_delivery_check', 10, 2 );
+add_action( 'plugins_loaded', 'dicey_register_pending_payment_gateway', 20 );
+add_filter( 'woocommerce_payment_gateways', 'dicey_add_pending_payment_gateway' );
 
 function dicey_is_woocommerce_ready() {
 	return function_exists( 'WC' ) && WC()->cart;
+}
+
+function dicey_register_pending_payment_gateway() {
+	if ( ! class_exists( 'WC_Payment_Gateway' ) || class_exists( 'Dicey_Pending_Payment_Gateway' ) ) {
+		return;
+	}
+
+	class Dicey_Pending_Payment_Gateway extends WC_Payment_Gateway {
+		public function __construct() {
+			$this->id                 = 'dicey_pending_payment';
+			$this->method_title       = 'Дайси: оплата после подтверждения';
+			$this->method_description = 'Временный способ оплаты до подключения банковского шлюза.';
+			$this->has_fields         = false;
+			$this->enabled            = 'yes';
+			$this->title              = 'Оплата после подтверждения';
+			$this->description        = 'Платежный шлюз будет подключен позже. Сейчас заказ уйдет менеджеру для обработки.';
+		}
+
+		public function process_payment( $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( ! $order ) {
+				return array( 'result' => 'failure' );
+			}
+
+			$order->update_status( 'on-hold', 'Заказ оформлен через временный способ оплаты до подключения платежного шлюза.' );
+			WC()->cart->empty_cart();
+
+			return array(
+				'result'   => 'success',
+				'redirect' => $this->get_return_url( $order ),
+			);
+		}
+	}
+}
+
+function dicey_add_pending_payment_gateway( $gateways ) {
+	if ( class_exists( 'Dicey_Pending_Payment_Gateway' ) ) {
+		$gateways[] = 'Dicey_Pending_Payment_Gateway';
+	}
+
+	return $gateways;
 }
 
 function dicey_cart_item_period_label( $cart_item ) {
@@ -308,9 +351,74 @@ function dicey_render_checkout_order_summary() {
 	<?php
 }
 
+function dicey_render_order_received_page( $order_id = 0 ) {
+	if ( ! function_exists( 'wc_get_order' ) ) {
+		return dicey_missing_content_notice( 'Спасибо за заказ' );
+	}
+
+	$order_id = $order_id ? absint( $order_id ) : absint( get_query_var( 'order-received' ) );
+	$order    = $order_id ? wc_get_order( $order_id ) : null;
+
+	ob_start();
+	?>
+	<main>
+		<section class="decoration dicey-thankyou">
+			<div class="container">
+				<div class="decoration__head">
+					<div class="standart-nav">
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a>
+						<p>Заказ оформлен</p>
+					</div>
+					<h1 class="decoration__title">Спасибо за заказ</h1>
+				</div>
+				<div class="dicey-thankyou__box">
+					<?php if ( $order ) : ?>
+						<p class="dicey-thankyou__lead">Мы получили ваш заказ №<?php echo esc_html( $order->get_order_number() ); ?> и отправили детали на <?php echo esc_html( $order->get_billing_email() ); ?>.</p>
+						<div class="dicey-thankyou__grid">
+							<div>
+								<p class="dicey-thankyou__label">Дата</p>
+								<p class="dicey-thankyou__value"><?php echo esc_html( wc_format_datetime( $order->get_date_created(), 'd.m.Y H:i' ) ); ?></p>
+							</div>
+							<div>
+								<p class="dicey-thankyou__label">Итого</p>
+								<p class="dicey-thankyou__value"><?php echo wp_kses_post( $order->get_formatted_order_total() ); ?></p>
+							</div>
+							<div>
+								<p class="dicey-thankyou__label">Статус</p>
+								<p class="dicey-thankyou__value"><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></p>
+							</div>
+						</div>
+						<div class="dicey-thankyou__items">
+							<?php foreach ( $order->get_items() as $item ) : ?>
+								<div class="dicey-thankyou__item">
+									<span><?php echo esc_html( $item->get_name() ); ?></span>
+									<strong><?php echo wp_kses_post( $order->get_formatted_line_subtotal( $item ) ); ?></strong>
+								</div>
+							<?php endforeach; ?>
+						</div>
+						<p class="dicey-thankyou__note">Если способ оплаты еще не подключен, менеджер свяжется с вами и подскажет следующий шаг.</p>
+					<?php else : ?>
+						<p class="dicey-thankyou__lead">Заказ принят. Подробности отправлены на вашу почту.</p>
+					<?php endif; ?>
+					<div class="dicey-thankyou__actions">
+						<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="main__link">В магазин</a>
+						<a href="<?php echo esc_url( home_url( '/lk/' ) ); ?>" class="basket__purchases">Личный кабинет</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<?php
+	return ob_get_clean();
+}
+
 function dicey_render_decoration_page() {
 	if ( ! dicey_is_woocommerce_ready() ) {
 		return dicey_missing_content_notice( 'Оформление заказа' );
+	}
+
+	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) ) {
+		return dicey_render_order_received_page();
 	}
 
 	if ( WC()->cart->is_empty() ) {

@@ -146,6 +146,53 @@ function dicey_yoast_metadesc( $description ) {
 
 add_filter( 'wpseo_metadesc', 'dicey_yoast_metadesc' );
 
+function dicey_robots_txt( $output, $public ) {
+	if ( '0' === (string) $public ) {
+		return $output;
+	}
+
+	$lines = array(
+		'User-agent: *',
+		'Disallow: /wp-admin/',
+		'Allow: /wp-admin/admin-ajax.php',
+		'Disallow: /basket/',
+		'Disallow: /decoration/',
+		'Disallow: /lk/',
+		'Disallow: /gratitude/',
+		'Disallow: /cookies/',
+		'Sitemap: ' . home_url( '/wp-sitemap.xml' ),
+	);
+
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		$lines[] = 'Sitemap: ' . home_url( '/sitemap_index.xml' );
+	}
+
+	return implode( "\n", array_unique( $lines ) ) . "\n";
+}
+
+add_filter( 'robots_txt', 'dicey_robots_txt', 10, 2 );
+
+function dicey_attachment_image_alt_fallback( $attr, $attachment, $size ) {
+	unset( $size );
+
+	if ( ! empty( $attr['alt'] ) || ! $attachment instanceof WP_Post ) {
+		return $attr;
+	}
+
+	$alt = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+	if ( '' === trim( $alt ) ) {
+		$alt = $attachment->post_title;
+	}
+
+	if ( '' !== trim( $alt ) ) {
+		$attr['alt'] = wp_strip_all_tags( $alt );
+	}
+
+	return $attr;
+}
+
+add_filter( 'wp_get_attachment_image_attributes', 'dicey_attachment_image_alt_fallback', 10, 3 );
+
 function dicey_disable_comments_support() {
 	$post_types = get_post_types();
 

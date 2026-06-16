@@ -2638,6 +2638,25 @@ footer::before {
 	text-underline-position: from-font;
 }
 
+.footer__form-message {
+	color: #F5F9FF;
+	font-family: Mulish;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: 140%;
+	min-height: 18px;
+	margin-top: 10px;
+}
+
+.footer__form-message.is-error {
+	color: #ffeded;
+}
+
+.footer__form-message.is-success {
+	color: #f5fff0;
+}
+
 .footer__bottom {
 	padding-top: 134px;
 }
@@ -5841,6 +5860,33 @@ footer::before {
 	line-height: 150%;
 }
 
+.dicey-account-empty {
+	border-radius: 18px;
+	background: #EEF5FF;
+	padding: 24px;
+	margin-bottom: 24px;
+}
+
+.dicey-account-empty__title {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 24px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+	margin-bottom: 8px;
+}
+
+.dicey-account-empty__text {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 150%;
+	margin-bottom: 18px;
+}
+
 .dicey-consultation-products {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6112,6 +6158,107 @@ footer::before {
 
 .decoration__wr .decoration__btn:hover {
 	background: #295D82;
+}
+
+.dicey-thankyou__box {
+	max-width: 860px;
+	margin: 0 auto;
+	border-radius: 20px;
+	background: #EEF5FF;
+	padding: 40px 30px;
+}
+
+.dicey-thankyou__lead {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 140%;
+	margin-bottom: 28px;
+}
+
+.dicey-thankyou__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 28px;
+}
+
+.dicey-thankyou__grid > div,
+.dicey-thankyou__items {
+	border-radius: 12px;
+	background: #fff;
+	padding: 18px;
+}
+
+.dicey-thankyou__label {
+	color: #86AFCC;
+	font-family: Mulish;
+	font-size: 14px;
+	line-height: 140%;
+	margin-bottom: 6px;
+}
+
+.dicey-thankyou__value {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 140%;
+}
+
+.dicey-thankyou__items {
+	margin-bottom: 24px;
+}
+
+.dicey-thankyou__item {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 16px;
+	line-height: 140%;
+	padding: 12px 0;
+	border-bottom: 1px solid rgba(134, 175, 204, 0.3);
+}
+
+.dicey-thankyou__item:last-child {
+	border-bottom: 0;
+}
+
+.dicey-thankyou__note {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 16px;
+	line-height: 150%;
+	margin-bottom: 24px;
+}
+
+.dicey-thankyou__actions {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+@media (max-width: 767px) {
+	.dicey-thankyou__box {
+		padding: 24px 18px;
+	}
+
+	.dicey-thankyou__lead {
+		font-size: 18px;
+	}
+
+	.dicey-thankyou__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.dicey-thankyou__item {
+		flex-direction: column;
+		gap: 6px;
+	}
 }
 
 .decoration__right-head {
