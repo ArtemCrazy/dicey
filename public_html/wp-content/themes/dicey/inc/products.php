@@ -263,6 +263,18 @@ function dicey_get_products_query( $args = array() ) {
 		'posts_per_page'      => -1,
 		'orderby'             => array( 'menu_order' => 'ASC', 'date' => 'DESC' ),
 		'ignore_sticky_posts' => true,
+		'meta_query'          => array(
+			'relation' => 'OR',
+			array(
+				'key'     => '_dicey_is_consultation',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => '_dicey_is_consultation',
+				'value'   => '1',
+				'compare' => '!=',
+			),
+		),
 	);
 
 	return new WP_Query( array_merge( $defaults, $args ) );

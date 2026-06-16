@@ -5816,6 +5816,40 @@ footer::before {
 	line-height: 150%;
 }
 
+.dicey-consultation-products {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px;
+	width: 100%;
+}
+
+.dicey-consultation-product {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 22px;
+	border-radius: 24px;
+	background: #fff;
+}
+
+.dicey-consultation-product__title {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 130%;
+}
+
+.dicey-consultation-product__price {
+	color: #5182A6;
+	font-family: Mulish;
+	font-size: 20px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 130%;
+}
+
 .basket__empty {
 	display: flex;
 	flex-direction: column;
@@ -12291,6 +12325,10 @@ footer::before {
 	}
 
 	.dicey-account-auth__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.dicey-consultation-products {
 		grid-template-columns: 1fr;
 	}
 }

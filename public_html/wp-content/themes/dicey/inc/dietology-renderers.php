@@ -84,6 +84,7 @@ function dicey_render_dietology( $attrs = array() ) {
 	$advantages        = dicey_non_empty_items( $data['advantages'] );
 	$prices            = dicey_non_empty_items( $data['prices'] );
 	$faq_items         = dicey_non_empty_items( $data['faq_items'] );
+	$consult_products  = function_exists( 'dicey_get_consultation_products' ) ? dicey_get_consultation_products() : array();
 
 	if ( ! dicey_has_value( $data ) ) {
 		return '';
@@ -171,9 +172,10 @@ function dicey_render_dietology( $attrs = array() ) {
 				<div class="container">
 					<?php if ( '' !== trim( $data['price_title'] ) ) : ?><h2 class="popularity__title"><?php echo dicey_kses_inline( $data['price_title'] ); ?></h2><?php endif; ?>
 					<?php if ( $prices ) : ?><div class="price__blocks">
-						<?php foreach ( $prices as $card ) : ?>
+						<?php foreach ( $prices as $price_index => $card ) : ?>
 							<?php $items = dicey_non_empty_items( isset( $card['items'] ) ? $card['items'] : array() ); ?>
-							<div class="price__block"><?php if ( ! empty( $card['title'] ) || ! empty( $card['text'] ) ) : ?><div class="price__head"><?php if ( ! empty( $card['title'] ) ) : ?><h3 class="price__title"><?php echo dicey_kses_inline( $card['title'] ); ?></h3><?php endif; ?><?php if ( ! empty( $card['text'] ) ) : ?><p class="price__text"><?php echo dicey_kses_inline( $card['text'] ); ?></p><?php endif; ?></div><?php endif; ?><?php if ( $items || ! empty( $card['button'] ) ) : ?><div class="price__info"><?php if ( $items ) : ?><div class="price__list"><ul><?php foreach ( $items as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul></div><?php endif; ?><?php if ( ! empty( $card['button'] ) ) : ?><button class="price__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $card['button'] ); ?></button><?php endif; ?></div><?php endif; ?></div>
+							<?php $consult_product = isset( $consult_products[ $price_index ] ) ? $consult_products[ $price_index ] : null; ?>
+							<div class="price__block"><?php if ( ! empty( $card['title'] ) || ! empty( $card['text'] ) ) : ?><div class="price__head"><?php if ( ! empty( $card['title'] ) ) : ?><h3 class="price__title"><?php echo dicey_kses_inline( $card['title'] ); ?></h3><?php endif; ?><?php if ( ! empty( $card['text'] ) ) : ?><p class="price__text"><?php echo dicey_kses_inline( $card['text'] ); ?></p><?php endif; ?></div><?php endif; ?><?php if ( $items || ! empty( $card['button'] ) ) : ?><div class="price__info"><?php if ( $items ) : ?><div class="price__list"><ul><?php foreach ( $items as $item ) : ?><li><?php echo dicey_kses_inline( $item ); ?></li><?php endforeach; ?></ul></div><?php endif; ?><?php if ( ! empty( $card['button'] ) ) : ?><?php if ( $consult_product ) : ?><a class="price__btn" href="<?php echo esc_url( add_query_arg( array( 'add-to-cart' => $consult_product->get_id() ), function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/decoration/' ) ) ); ?>"><?php echo esc_html( $card['button'] ); ?></a><?php else : ?><button class="price__btn" data-fancybox data-src="#consult-modal"><?php echo esc_html( $card['button'] ); ?></button><?php endif; ?><?php endif; ?></div><?php endif; ?></div>
 						<?php endforeach; ?>
 					</div><?php endif; ?>
 				</div>

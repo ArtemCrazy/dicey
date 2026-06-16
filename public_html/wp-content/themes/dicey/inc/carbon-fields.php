@@ -62,6 +62,16 @@ function dicey_register_carbon_global_fields() {
 		return;
 	}
 
+	\Carbon_Fields\Container::make( 'theme_options', 'Консультации' )
+		->add_fields(
+			array(
+				\Carbon_Fields\Field::make( 'html', 'dicey_consultation_note' )
+					->set_html( '<p>Ссылка отправляется пользователю по email после оплаты консультации.</p>' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_consultation_form_url', 'Ссылка на Яндекс.Форму' )
+					->set_attribute( 'type', 'url' ),
+			)
+		);
+
 	\Carbon_Fields\Container::make( 'theme_options', 'Остались вопросы' )
 		->add_fields(
 			array(

@@ -183,57 +183,27 @@ ob_start();
   <div class="modal__wr">
     <p class="cons__name">Консультация диетолога</p>
     <p class="cons__text"><span>1.</span> Выберете необходимую форму консультации. Стоимость консультации возвращается при заказе и оплате рациона</p>
-    <form class="cons__form">
+    <?php $dicey_consultation_products = function_exists( 'dicey_get_consultation_products' ) ? dicey_get_consultation_products() : array(); ?>
+    <form class="cons__form" method="post" action="<?php echo esc_url( function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/decoration/' ) ); ?>">
       <div class="nutritionist">
-        <label class="service-card">
-          <input type="radio" name="service" />
-      
-          <span class="custom-radio"></span>
-      
-          <div class="service-content">
-         <p>   Консультация ветеринарного врача
-          <strong>1 500 ₽</strong></p>
-          </div>
-        </label>
-        <label class="service-card">
-          <input type="radio" name="service" />
-      
-          <span class="custom-radio"></span>
-      
-          <div class="service-content">
-           <p> Консультация ветеринарного врача
-            <strong>1 500 ₽</strong></p>
-          </div>
-        </label>
-        <label class="service-card">
-          <input type="radio" name="service" />
-      
-          <span class="custom-radio"></span>
-      
-          <div class="service-content">
-            <p>Консультация ветеринарного врача
-              <strong>1 500 ₽</strong></p>
-          </div>
-        </label>
-        <label class="service-card">
-          <input type="radio" name="service" />
-      
-          <span class="custom-radio"></span>
-      
-          <div class="service-content">
-          <p>  Ведение питания
-            <strong>2 500 ₽</strong></p>
-          </div>
-        </label>
+        <?php foreach ( $dicey_consultation_products as $index => $product ) : ?>
+          <label class="service-card">
+            <input type="radio" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>" <?php checked( 0, $index ); ?> required />
+            <span class="custom-radio"></span>
+            <div class="service-content">
+              <p><?php echo esc_html( $product->get_name() ); ?> <strong><?php echo wp_kses_post( $product->get_price_html() ); ?></strong></p>
+            </div>
+          </label>
+        <?php endforeach; ?>
       </div>
       <p class="cons__text"><span>2.</span> Заполните контактные данные</p>
       <div class="consult-modal__wr">
         <div class="consult-modal__inputs">
-        <input type="text" placeholder="Иван Иванов" class="consult-modal__input">
-        <input type="tel" placeholder="8(800)800-00-00" class="consult-modal__input">
-        <input type="mail" placeholder="ivan@mail.ru" class="consult-modal__input">
+        <input type="text" name="dicey_consultation_name" placeholder="Иван Иванов" class="consult-modal__input" required>
+        <input type="tel" name="dicey_consultation_phone" placeholder="8(800)800-00-00" class="consult-modal__input" required>
+        <input type="email" name="dicey_consultation_email" placeholder="ivan@mail.ru" class="consult-modal__input" required>
         </div>
-        <textarea class="consult-modal__textarea" placeholder="Комментарий при необходимости"></textarea>
+        <textarea name="dicey_consultation_comment" class="consult-modal__textarea" placeholder="Комментарий при необходимости"></textarea>
         <label class="checkbox__parent authorization__checkbox">
           <input type="checkbox" name="checkbox" required="" checked="" wfd-id="id2">
           <span class="checkbox__icon">
@@ -248,7 +218,7 @@ ob_start();
             порядке и на условиях, указанных в <a href="policy.php">Политике обработки персональных данных</a>
           </p>
         </label>
-        <button class="authorization__btn">Оплатить</button>
+        <button type="submit" class="authorization__btn">Оплатить</button>
       </div>
     </form>
   </div>

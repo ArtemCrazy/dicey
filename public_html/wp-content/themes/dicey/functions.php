@@ -20,6 +20,7 @@ require DICEY_THEME_DIR . '/inc/blog.php';
 require DICEY_THEME_DIR . '/inc/products.php';
 require DICEY_THEME_DIR . '/inc/commerce.php';
 require DICEY_THEME_DIR . '/inc/account.php';
+require DICEY_THEME_DIR . '/inc/consultations.php';
 require DICEY_THEME_DIR . '/inc/seo.php';
 require DICEY_THEME_DIR . '/inc/editor.php';
 require DICEY_THEME_DIR . '/inc/carbon-fields.php';

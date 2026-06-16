@@ -268,9 +268,15 @@ function dicey_render_account_orders() {
 		return;
 	}
 
+	$has_product_orders = false;
 	foreach ( $orders as $order ) {
 		foreach ( $order->get_items() as $item ) {
 			$product = $item->get_product();
+			if ( $product && function_exists( 'dicey_is_consultation_product' ) && dicey_is_consultation_product( $product->get_id() ) ) {
+				continue;
+			}
+
+			$has_product_orders = true;
 			$meta    = $product && function_exists( 'dicey_get_product_meta' ) ? dicey_get_product_meta( $product->get_parent_id() ? $product->get_parent_id() : $product->get_id() ) : array();
 			?>
 			<div class="lk__history-block">
@@ -291,6 +297,11 @@ function dicey_render_account_orders() {
 			</div>
 			<?php
 		}
+	}
+
+	if ( ! $has_product_orders ) {
+		echo '<p class="lk-vet__text">У вас пока нет заказов рационов.</p>';
+		echo '<a href="' . esc_url( home_url( '/shop/' ) ) . '" class="lk-vet__btn">Перейти в магазин</a>';
 	}
 }
 
@@ -319,15 +330,12 @@ function dicey_render_account_addresses() {
 }
 
 function dicey_render_account_vet() {
-	$consultations = get_user_meta( get_current_user_id(), 'dicey_consultations', true );
-	if ( ! is_array( $consultations ) ) {
-		$consultations = array();
-	}
+	$consultations = dicey_get_customer_consultations( get_current_user_id() );
 
 	if ( ! $consultations ) {
 		echo '<div class="lk-vet">';
 		echo '<p class="lk-vet__text">У вас еще нет консультаций у ветеринара</p>';
-		echo '<a href="' . esc_url( home_url( '/dietology/' ) ) . '" class="lk-vet__btn">Получить консультацию</a>';
+		echo function_exists( 'dicey_render_consultation_product_cards' ) ? dicey_render_consultation_product_cards() : '<a href="' . esc_url( home_url( '/dietology/' ) ) . '" class="lk-vet__btn">Получить консультацию</a>';
 		echo '</div>';
 		return;
 	}
@@ -354,4 +362,52 @@ function dicey_render_account_vet() {
 		</div>
 		<?php
 	}
+}
+
+function dicey_get_customer_consultations( $user_id ) {
+	$items = array();
+
+	if ( function_exists( 'wc_get_orders' ) && function_exists( 'dicey_is_consultation_product' ) ) {
+		$orders = wc_get_orders(
+			array(
+				'customer_id' => $user_id,
+				'limit'       => 50,
+				'orderby'     => 'date',
+				'order'       => 'DESC',
+			)
+		);
+
+		foreach ( $orders as $order ) {
+			foreach ( $order->get_items() as $order_item ) {
+				$product = $order_item->get_product();
+				if ( ! $product || ! dicey_is_consultation_product( $product->get_id() ) ) {
+					continue;
+				}
+
+				$consultation = array(
+					'title'  => $order_item->get_name() . ' от ' . wc_format_datetime( $order->get_date_created(), 'd.m.y' ),
+					'Дата'   => wc_format_datetime( $order->get_date_created(), 'd.m.Y' ),
+					'Статус' => wc_get_order_status_name( $order->get_status() ),
+					'Заказ'  => '#' . $order->get_order_number(),
+				);
+
+				foreach ( $order_item->get_meta_data() as $meta ) {
+					$data = $meta->get_data();
+					if ( empty( $data['key'] ) || empty( $data['value'] ) || '_' === substr( $data['key'], 0, 1 ) ) {
+						continue;
+					}
+					$consultation[ $data['key'] ] = $data['value'];
+				}
+
+				$items[] = $consultation;
+			}
+		}
+	}
+
+	if ( $items ) {
+		return $items;
+	}
+
+	$legacy = get_user_meta( $user_id, 'dicey_consultations', true );
+	return is_array( $legacy ) ? $legacy : array();
 }

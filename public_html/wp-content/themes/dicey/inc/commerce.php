@@ -296,6 +296,10 @@ function dicey_render_decoration_page() {
 
 	$checkout = WC()->checkout();
 	$city     = function_exists( 'dicey_get_detected_city' ) ? dicey_get_detected_city() : array( 'label' => 'Москва' );
+	$consult_contact = function_exists( 'dicey_get_cart_consultation_contact' ) ? dicey_get_cart_consultation_contact() : array();
+	$billing_name    = $checkout->get_value( 'billing_first_name' ) ? $checkout->get_value( 'billing_first_name' ) : ( isset( $consult_contact['name'] ) ? $consult_contact['name'] : '' );
+	$billing_email   = $checkout->get_value( 'billing_email' ) ? $checkout->get_value( 'billing_email' ) : ( isset( $consult_contact['email'] ) ? $consult_contact['email'] : '' );
+	$billing_phone   = $checkout->get_value( 'billing_phone' ) ? $checkout->get_value( 'billing_phone' ) : ( isset( $consult_contact['phone'] ) ? $consult_contact['phone'] : '' );
 
 	ob_start();
 	wc_print_notices();
@@ -316,10 +320,10 @@ function dicey_render_decoration_page() {
 						<div class="decoration__block">
 							<p class="decoration__name">Покупатель</p>
 							<div class="decoration__inputs">
-								<input type="text" name="billing_first_name" class="decoration__input" placeholder="Имя и Фамилия" value="<?php echo esc_attr( $checkout->get_value( 'billing_first_name' ) ); ?>" required>
+								<input type="text" name="billing_first_name" class="decoration__input" placeholder="Имя и Фамилия" value="<?php echo esc_attr( $billing_name ); ?>" required>
 								<input type="hidden" name="billing_last_name" value="<?php echo esc_attr( $checkout->get_value( 'billing_last_name' ) ); ?>">
-								<input type="email" name="billing_email" class="decoration__input" placeholder="Почта" value="<?php echo esc_attr( $checkout->get_value( 'billing_email' ) ); ?>" required>
-								<input type="tel" name="billing_phone" class="decoration__input" placeholder="Телефон" value="<?php echo esc_attr( $checkout->get_value( 'billing_phone' ) ); ?>" required>
+								<input type="email" name="billing_email" class="decoration__input" placeholder="Почта" value="<?php echo esc_attr( $billing_email ); ?>" required>
+								<input type="tel" name="billing_phone" class="decoration__input" placeholder="Телефон" value="<?php echo esc_attr( $billing_phone ); ?>" required>
 								<input type="hidden" name="billing_country" value="RU">
 							</div>
 						</div>
