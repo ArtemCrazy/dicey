@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'template_redirect', 'dicey_handle_account_updates' );
+add_filter( 'woocommerce_login_redirect', 'dicey_account_auth_redirect', 10, 2 );
+add_filter( 'woocommerce_registration_redirect', 'dicey_account_auth_redirect', 10, 1 );
 
 function dicey_account_sections() {
 	return array(
@@ -36,6 +38,16 @@ function dicey_account_url( $section = 'profile' ) {
 	}
 
 	return add_query_arg( 'lk_section', $section, $url );
+}
+
+function dicey_account_auth_redirect( $redirect, $user = null ) {
+	if ( ! empty( $_POST['redirect'] ) ) {
+		$posted_redirect = esc_url_raw( wp_unslash( $_POST['redirect'] ) );
+
+		return wp_validate_redirect( $posted_redirect, dicey_account_url( 'profile' ) );
+	}
+
+	return $redirect;
 }
 
 function dicey_handle_account_updates() {
@@ -169,8 +181,9 @@ function dicey_render_account_auth() {
 				<div class="lk__wr dicey-account-auth">
 					<div class="lk__contents">
 						<div class="lk__content">
+							<?php if ( function_exists( 'wc_print_notices' ) ) { wc_print_notices(); } ?>
 							<div class="dicey-account-auth__grid">
-								<form method="post" class="lk__form">
+								<form method="post" class="lk__form" action="<?php echo esc_url( dicey_account_url( 'profile' ) ); ?>">
 									<p class="decoration__name">Вход</p>
 									<div class="lk__form-blocks">
 										<div class="lk__form-block">
@@ -183,11 +196,12 @@ function dicey_render_account_auth() {
 										</div>
 									</div>
 									<?php wp_nonce_field( 'woocommerce-login', 'woocommerce-login-nonce' ); ?>
+									<input type="hidden" name="redirect" value="<?php echo esc_url( dicey_account_url( 'profile' ) ); ?>">
 									<div class="lk__form-btns">
 										<button type="submit" class="lk__form-btn-save" name="login" value="Войти">Войти</button>
 									</div>
 								</form>
-								<form method="post" class="lk__form">
+								<form method="post" class="lk__form" action="<?php echo esc_url( dicey_account_url( 'profile' ) ); ?>">
 									<p class="decoration__name">Регистрация</p>
 									<div class="lk__form-blocks">
 										<div class="lk__form-block">
@@ -200,6 +214,7 @@ function dicey_render_account_auth() {
 										</div>
 									</div>
 									<?php wp_nonce_field( 'woocommerce-register', 'woocommerce-register-nonce' ); ?>
+									<input type="hidden" name="redirect" value="<?php echo esc_url( dicey_account_url( 'profile' ) ); ?>">
 									<div class="lk__form-btns">
 										<button type="submit" class="lk__form-btn-save" name="register" value="Зарегистрироваться">Зарегистрироваться</button>
 									</div>

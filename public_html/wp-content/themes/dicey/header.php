@@ -151,14 +151,14 @@ ob_start();
 <div class="authorization-modal" id="authorization-modal">
   <div class="modal__wr">
     <p class="authorization__name">Добро пожаловать!</p>
-    <form class="authorization__form">
+    <form class="authorization__form" method="post" action="<?php echo esc_url( function_exists( 'dicey_account_url' ) ? dicey_account_url( 'profile' ) : home_url( '/lk/' ) ); ?>">
       <div class="lk__form-block">
         <p class="lk__form-name">Почта</p>
-        <input type="text" class="lk__form-input" placeholder="info@mail.ru">
+        <input type="email" class="lk__form-input" name="username" placeholder="info@mail.ru" autocomplete="email" required>
       </div>
       <div class="lk__form-block">
-        <p class="lk__form-name">Код с почты</p>
-        <input type="password" class="lk__form-input">
+        <p class="lk__form-name">Пароль</p>
+        <input type="password" class="lk__form-input" name="password" autocomplete="current-password" required>
       </div>
       <label class="checkbox__parent authorization__checkbox">
         <input type="checkbox" name="checkbox" required="" checked="">
@@ -174,7 +174,9 @@ ob_start();
           порядке и на условиях, указанных в <a href="policy.php">Политике обработки персональных данных</a>
         </p>
       </label>
-      <button class="authorization__btn">Войти</button>
+      <?php wp_nonce_field( 'woocommerce-login', 'woocommerce-login-nonce' ); ?>
+      <input type="hidden" name="redirect" value="<?php echo esc_url( function_exists( 'dicey_account_url' ) ? dicey_account_url( 'profile' ) : home_url( '/lk/' ) ); ?>">
+      <button type="submit" class="authorization__btn" name="login" value="Войти">Войти</button>
     </form>
   </div>
 </div>
