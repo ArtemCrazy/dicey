@@ -14,8 +14,8 @@ add_action( 'enqueue_block_editor_assets', 'dicey_enqueue_editor_assets' );
 
 function dicey_get_delivery_client_settings() {
 	$settings = array(
-		'yandexMapsApiKey'    => '',
-		'dadataToken'         => '',
+		'yandexMapsApiKey'    => 'eee5455e-2d4c-4174-b71d-e53e2c579428',
+		'dadataToken'         => '625ac2d6e333230dfb431316f21c5024f2229a70',
 		'freeMessage'         => 'Бесплатная доставка по вашему адресу',
 		'paidMessage'         => 'Адрес входит в дополнительную зону доставки. Условия нужно уточнить у менеджера.',
 		'outsideMessage'      => 'Адрес не входит в зону доставки. Оставьте заявку, и мы уточним возможные варианты.',
