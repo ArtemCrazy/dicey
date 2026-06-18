@@ -347,8 +347,8 @@ function dicey_render_account_vet() {
 
 	if ( ! $consultations ) {
 		echo '<div class="lk-vet">';
-		dicey_render_account_empty_state( 'Консультаций пока нет', 'Вы можете выбрать один из вариантов консультации ниже. После оплаты она появится в этом разделе.' );
-		echo function_exists( 'dicey_render_consultation_product_cards' ) ? dicey_render_consultation_product_cards() : '<a href="' . esc_url( home_url( '/dietology/' ) ) . '" class="lk-vet__btn">Получить консультацию</a>';
+		echo '<p class="lk-vet__text">У вас еще нет консультаций у ветеринара</p>';
+		echo '<a href="' . esc_url( home_url( '/dietology/' ) ) . '" class="lk-vet__btn">Получить консультацию</a>';
 		echo '</div>';
 		return;
 	}
@@ -365,7 +365,7 @@ function dicey_render_account_vet() {
 				<div class="questions__content-wr">
 					<?php foreach ( $consultation as $key => $value ) : ?>
 						<?php if ( 'title' === $key || '' === $value ) { continue; } ?>
-						<div class="questions__line">
+						<div class="questions__line <?php echo 'Рекомендации диетолога' === $key ? 'rec' : ''; ?>">
 							<p><?php echo esc_html( $key ); ?></p>
 							<p><?php echo esc_html( $value ); ?></p>
 						</div>
