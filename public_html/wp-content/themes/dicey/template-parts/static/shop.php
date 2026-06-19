@@ -225,6 +225,7 @@
             <div class="shop__blocks">
                 <?php if ( function_exists( 'dicey_render_products_grid' ) && dicey_render_products_grid() ) : ?>
                 <?php else : ?>
+                <?php if ( false ) : ?>
                 <div class="popularity__block">
                     <a href="#" class="popularity__link">
                         <div class="popularity__img-wr">
@@ -426,6 +427,7 @@
                     </a>
                     <div class="popularity__btn">В корзину</div>
                 </div>
+                <?php endif; ?>
                 <?php endif; ?>
             </div>
             <div class="shop__empty" style="display: none;">Подходящие рационы не найдены. Попробуйте изменить параметры подбора.</div>

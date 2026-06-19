@@ -1381,6 +1381,14 @@ header {
 	width: 98%;
 }
 
+.popularity__cart-form {
+	width: 100%;
+}
+
+.popularity__cart-form .popularity__btn {
+	border: 1px solid #5182A6;
+}
+
 .popularity__btn:hover {
 	background: #295D82;
 }

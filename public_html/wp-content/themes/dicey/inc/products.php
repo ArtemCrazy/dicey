@@ -176,6 +176,59 @@ function dicey_product_price_for_card( $post_id, $meta = null ) {
 	return '';
 }
 
+function dicey_product_cart_payload( $post_id ) {
+	if ( ! function_exists( 'wc_get_product' ) || ! function_exists( 'wc_get_cart_url' ) ) {
+		return array();
+	}
+
+	$product = wc_get_product( $post_id );
+	if ( ! $product || ! $product->exists() || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return array();
+	}
+
+	$payload = array(
+		'action' => wc_get_cart_url(),
+		'fields' => array(
+			'add-to-cart' => $post_id,
+			'product_id'  => $post_id,
+			'quantity'    => 1,
+		),
+	);
+
+	if ( $product->is_type( 'variable' ) ) {
+		$options = dicey_get_wc_product_period_options( $post_id );
+		if ( empty( $options[0] ) ) {
+			return array();
+		}
+
+		$payload['fields']['variation_id'] = $options[0]['variation_id'];
+		foreach ( $options[0]['attributes'] as $attribute_key => $attribute_value ) {
+			$payload['fields'][ $attribute_key ] = $attribute_value;
+		}
+	}
+
+	return $payload;
+}
+
+function dicey_render_product_cart_button( $post_id ) {
+	$payload = dicey_product_cart_payload( $post_id );
+
+	if ( ! $payload ) {
+		?>
+		<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" class="popularity__btn">Смотреть</a>
+		<?php
+		return;
+	}
+	?>
+	<form class="popularity__cart-form" method="post" action="<?php echo esc_url( $payload['action'] ); ?>">
+		<?php foreach ( $payload['fields'] as $field_name => $field_value ) : ?>
+			<input type="hidden" name="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $field_value ); ?>">
+		<?php endforeach; ?>
+		<button type="submit" class="popularity__btn">В корзину</button>
+	</form>
+	<?php
+}
+
 function dicey_product_variation_label( $attribute_name, $attribute_value ) {
 	$attribute_name  = preg_replace( '/^attribute_/', '', (string) $attribute_name );
 	$attribute_value = (string) $attribute_value;
@@ -265,7 +318,7 @@ function dicey_render_product_card( $post_id ) {
 				<p class="popularity__price"><?php echo esc_html( $price ); ?></p>
 			<?php endif; ?>
 		</a>
-		<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" class="popularity__btn">Смотреть</a>
+		<?php dicey_render_product_cart_button( $post_id ); ?>
 	</div>
 	<?php
 }
@@ -316,6 +369,10 @@ function dicey_render_products_grid() {
 
 	wp_reset_postdata();
 	return true;
+}
+
+function dicey_render_shop_page() {
+	return dicey_get_template_html( 'template-parts/static/shop' );
 }
 
 function dicey_render_featured_products() {

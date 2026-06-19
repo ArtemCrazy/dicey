@@ -14,6 +14,8 @@ while ( have_posts() ) :
 
 	if ( 'basket' === $slug && function_exists( 'dicey_render_basket_page' ) ) {
 		echo dicey_render_basket_page();
+	} elseif ( 'shop' === $slug && function_exists( 'dicey_render_shop_page' ) ) {
+		echo dicey_render_shop_page();
 	} elseif ( 'decoration' === $slug && function_exists( 'dicey_render_decoration_page' ) ) {
 		echo dicey_render_decoration_page();
 	} elseif ( 'lk' === $slug && function_exists( 'dicey_render_account_page' ) ) {

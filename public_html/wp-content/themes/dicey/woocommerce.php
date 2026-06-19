@@ -13,7 +13,7 @@ if ( is_product() ) {
 		get_template_part( 'template-parts/product/single-content' );
 	endwhile;
 } elseif ( is_shop() || is_product_taxonomy() ) {
-	echo dicey_get_template_html( 'template-parts/static/shop' );
+	echo function_exists( 'dicey_render_shop_page' ) ? dicey_render_shop_page() : dicey_get_template_html( 'template-parts/static/shop' );
 } else {
 	woocommerce_content();
 }
