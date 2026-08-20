@@ -15,6 +15,11 @@ ob_start();
                     192171, г. Санкт-Петербург, ул Седова, д. 70 литера. А</p>
                 <p>ОГРН 1267800025283 / <br> ИНН 7811815173 / <br> КПП 781101001</p>
             </div>
+            <div class="footer__contacts">
+                <a href="tel:+79818850003">8 981 885-00-03</a>
+                <a href="mailto:Info@daysi.ru">Info@daysi.ru</a>
+                <a href="https://web.max.ru/336027897" target="_blank" rel="noopener">MAX</a>
+            </div>
         </div>
         <div class="footer__menu">
             <div class="footer__menu-block">
@@ -64,7 +69,7 @@ ob_start();
         <div class="footer__bottom">
             <div class="footer__links">
                 <p>© 2026. Все права защищены.</p>
-                <a href="policy.php">Политика обработки персональных данных</a>
+                <a href="<?php echo esc_url( home_url( '/policy/' ) ); ?>">Политика обработки персональных данных</a>
                 <a href="<?php echo esc_url( home_url( '/offer/' ) ); ?>">Договор оферты</a>
                 <a href="<?php echo esc_url( home_url( '/mailing-consent/' ) ); ?>">Согласие на получение информационной и рекламной рассылки</a>
                 <a href="<?php echo esc_url( home_url( '/personal-data-consent/' ) ); ?>">Согласие об обработке персональных данных</a>

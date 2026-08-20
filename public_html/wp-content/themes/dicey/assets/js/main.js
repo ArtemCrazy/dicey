@@ -696,8 +696,24 @@ $(function () {
 		spb: "Санкт-Петербург"
 	}
 
+	var CITY_SHORT_LABELS = {
+		moscow: "Москва",
+		spb: "СПБ"
+	}
+
 	function normalizeCityKey(key) {
 		return key === "spb" ? "spb" : "moscow"
+	}
+
+	function getCityCookie() {
+		var match = document.cookie.match(/(?:^|;\s*)dicey_city=([^;]+)/)
+		return match ? normalizeCityKey(decodeURIComponent(match[1])) : ""
+	}
+
+	function setCityCookie(key) {
+		var expires = new Date()
+		expires.setFullYear(expires.getFullYear() + 1)
+		document.cookie = "dicey_city=" + encodeURIComponent(normalizeCityKey(key)) + "; expires=" + expires.toUTCString() + "; path=/; SameSite=Lax"
 	}
 
 	function getThemeCity() {
@@ -748,8 +764,14 @@ $(function () {
 		setThemeCity(city)
 
 		var current = getThemeCity()
-		$(".header-city__label").text(current.label)
+		$(".header-city__label").text(CITY_SHORT_LABELS[current.key] || current.label)
+		$(".header-city__option").removeClass("active")
+		$('.header-city__option[data-city-key="' + current.key + '"]').addClass("active")
 		$("body").attr("data-dicey-city", current.key)
+		if ($("#checkout-shipping-input").length) {
+			$('input[name="billing_city"]').val(current.label).trigger("change")
+			$(".decoration .select-box").first().find("summary span").text(current.label)
+		}
 		activateShippingCity(current.key)
 	}
 
@@ -760,7 +782,29 @@ $(function () {
 	window.diceyApplyCity = applyCity
 
 	$(function () {
-		applyCity(getThemeCity())
+		var manualCity = getCityCookie()
+		applyCity(manualCity ? { key: manualCity, label: CITY_LABELS[manualCity] } : getThemeCity())
+
+		$(document).on("click", ".header-city__current", function (e) {
+			e.preventDefault()
+			var $switcher = $(this).closest("[data-city-switcher]")
+			var isOpen = $switcher.toggleClass("active").hasClass("active")
+			$(this).attr("aria-expanded", isOpen ? "true" : "false")
+		})
+
+		$(document).on("click", ".header-city__option", function (e) {
+			e.preventDefault()
+			var key = normalizeCityKey($(this).data("city-key"))
+			setCityCookie(key)
+			applyCity({ key: key, label: CITY_LABELS[key] })
+			$(this).closest("[data-city-switcher]").removeClass("active").find(".header-city__current").attr("aria-expanded", "false")
+		})
+
+		$(document).on("click", function (e) {
+			if (!$(e.target).closest("[data-city-switcher]").length) {
+				$("[data-city-switcher]").removeClass("active").find(".header-city__current").attr("aria-expanded", "false")
+			}
+		})
 
 		if (!window.diceyTheme || !window.diceyTheme.ajaxUrl) {
 			return
@@ -772,6 +816,9 @@ $(function () {
 			dataType: "json",
 			data: { action: "dicey_detect_city" },
 			success: function (res) {
+				if (getCityCookie()) {
+					return
+				}
 				if (res && res.success && res.data) {
 					applyCity(res.data)
 				}
@@ -873,23 +920,29 @@ $(function () {
     }
 
     function addFreeZone(coordinates, map) {
-        map.geoObjects.add(new ymaps.GeoObject({
-            geometry: { type: 'Polygon', coordinates: coordinates, fillRule: 'nonZero' },
-            properties: { balloonContent: 'Бесплатная доставка' }
-        }, {
-            fillColor: '#FFBD74', strokeColor: '#FF9425',
-            opacity: 0.5, strokeWidth: 3, strokeStyle: 'solid', zIndex: 2
-        }));
+        coordinates.forEach(function (ring) {
+            if (!Array.isArray(ring) || ring.length < 3) return;
+            map.geoObjects.add(new ymaps.GeoObject({
+                geometry: { type: 'Polygon', coordinates: [ring], fillRule: 'nonZero' },
+                properties: { balloonContent: 'Бесплатная доставка' }
+            }, {
+                fillColor: '#FFBD74', strokeColor: '#FF9425',
+                opacity: 0.5, strokeWidth: 3, strokeStyle: 'solid', zIndex: 2
+            }));
+        });
     }
 
     function addPaidZone(coordinates, map) {
-        map.geoObjects.add(new ymaps.GeoObject({
-            geometry: { type: 'Polygon', coordinates: coordinates, fillRule: 'nonZero' },
-            properties: { balloonContent: 'Платная доставка' }
-        }, {
-            fillColor: '#7F9FE0', strokeColor: '#326CEC',
-            opacity: 0.4, strokeWidth: 3, strokeStyle: 'solid', zIndex: 1
-        }));
+        coordinates.forEach(function (ring) {
+            if (!Array.isArray(ring) || ring.length < 3) return;
+            map.geoObjects.add(new ymaps.GeoObject({
+                geometry: { type: 'Polygon', coordinates: [ring], fillRule: 'nonZero' },
+                properties: { balloonContent: 'Платная доставка' }
+            }, {
+                fillColor: '#7F9FE0', strokeColor: '#326CEC',
+                opacity: 0.4, strokeWidth: 3, strokeStyle: 'solid', zIndex: 1
+            }));
+        });
     }
 
     function initMap(key) {

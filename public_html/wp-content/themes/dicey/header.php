@@ -10,7 +10,7 @@ ob_start();
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<?php $dicey_city = function_exists( 'dicey_get_detected_city' ) ? dicey_get_detected_city() : array( 'label' => 'Москва' ); ?>
+<?php $dicey_city = function_exists( 'dicey_get_detected_city' ) ? dicey_get_detected_city() : array( 'key' => 'moscow', 'label' => 'Москва', 'short_label' => 'Москва' ); ?>
 <?php $dicey_cart_count = function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0; ?>
 <?php $dicey_cart_url = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/basket/' ); ?>
 
@@ -95,11 +95,17 @@ ob_start();
        </ul>
     </div>
     <div class="header__wr">
-      <div class="header-city">
-        <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.08962 7.33036C6.08962 7.33036 6.19943 7.21875 6.41904 6.99554C6.63866 6.77233 6.74846 6.34524 6.74846 5.71429C6.74846 5.08334 6.52885 4.54465 6.08962 4.09822C5.6504 3.65179 5.1204 3.42858 4.49963 3.42858C3.87885 3.42858 3.34885 3.65179 2.90963 4.09822C2.4704 4.54465 2.25079 5.08334 2.25079 5.71429C2.25079 6.34524 2.4704 6.88393 2.90963 7.33036C3.34885 7.77679 3.87885 8 4.49963 8C5.1204 8 5.6504 7.77679 6.08962 7.33036ZM8.9973 5.71429C8.9973 6.3631 8.90067 6.89584 8.70741 7.3125L5.50985 14.2232C5.41614 14.4196 5.27706 14.5744 5.09258 14.6875C4.90811 14.8006 4.71045 14.8571 4.49963 14.8571C4.2888 14.8571 4.09115 14.8006 3.90667 14.6875C3.7222 14.5744 3.58604 14.4196 3.49819 14.2232L0.291842 7.3125C0.0985828 6.89584 0.00195312 6.3631 0.00195312 5.71429C0.00195312 4.45238 0.441179 3.375 1.31963 2.48215C2.19808 1.58929 3.25808 1.14286 4.49963 1.14286C5.74117 1.14286 6.80117 1.58929 7.67962 2.48215C8.55807 3.375 8.9973 4.45238 8.9973 5.71429Z" fill="#5182A6"/>
-        </svg>            
-        <span class="header-city__label"><?php echo esc_html( $dicey_city['label'] ); ?></span>
+      <div class="header-city" data-city-switcher>
+        <button type="button" class="header-city__current" aria-haspopup="true" aria-expanded="false">
+          <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.08962 7.33036C6.08962 7.33036 6.19943 7.21875 6.41904 6.99554C6.63866 6.77233 6.74846 6.34524 6.74846 5.71429C6.74846 5.08334 6.52885 4.54465 6.08962 4.09822C5.6504 3.65179 5.1204 3.42858 4.49963 3.42858C3.87885 3.42858 3.34885 3.65179 2.90963 4.09822C2.4704 4.54465 2.25079 5.08334 2.25079 5.71429C2.25079 6.34524 2.4704 6.88393 2.90963 7.33036C3.34885 7.77679 3.87885 8 4.49963 8C5.1204 8 5.6504 7.77679 6.08962 7.33036ZM8.9973 5.71429C8.9973 6.3631 8.90067 6.89584 8.70741 7.3125L5.50985 14.2232C5.41614 14.4196 5.27706 14.5744 5.09258 14.6875C4.90811 14.8006 4.71045 14.8571 4.49963 14.8571C4.2888 14.8571 4.09115 14.8006 3.90667 14.6875C3.7222 14.5744 3.58604 14.4196 3.49819 14.2232L0.291842 7.3125C0.0985828 6.89584 0.00195312 6.3631 0.00195312 5.71429C0.00195312 4.45238 0.441179 3.375 1.31963 2.48215C2.19808 1.58929 3.25808 1.14286 4.49963 1.14286C5.74117 1.14286 6.80117 1.58929 7.67962 2.48215C8.55807 3.375 8.9973 4.45238 8.9973 5.71429Z" fill="#5182A6"/>
+          </svg>
+          <span class="header-city__label"><?php echo esc_html( ! empty( $dicey_city['short_label'] ) ? $dicey_city['short_label'] : $dicey_city['label'] ); ?></span>
+        </button>
+        <div class="header-city__menu" role="menu">
+          <button type="button" class="header-city__option <?php echo 'moscow' === $dicey_city['key'] ? 'active' : ''; ?>" data-city-key="moscow" data-city-label="Москва" role="menuitem">Москва</button>
+          <button type="button" class="header-city__option <?php echo 'spb' === $dicey_city['key'] ? 'active' : ''; ?>" data-city-key="spb" data-city-label="Санкт-Петербург" role="menuitem">СПБ</button>
+        </div>
       </div>
       <button class="header__btn-consult" data-fancybox data-src="#consult-modal">Консультация диетолога</button>
       <div class="header__nav">
@@ -170,8 +176,8 @@ ob_start();
         </span>
 
         <p class="consult__text">
-          Я подтверждаю ознакомление и даю <a href="policy.php">Согласие на обработку моих персональных данных</a> в
-          порядке и на условиях, указанных в <a href="policy.php">Политике обработки персональных данных</a>
+          Я подтверждаю ознакомление и даю <a href="<?php echo esc_url( home_url( '/personal-data-consent/' ) ); ?>">Согласие на обработку моих персональных данных</a> в
+          порядке и на условиях, указанных в <a href="<?php echo esc_url( home_url( '/policy/' ) ); ?>">Политике обработки персональных данных</a>
         </p>
       </label>
       <?php wp_nonce_field( 'woocommerce-login', 'woocommerce-login-nonce' ); ?>
@@ -216,8 +222,8 @@ ob_start();
           </span>
   
           <p class="consult__text">
-            Я подтверждаю ознакомление и даю <a href="policy.php">Согласие на обработку моих персональных данных</a> в
-            порядке и на условиях, указанных в <a href="policy.php">Политике обработки персональных данных</a>
+            Я подтверждаю ознакомление и даю <a href="<?php echo esc_url( home_url( '/personal-data-consent/' ) ); ?>">Согласие на обработку моих персональных данных</a> в
+            порядке и на условиях, указанных в <a href="<?php echo esc_url( home_url( '/policy/' ) ); ?>">Политике обработки персональных данных</a>
           </p>
         </label>
         <button type="submit" class="authorization__btn">Оплатить</button>
@@ -246,11 +252,11 @@ ob_start();
         </span>
 
         <p class="consult__text">
-          Я подтверждаю ознакомление и даю <a href="policy.php">Согласие на обработку моих персональных данных</a> в
-          порядке и на условиях, указанных в <a href="policy.php">Политике обработки персональных данных</a>
+          Я подтверждаю ознакомление и даю <a href="<?php echo esc_url( home_url( '/personal-data-consent/' ) ); ?>">Согласие на обработку моих персональных данных</a> в
+          порядке и на условиях, указанных в <a href="<?php echo esc_url( home_url( '/policy/' ) ); ?>">Политике обработки персональных данных</a>
         </p>
       </label>
-      <button class="authorization__btn">Оплатить</button>
+      <button class="authorization__btn">Отправить</button>
     </div>
   </div>
 </div>

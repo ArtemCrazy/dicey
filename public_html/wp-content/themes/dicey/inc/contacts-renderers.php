@@ -21,16 +21,25 @@ function dicey_contacts_defaults() {
 			array( 'icon' => 'imgs/icons/apply__icon4.svg', 'text' => 'Консультация диетолога' ),
 		),
 		'contact_items' => array(
-			array( 'icon' => 'imgs/icons/contacts__icon1.svg', 'label' => '+1 (555) 000-0000', 'url' => 'tel:+15550000000' ),
-			array( 'icon' => 'imgs/icons/contacts__icon2.svg', 'label' => 'info@mail.ru', 'url' => 'mailto:info@mail.ru' ),
-			array( 'icon' => 'imgs/icons/contacts__icon3.svg', 'label' => '+1 (555) 000-0000', 'url' => 'tel:+15550000000' ),
+			array( 'icon' => 'imgs/icons/contacts__icon1.svg', 'label' => '8 981 885-00-03', 'url' => 'tel:+79818850003' ),
+			array( 'icon' => 'imgs/icons/contacts__icon2.svg', 'label' => 'Info@daysi.ru', 'url' => 'mailto:Info@daysi.ru' ),
+			array( 'icon' => 'imgs/icons/contacts__icon3.svg', 'label' => 'MAX', 'url' => 'https://web.max.ru/336027897' ),
 		),
-		'company_info' => 'ООО «ДАЙСИ», 192171, город Санкт-Петербург, ул Седова, д.. 70 литера. А <br> ОГРН 1267800025283 / ИНН 7811815173 / КПП 781101001',
+		'company_info' => 'ООО «ДАЙСИ», 192171, город Санкт-Петербург, ул. Седова, д. 70 литера А <br> ОГРН 1267800025283 / ИНН 7811815173 / КПП 781101001',
 	);
 }
 
 function dicey_contacts_data( $attrs = array() ) {
-	return dicey_merge_block_attrs( $attrs, dicey_contacts_defaults() );
+	$data = dicey_merge_block_attrs( $attrs, dicey_contacts_defaults() );
+
+	foreach ( $data['contact_items'] as &$item ) {
+		if ( isset( $item['url'] ) && 'https://max.ru/id7811815173_biz' === $item['url'] ) {
+			$item['url'] = 'https://web.max.ru/336027897';
+		}
+	}
+	unset( $item );
+
+	return $data;
 }
 
 function dicey_render_contacts_page( $attrs = array() ) {
