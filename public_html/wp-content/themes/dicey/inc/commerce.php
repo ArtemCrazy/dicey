@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'template_redirect', 'dicey_handle_cart_period_change' );
+add_action( 'template_redirect', 'dicey_handle_checkout_payment_endpoint', 20 );
 add_filter( 'woocommerce_checkout_fields', 'dicey_simplify_checkout_fields' );
 add_action( 'woocommerce_before_checkout_process', 'dicey_apply_checkout_coupon' );
 add_action( 'woocommerce_checkout_create_order', 'dicey_save_checkout_delivery_check', 10, 2 );
@@ -18,6 +19,26 @@ add_filter( 'woocommerce_payment_gateways', 'dicey_add_pending_payment_gateway' 
 
 function dicey_is_woocommerce_ready() {
 	return function_exists( 'WC' ) && WC()->cart;
+}
+
+/**
+ * Let WooCommerce render the payment receipt before the theme sends output.
+ *
+ * Redirect-based gateways use the order-pay endpoint to create the remote
+ * payment and redirect the customer. The custom checkout page otherwise
+ * renders its checkout form again and prevents that receipt hook from running.
+ */
+function dicey_handle_checkout_payment_endpoint() {
+	if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'order-pay' ) ) {
+		return;
+	}
+
+	if ( isset( $_GET['pay_for_order'] ) || ! class_exists( 'WC_Shortcode_Checkout' ) ) {
+		return;
+	}
+
+	WC_Shortcode_Checkout::output();
+	exit;
 }
 
 function dicey_register_pending_payment_gateway() {
@@ -415,6 +436,12 @@ function dicey_render_order_received_page( $order_id = 0 ) {
 function dicey_render_decoration_page() {
 	if ( ! dicey_is_woocommerce_ready() ) {
 		return dicey_missing_content_notice( 'Оформление заказа' );
+	}
+
+	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-pay' ) && class_exists( 'WC_Shortcode_Checkout' ) ) {
+		ob_start();
+		WC_Shortcode_Checkout::output();
+		return ob_get_clean();
 	}
 
 	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) ) {
