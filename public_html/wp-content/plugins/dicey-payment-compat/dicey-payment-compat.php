@@ -28,6 +28,6 @@ function dicey_payment_compat_render_order_pay() {
 		return;
 	}
 
-	WC_Shortcode_Checkout::output();
+	WC_Shortcode_Checkout::output( array() );
 	exit;
 }
