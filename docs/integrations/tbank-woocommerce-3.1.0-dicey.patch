@@ -1,0 +1,11 @@
+--- a/wc-tbank.php
++++ b/wc-tbank.php
+@@
+-            $TBank = new TBankMerchantAPI($this->get_option('merchant_id'), $this->get_option('secret_key'));
++            // Dicey: keep callbacks bound to the current site even when the
++            // terminal defaults have not been configured in T-Business yet.
++            $arrFields['NotificationURL'] = plugins_url('tbank/success.php', __FILE__);
++            $arrFields['SuccessURL'] = $this->get_return_url($order);
++            $arrFields['FailURL'] = $order->get_cancel_order_url();
++
++            $TBank = new TBankMerchantAPI($this->get_option('merchant_id'), $this->get_option('secret_key'));
