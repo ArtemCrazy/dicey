@@ -2664,6 +2664,26 @@ footer {
   line-height: 140%;
 }
 
+.footer__contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 14px;
+
+  a {
+    color: #F5F9FF;
+    font-family: Mulish;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 130%;
+    .transition;
+
+    &:hover {
+      color: #FFF;
+    }
+  }
+}
 
 .footer__menu {
   display: flex;
@@ -6088,6 +6108,10 @@ footer::before {
   flex-wrap: wrap;
   gap: 11px;
   margin-bottom: 24px;
+
+  .decoration__methods-block:only-child {
+    width: 100%;
+  }
 }
 
 .decoration__methods-block {
@@ -6915,6 +6939,47 @@ footer::before {
     line-height: 150%;
 
   }
+
+  h2,
+  h3 {
+    color: #5182A6;
+    font-family: Mulish;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 130%;
+  }
+
+  h2 {
+    font-size: 26px;
+    margin-top: 18px;
+  }
+
+  h3 {
+    font-size: 21px;
+    margin-top: 8px;
+  }
+}
+
+.policy__table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.policy__table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  color: #5182A6;
+  font-family: Mulish;
+  font-size: 16px;
+  line-height: 145%;
+
+  td {
+    border: 1px solid rgba(81, 130, 166, 0.35);
+    padding: 12px 14px;
+    vertical-align: top;
+  }
 }
 
 .authorization-modal {
@@ -7293,6 +7358,17 @@ footer::before {
 .shipping__suggest-wr {
   position: relative;
   margin-bottom: 24px;
+  width: 100%;
+
+  .decoration__input {
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
+.dicey-payment-placeholder {
+  width: 100%;
+  cursor: default;
 }
 
 .shipping__suggest-list {
@@ -7381,7 +7457,24 @@ text-underline-position: from-font;
   }
 }
 
+.carte-modal{
+  transform: translateX(100%);
+  .transition;
+  &.active{
+    transform: translateX(0);
+  }
+}
 
+.carte-var__content{
+  display: none;
+}
+
+.product__imgs img{
+  object-fit: cover;
+}
+.popularity__diet{
+  height: 100%!important;
+}
 /**
 *
   Адаптив

@@ -134,9 +134,10 @@ $(".questions__top").click(function () {
 
 
 
-$(".dark,.burger-menu__close").click(function () {
+$(".dark,.burger-menu__close,.carte-modal__close").click(function () {
 	$(".burger-menu").removeClass("active")
 	$(".dark").fadeOut(200)
+	$(".carte-modal").removeClass("active")
 })
 $(".header-burger").click(function () {
 	$(this).toggleClass("active")
@@ -216,6 +217,37 @@ $(".product__imgs img").click(function () {
 	$(".product__imgs img").removeClass("active");
 	$(this).addClass("active");
 });
+
+$(".carte-var__img-slider").on("changed.owl.carousel", function (e) {
+	if (!e.namespace || e.property.name !== "position") {
+		return
+	}
+	var index = e.relatedTarget.relative(e.item.index)
+	var $thumbs = $(this).closest(".carte-var__imgswr").find(".carte-var__imgs img")
+	$thumbs.removeClass("active").eq(index).addClass("active")
+})
+
+$(".carte-var__img-slider").owlCarousel({
+	items: 1,
+	loop: true,
+	dots: false,
+	nav: true,
+	navText: [`<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 1.00012C8.73247 1.17157 6.99259 2.91518 5.44174 4.48782C3.93085 6.01993 2.26556 7.06227 1.37185 8.03784C1.14953 8.28053 0.970679 8.52698 1.00401 8.73163C1.21925 10.053 3.4352 11.1809 4.59087 12.3337C5.6242 13.3645 6.67202 14.649 7.4785 15.6305C7.6804 15.8784 7.87339 16.1247 8.07399 16.3716C8.27459 16.6184 8.47695 16.8584 8.40382 17.0001" stroke="#5182A6" stroke-width="2" stroke-linecap="round"/>
+</svg>
+`,`<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 1.00012C1.26753 1.17157 3.00741 2.91518 4.55826 4.48782C6.06915 6.01993 7.73444 7.06227 8.62815 8.03784C8.85047 8.28053 9.02932 8.52698 8.99599 8.73163C8.78075 10.053 6.5648 11.1809 5.40913 12.3337C4.3758 13.3645 3.32798 14.649 2.5215 15.6305C2.3196 15.8784 2.12661 16.1247 1.92601 16.3716C1.72541 16.6184 1.52305 16.8584 1.59618 17.0001" stroke="#5182A6" stroke-width="2" stroke-linecap="round"/>
+</svg>
+`],
+})
+
+$(".carte-var__imgs img").click(function () {
+	var $wr = $(this).closest(".carte-var__imgswr")
+	var index = $wr.find(".carte-var__imgs img").index(this)
+	$wr.find(".carte-var__img-slider").owlCarousel("to", index)
+	$wr.find(".carte-var__imgs img").removeClass("active")
+	$(this).addClass("active")
+})
 
 $(document).on("click", ".product__term-tab", function () {
 	var $tab = $(this)
@@ -1182,4 +1214,75 @@ $(".shop__wr").each(function () {
 
 	el.addEventListener("pointerup", endDrag)
 	el.addEventListener("pointercancel", endDrag)
+})
+
+
+function showCarteMenuItem($carte, index) {
+	var $tabs = $carte.find(".carte-var__tab")
+	var $contents = $carte.find(".carte-var__content")
+	if (!$contents.length) {
+		return
+	}
+
+	$tabs.removeClass("active").attr("aria-selected", "false")
+	$tabs.filter('[data-menu-index="' + index + '"]').addClass("active").attr("aria-selected", "true")
+	$contents.hide()
+	var $content = $contents.filter('[data-menu-content="' + index + '"]').css("display", "flex")
+	$content.find(".carte-var__img-slider").trigger("refresh.owl.carousel")
+}
+
+function updateCarteMenuLimit($carte, limit) {
+	var $tabs = $carte.find(".carte-var__tab")
+	limit = Math.max(1, Math.min(parseInt(limit, 10) || 5, $tabs.length))
+	$carte.attr("data-menu-limit", limit)
+	$tabs.each(function (index) {
+		$(this).toggle(index < limit)
+	})
+
+	var activeIndex = parseInt($tabs.filter(".active").attr("data-menu-index"), 10) || 0
+	if (activeIndex >= limit) {
+		showCarteMenuItem($carte, 0)
+	}
+}
+
+function updateCarteVariation($carte, $tab) {
+	var price = $tab.attr("data-variation-price")
+	var variationId = $tab.attr("data-variation-id")
+	var attributes = $tab.attr("data-variation-attributes")
+
+	if (price) {
+		$carte.find("[data-product-price]").text(price)
+	}
+	if (variationId) {
+		$carte.find("[data-variation-id-input]").val(variationId)
+	}
+	if (attributes) {
+		try {
+			var parsed = JSON.parse(attributes)
+			Object.keys(parsed).forEach(function (name) {
+				var $input = $carte.find('.dicey-product-variation-attribute[name="' + name + '"]')
+				if (!$input.length) {
+					$input = $('<input type="hidden" class="dicey-product-variation-attribute">').attr("name", name)
+					$carte.find(".dicey-product-cart").append($input)
+				}
+				$input.val(parsed[name])
+			})
+		} catch (e) {}
+	}
+}
+
+$(document).on("click", ".carte-var__tab", function () {
+	showCarteMenuItem($(this).closest(".carte"), parseInt($(this).attr("data-menu-index"), 10) || 0)
+})
+
+$(document).on("click", ".carte__term-tab", function () {
+	var $tab = $(this)
+	var $carte = $tab.closest(".carte")
+	$tab.addClass("active").attr("aria-selected", "true").siblings().removeClass("active").attr("aria-selected", "false")
+	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
+	updateCarteVariation($carte, $tab)
+})
+
+$(".carte__term-tab.active").each(function () {
+	updateCarteMenuLimit($(this).closest(".carte"), $(this).attr("data-menu-limit"))
 })

@@ -14,22 +14,55 @@ function dicey_register_carbon_product_fields() {
 		return;
 	}
 
-	\Carbon_Fields\Container::make( 'post_meta', 'Данные карточки Дайси' )
+	\Carbon_Fields\Container::make( 'post_meta', 'Данные карточки' )
 		->where( 'post_type', '=', 'product' )
 		->add_fields(
 			array(
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_card_title', 'Название в карточке' )
-					->set_help_text( 'Если пусто, берется заголовок товара.' ),
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_price', 'Цена' ),
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_calories', 'КБЖУ для карточки' ),
-				\Carbon_Fields\Field::make( 'image', 'dicey_product_card_image', 'Изображение карточки' )
-					->set_value_type( 'id' ),
-				\Carbon_Fields\Field::make( 'checkbox', 'dicey_product_show_on_home', 'Показывать на главной' )
-					->set_option_value( '1' )
-					->set_help_text( 'На главную выводится максимум 4 товара.' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_price', 'Цена' )
+					->set_help_text( 'Например: 5 000. Знак ₽ добавится на сайте автоматически.' ),
+				\Carbon_Fields\Field::make( 'separator', 'dicey_product_card_kbju_separator', 'КБЖУ для карточки' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_calories_k', 'К' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_calories_b', 'Б' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_calories_f', 'Ж' ),
+				\Carbon_Fields\Field::make( 'text', 'dicey_product_calories_c', 'У' ),
+				\Carbon_Fields\Field::make( 'set', 'dicey_product_terms', 'Сроки' )
+					->add_options( function_exists( 'dicey_product_term_options' ) ? dicey_product_term_options() : array() ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_composition_text', 'Состав' )
+					->set_rows( 5 ),
+				\Carbon_Fields\Field::make( 'separator', 'dicey_product_questions_separator', 'Вопросы в карточке' ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_feeding_answer', 'Как кормить?' )
+					->set_rows( 4 ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_storage_answer', 'Как хранить?' )
+					->set_rows( 4 ),
+				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_delivery_answer', 'Доставка' )
+					->set_rows( 4 ),
+				\Carbon_Fields\Field::make( 'separator', 'dicey_product_menu_separator', 'Примеры меню' ),
+				\Carbon_Fields\Field::make( 'complex', 'dicey_product_menu_examples', 'Дни меню' )
+					->set_help_text( 'Добавьте до пяти примеров. Для срока 3 дня выводятся первые три, для 5 дней и месяца — все пять.' )
+					->set_max( 5 )
+					->add_fields(
+						array(
+							\Carbon_Fields\Field::make( 'text', 'title', 'Название блюда' ),
+							\Carbon_Fields\Field::make( 'textarea', 'composition', 'Состав' )->set_rows( 4 ),
+							\Carbon_Fields\Field::make( 'textarea', 'kbju', 'КБЖУ' )->set_rows( 4 ),
+							\Carbon_Fields\Field::make( 'textarea', 'minerals', 'Витамины и минеральные вещества' )->set_rows( 3 ),
+							\Carbon_Fields\Field::make( 'text', 'portion_weight', 'Вес порции' ),
+							\Carbon_Fields\Field::make( 'image', 'image_main', 'Основное изображение' )->set_value_type( 'id' ),
+							\Carbon_Fields\Field::make( 'image', 'image_second', 'Дополнительное изображение 1' )->set_value_type( 'id' ),
+							\Carbon_Fields\Field::make( 'image', 'image_third', 'Дополнительное изображение 2' )->set_value_type( 'id' ),
+						)
+					),
+			)
+		);
+
+	\Carbon_Fields\Container::make( 'post_meta', 'Подбор рациона' )
+		->where( 'post_type', '=', 'product' )
+		->set_context( 'side' )
+		->set_priority( 'default' )
+		->add_fields(
+			array(
 				\Carbon_Fields\Field::make( 'checkbox', 'dicey_product_is_vip', 'ВИП-рацион' )
 					->set_option_value( '1' ),
-				\Carbon_Fields\Field::make( 'separator', 'dicey_product_matching_separator', 'Логика подбора рациона' ),
 				\Carbon_Fields\Field::make( 'set', 'dicey_product_match_age_groups', 'Возраст собаки' )
 					->set_help_text( 'Если ничего не выбрано, рацион считается подходящим для любого возраста.' )
 					->add_options(
@@ -48,33 +81,21 @@ function dicey_register_carbon_product_fields() {
 					->set_attribute( 'type', 'number' )
 					->set_attribute( 'step', '0.5' )
 					->set_attribute( 'min', '0' ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_match_breeds', 'Породы для подбора' )
-					->set_help_text( 'Каждая порода с новой строки. Если пусто, рацион подходит для любой породы. Для универсального варианта используйте «Другая порода».' )
-					->set_rows( 4 ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_tags', 'Теги карточки' )
-					->set_help_text( 'Каждый тег с новой строки.' )
-					->set_rows( 4 ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_terms', 'Сроки' )
-					->set_help_text( 'Каждый срок с новой строки.' )
-					->set_rows( 5 ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_gallery', 'Галерея' )
-					->set_help_text( 'Каждый URL/путь или ID изображения с новой строки.' )
-					->set_rows( 5 ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_gallery_thumbs', 'Миниатюры галереи' )
-					->set_help_text( 'Каждый URL/путь или ID изображения с новой строки.' )
-					->set_rows( 5 ),
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_composition_title', 'Заголовок состава' ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_composition_text', 'Состав' )
-					->set_rows( 5 ),
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_desc_title', 'Заголовок описания' ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_desc_text', 'Описание рациона' )
-					->set_rows( 8 ),
-				\Carbon_Fields\Field::make( 'text', 'dicey_product_kbju_title', 'Заголовок КБЖУ' ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_kbju_text', 'КБЖУ' )
-					->set_rows( 4 ),
-				\Carbon_Fields\Field::make( 'textarea', 'dicey_product_faq', 'FAQ' )
-					->set_help_text( 'Формат: вопрос|ответ, каждый пункт с новой строки.' )
-					->set_rows( 6 ),
+				\Carbon_Fields\Field::make( 'set', 'dicey_product_match_breeds', 'Породы для подбора' )
+					->set_help_text( 'Если ничего не выбрано, рацион подходит для любой породы.' )
+					->add_options( function_exists( 'dicey_product_breed_options' ) ? dicey_product_breed_options() : array() ),
+			)
+		);
+
+	\Carbon_Fields\Container::make( 'post_meta', 'Главная' )
+		->where( 'post_type', '=', 'product' )
+		->set_context( 'side' )
+		->set_priority( 'low' )
+		->add_fields(
+			array(
+				\Carbon_Fields\Field::make( 'checkbox', 'dicey_product_show_on_home', 'Показывать на главной' )
+					->set_option_value( '1' )
+					->set_help_text( 'На главную выводится максимум 4 товара.' ),
 			)
 		);
 }

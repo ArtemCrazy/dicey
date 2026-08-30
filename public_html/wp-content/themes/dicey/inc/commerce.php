@@ -13,7 +13,7 @@ add_action( 'template_redirect', 'dicey_handle_cart_period_change' );
 add_filter( 'woocommerce_checkout_fields', 'dicey_simplify_checkout_fields' );
 add_action( 'woocommerce_before_checkout_process', 'dicey_apply_checkout_coupon' );
 add_action( 'woocommerce_checkout_create_order', 'dicey_save_checkout_delivery_check', 10, 2 );
-add_action( 'plugins_loaded', 'dicey_register_pending_payment_gateway', 20 );
+add_action( 'woocommerce_init', 'dicey_register_pending_payment_gateway' );
 add_filter( 'woocommerce_payment_gateways', 'dicey_add_pending_payment_gateway' );
 
 function dicey_is_woocommerce_ready() {
@@ -162,8 +162,9 @@ function dicey_render_basket_page() {
 								continue;
 							}
 
-							$meta          = function_exists( 'dicey_get_product_meta' ) ? dicey_get_product_meta( $product_id ) : array();
-							$period_label  = dicey_cart_item_period_label( $cart_item );
+							$meta           = function_exists( 'dicey_get_product_meta' ) ? dicey_get_product_meta( $product_id ) : array();
+							$calories       = function_exists( 'dicey_product_card_calories_text' ) ? dicey_product_card_calories_text( $meta ) : ( isset( $meta['calories'] ) ? $meta['calories'] : '' );
+							$period_label   = dicey_cart_item_period_label( $cart_item );
 							$period_options = dicey_cart_item_period_options( $cart_item );
 							?>
 							<div class="basket__block">
@@ -171,8 +172,8 @@ function dicey_render_basket_page() {
 									<img src="<?php echo esc_url( dicey_cart_item_image_url( $product_id, $product ) ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" class="basket__img">
 									<div class="basket__block-info">
 										<p class="basket__block-name"><?php echo esc_html( $product->get_name() ); ?></p>
-										<?php if ( ! empty( $meta['calories'] ) ) : ?>
-											<p class="basket__kbju"><?php echo esc_html( $meta['calories'] ); ?></p>
+										<?php if ( '' !== trim( $calories ) ) : ?>
+											<p class="basket__kbju"><?php echo esc_html( $calories ); ?></p>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -285,10 +286,11 @@ function dicey_render_checkout_payment_methods() {
 
 	if ( empty( $gateways ) ) {
 		?>
-		<div class="decoration__methods-block active">
+		<label class="decoration__methods-block active dicey-payment-placeholder">
+			<input type="radio" name="payment_method" value="dicey_pending_payment" checked>
 			<div class="decoration__icon"></div>
-			Способы оплаты будут подключены после выбора платежного шлюза
-		</div>
+			Заказ подтвердит менеджер
+		</label>
 		<?php
 		return;
 	}
@@ -502,7 +504,7 @@ function dicey_render_decoration_page() {
 							</p>
 						</label>
 						<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
-						<button type="submit" class="decoration__btn" name="woocommerce_checkout_place_order" value="Оформить заказ">Оплатить</button>
+						<button type="submit" class="decoration__btn" name="woocommerce_checkout_place_order" value="Оформить заказ">Оформить заказ</button>
 					</div>
 
 					<?php dicey_render_checkout_order_summary(); ?>
