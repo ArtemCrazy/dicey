@@ -13,6 +13,7 @@ add_action( 'template_redirect', 'dicey_handle_cart_period_change' );
 add_filter( 'woocommerce_checkout_fields', 'dicey_simplify_checkout_fields' );
 add_action( 'woocommerce_before_checkout_process', 'dicey_apply_checkout_coupon' );
 add_action( 'woocommerce_checkout_create_order', 'dicey_save_checkout_delivery_check', 10, 2 );
+add_action( 'woocommerce_checkout_create_order_line_item', 'dicey_save_order_item_period', 10, 4 );
 add_action( 'woocommerce_init', 'dicey_register_pending_payment_gateway' );
 add_filter( 'woocommerce_payment_gateways', 'dicey_add_pending_payment_gateway' );
 
@@ -62,6 +63,10 @@ function dicey_add_pending_payment_gateway( $gateways ) {
 }
 
 function dicey_cart_item_period_label( $cart_item ) {
+	if ( ! empty( $cart_item['dicey_period'] ) ) {
+		return sanitize_text_field( $cart_item['dicey_period'] );
+	}
+
 	if ( empty( $cart_item['variation'] ) || ! is_array( $cart_item['variation'] ) ) {
 		return '';
 	}
@@ -75,6 +80,14 @@ function dicey_cart_item_period_label( $cart_item ) {
 	}
 
 	return '';
+}
+
+function dicey_save_order_item_period( $item, $cart_item_key, $values, $order ) {
+	$period = dicey_cart_item_period_label( $values );
+
+	if ( '' !== $period ) {
+		$item->add_meta_data( 'Срок', $period, true );
+	}
 }
 
 function dicey_cart_item_image_url( $product_id, $product ) {

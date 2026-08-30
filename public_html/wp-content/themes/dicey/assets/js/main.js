@@ -1249,12 +1249,16 @@ function updateCarteVariation($carte, $tab) {
 	var price = $tab.attr("data-variation-price")
 	var variationId = $tab.attr("data-variation-id")
 	var attributes = $tab.attr("data-variation-attributes")
+	var period = $tab.attr("data-period-value")
 
 	if (price) {
 		$carte.find("[data-product-price]").text(price)
 	}
 	if (variationId) {
 		$carte.find("[data-variation-id-input]").val(variationId)
+	}
+	if (period) {
+		$carte.find("[data-product-period-input]").val(period)
 	}
 	if (attributes) {
 		try {

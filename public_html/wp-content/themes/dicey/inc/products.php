@@ -246,6 +246,20 @@ function dicey_product_price_with_currency( $price ) {
 	return '' === $price ? '' : $price . ' ₽';
 }
 
+function dicey_wc_product_price_fallback( $price, $product ) {
+	if ( '' !== (string) $price || ! $product || ! $product->is_type( 'simple' ) ) {
+		return $price;
+	}
+
+	$fallback = dicey_normalize_product_price_value( get_post_meta( $product->get_id(), '_dicey_product_price', true ) );
+	$fallback = str_replace( array( ' ', ',' ), array( '', '.' ), $fallback );
+
+	return is_numeric( $fallback ) ? $fallback : $price;
+}
+
+add_filter( 'woocommerce_product_get_price', 'dicey_wc_product_price_fallback', 10, 2 );
+add_filter( 'woocommerce_product_get_regular_price', 'dicey_wc_product_price_fallback', 10, 2 );
+
 function dicey_normalize_kbju_value( $value ) {
 	$value = trim( wp_strip_all_tags( (string) $value ) );
 	$value = str_replace( ',', '.', $value );
@@ -705,6 +719,24 @@ function dicey_product_add_to_cart_redirect( $url ) {
 }
 
 add_filter( 'woocommerce_add_to_cart_redirect', 'dicey_product_add_to_cart_redirect' );
+
+function dicey_product_add_period_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
+	if ( $variation_id || empty( $_POST['dicey_product_period'] ) ) {
+		return $cart_item_data;
+	}
+
+	$period  = sanitize_text_field( wp_unslash( $_POST['dicey_product_period'] ) );
+	$meta    = dicey_get_product_meta( $product_id );
+	$allowed = dicey_product_lines( isset( $meta['terms'] ) ? $meta['terms'] : array() );
+
+	if ( in_array( $period, $allowed, true ) ) {
+		$cart_item_data['dicey_period'] = $period;
+	}
+
+	return $cart_item_data;
+}
+
+add_filter( 'woocommerce_add_cart_item_data', 'dicey_product_add_period_to_cart_item', 10, 3 );
 
 function dicey_render_product_card( $post_id ) {
 	$meta        = dicey_get_product_meta( $post_id );

@@ -107,7 +107,7 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 										<?php endforeach; ?>
 									<?php else : ?>
 										<?php foreach ( $terms as $term_index => $term ) : ?>
-											<button type="button" class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>" data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $term ) ); ?>" aria-selected="<?php echo 0 === $term_index ? 'true' : 'false'; ?>"><?php echo esc_html( $term ); ?></button>
+											<button type="button" class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>" data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $term ) ); ?>" data-period-value="<?php echo esc_attr( $term ); ?>" aria-selected="<?php echo 0 === $term_index ? 'true' : 'false'; ?>"><?php echo esc_html( $term ); ?></button>
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</div>
@@ -132,6 +132,9 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 									<input type="hidden" name="add-to-cart" value="<?php echo esc_attr( $post_id ); ?>">
 									<input type="hidden" name="product_id" value="<?php echo esc_attr( $post_id ); ?>">
 									<input type="hidden" name="quantity" value="1">
+									<?php if ( ! $default_variation && '' !== $default_label ) : ?>
+										<input type="hidden" name="dicey_product_period" value="<?php echo esc_attr( $default_label ); ?>" data-product-period-input>
+									<?php endif; ?>
 									<?php if ( $default_variation ) : ?>
 										<input type="hidden" name="variation_id" value="<?php echo esc_attr( $default_variation['variation_id'] ); ?>" data-variation-id-input>
 										<?php foreach ( $default_variation['attributes'] as $attribute_key => $attribute_value ) : ?>
