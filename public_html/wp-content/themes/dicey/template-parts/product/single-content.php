@@ -17,6 +17,8 @@ $default_label     = $terms ? reset( $terms ) : '';
 $default_menu_limit = function_exists( 'dicey_product_menu_limit_for_period' ) ? dicey_product_menu_limit_for_period( $default_label ) : 5;
 $default_variation = $variation_options ? $variation_options[0] : null;
 $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/basket/' );
+$dietary_image     = ! empty( $menu_examples[0]['images'][0]['thumb'] ) ? $menu_examples[0]['images'][0]['thumb'] : dicey_product_card_image_url( $post_id );
+$dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dicey_product_card_calories_text( $meta ) : '';
 ?>
 <main>
 	<section class="carte" data-menu-limit="<?php echo esc_attr( $default_menu_limit ); ?>">
@@ -99,6 +101,7 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 												type="button"
 												class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>"
 												data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $option['label'] ) ); ?>"
+												data-day="<?php echo esc_attr( dicey_product_period_day_count( $option['label'] ) ); ?>"
 												data-variation-id="<?php echo esc_attr( $option['variation_id'] ); ?>"
 												data-variation-price="<?php echo esc_attr( $option['price'] ); ?>"
 												data-variation-attributes="<?php echo esc_attr( wp_json_encode( $option['attributes'] ) ); ?>"
@@ -107,7 +110,7 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 										<?php endforeach; ?>
 									<?php else : ?>
 										<?php foreach ( $terms as $term_index => $term ) : ?>
-											<button type="button" class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>" data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $term ) ); ?>" data-period-value="<?php echo esc_attr( $term ); ?>" aria-selected="<?php echo 0 === $term_index ? 'true' : 'false'; ?>"><?php echo esc_html( $term ); ?></button>
+											<button type="button" class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>" data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $term ) ); ?>" data-day="<?php echo esc_attr( dicey_product_period_day_count( $term ) ); ?>" data-period-value="<?php echo esc_attr( $term ); ?>" aria-selected="<?php echo 0 === $term_index ? 'true' : 'false'; ?>"><?php echo esc_html( $term ); ?></button>
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</div>
@@ -147,6 +150,30 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 									</div>
 								</form>
 							</div>
+						</div>
+					</div>
+
+					<div class="carte__dietary" style="display: none;" aria-hidden="true">
+						<div class="carte__dietary-top">
+							<p>В месячный рацион входят 6 пятидневных рационов, которые при необходимости можно скорректировать.</p>
+						</div>
+						<div class="carte__dietary-blocks">
+							<?php for ( $dietary_index = 1; $dietary_index <= 6; $dietary_index++ ) : ?>
+								<div class="carte__dietary-block <?php echo 1 === $dietary_index ? 'active' : ''; ?>">
+									<p class="carte__dietary-num"><span><?php echo esc_html( $dietary_index ); ?></span> рацион</p>
+									<div class="carte__dietary-wr">
+										<?php if ( $dietary_image ) : ?>
+											<img src="<?php echo esc_url( $dietary_image ); ?>" alt="<?php the_title_attribute(); ?>" class="carte__dietary-img">
+										<?php endif; ?>
+										<div class="carte__dietary-info">
+											<p class="carte__dietary-name"><?php the_title(); ?></p>
+											<?php if ( '' !== trim( $dietary_kbju ) ) : ?>
+												<p class="carte__dietary-kb"><?php echo esc_html( $dietary_kbju ); ?></p>
+											<?php endif; ?>
+										</div>
+									</div>
+								</div>
+							<?php endfor; ?>
 						</div>
 					</div>
 

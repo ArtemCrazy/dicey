@@ -1275,6 +1275,12 @@ function updateCarteVariation($carte, $tab) {
 	}
 }
 
+function updateCarteDietary($carte, $tab) {
+	var days = parseInt($tab.attr("data-day"), 10) || 0
+	var showDietary = days >= 28
+	$carte.find(".carte__dietary").toggle(showDietary).attr("aria-hidden", showDietary ? "false" : "true")
+}
+
 $(document).on("click", ".carte-var__tab", function () {
 	showCarteMenuItem($(this).closest(".carte"), parseInt($(this).attr("data-menu-index"), 10) || 0)
 })
@@ -1285,8 +1291,12 @@ $(document).on("click", ".carte__term-tab", function () {
 	$tab.addClass("active").attr("aria-selected", "true").siblings().removeClass("active").attr("aria-selected", "false")
 	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
 	updateCarteVariation($carte, $tab)
+	updateCarteDietary($carte, $tab)
 })
 
 $(".carte__term-tab.active").each(function () {
-	updateCarteMenuLimit($(this).closest(".carte"), $(this).attr("data-menu-limit"))
+	var $tab = $(this)
+	var $carte = $tab.closest(".carte")
+	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
+	updateCarteDietary($carte, $tab)
 })

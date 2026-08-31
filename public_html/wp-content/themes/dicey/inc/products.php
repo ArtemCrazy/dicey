@@ -493,6 +493,24 @@ function dicey_product_menu_limit_for_period( $label ) {
 	return 5;
 }
 
+function dicey_product_period_day_count( $label ) {
+	$label = function_exists( 'mb_strtolower' ) ? mb_strtolower( trim( (string) $label ), 'UTF-8' ) : strtolower( trim( (string) $label ) );
+
+	if ( preg_match( '/(\d+)\s*(?:месяц|месяца|месяцев)/u', $label, $matches ) ) {
+		return max( 1, absint( $matches[1] ) ) * 30;
+	}
+
+	if ( false !== strpos( $label, 'месяц' ) ) {
+		return 30;
+	}
+
+	if ( preg_match( '/(\d+)/', $label, $matches ) ) {
+		return absint( $matches[1] );
+	}
+
+	return 0;
+}
+
 function dicey_sanitize_product_menu_examples( $examples ) {
 	if ( ! is_array( $examples ) ) {
 		return array();
