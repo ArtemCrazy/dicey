@@ -524,6 +524,7 @@ function dicey_sanitize_product_menu_examples( $examples ) {
 
 		$item = array(
 			'title'          => isset( $example['title'] ) ? sanitize_text_field( $example['title'] ) : '',
+			'price'          => isset( $example['price'] ) && ! is_array( $example['price'] ) ? dicey_normalize_product_price_value( $example['price'] ) : '',
 			'composition'    => isset( $example['composition'] ) ? wp_kses_post( $example['composition'] ) : '',
 			'kbju'           => isset( $example['kbju'] ) ? wp_kses_post( $example['kbju'] ) : '',
 			'minerals'       => isset( $example['minerals'] ) ? wp_kses_post( $example['minerals'] ) : '',
@@ -568,6 +569,7 @@ function dicey_product_menu_examples_for_display( $post_id, $meta = null ) {
 	$examples         = dicey_sanitize_product_menu_examples( isset( $meta['menu_examples'] ) ? $meta['menu_examples'] : array() );
 	$fallback         = array(
 		'title'          => get_the_title( $post_id ),
+		'price'          => '',
 		'composition'    => isset( $meta['composition_text'] ) ? $meta['composition_text'] : '',
 		'kbju'           => function_exists( 'dicey_product_kbju_values_text' ) ? dicey_product_kbju_values_text( $meta ) : '',
 		'minerals'       => '',
@@ -587,6 +589,66 @@ function dicey_product_menu_examples_for_display( $post_id, $meta = null ) {
 	}
 
 	return $prepared;
+}
+
+function dicey_product_menu_price_number( $price ) {
+	$price = dicey_normalize_product_price_value( $price );
+	$price = str_replace( array( ' ', ',' ), array( '', '.' ), $price );
+
+	return is_numeric( $price ) ? (float) $price : null;
+}
+
+function dicey_product_menu_selection_for_period( $selection, $period, $candidate_count = 5 ) {
+	$required = min( $candidate_count, max( 1, dicey_product_menu_limit_for_period( $period ) ) );
+	$raw      = is_array( $selection ) ? $selection : preg_split( '/\s*,\s*/', (string) $selection, -1, PREG_SPLIT_NO_EMPTY );
+	$clean    = array();
+
+	foreach ( $raw as $candidate ) {
+		$candidate = absint( $candidate );
+		if ( $candidate < $candidate_count && ! in_array( $candidate, $clean, true ) ) {
+			$clean[] = $candidate;
+		}
+	}
+
+	for ( $candidate = 0; count( $clean ) < $required && $candidate < $candidate_count; $candidate++ ) {
+		if ( ! in_array( $candidate, $clean, true ) ) {
+			$clean[] = $candidate;
+		}
+	}
+
+	return array_slice( $clean, 0, $required );
+}
+
+function dicey_product_menu_price_details( $post_id, $selection, $period ) {
+	$meta      = dicey_get_product_meta( $post_id );
+	$examples  = dicey_sanitize_product_menu_examples( isset( $meta['menu_examples'] ) ? $meta['menu_examples'] : array() );
+	$selection = dicey_product_menu_selection_for_period( $selection, $period, 5 );
+	$total     = 0.0;
+	$titles    = array();
+	$priced    = true;
+
+	foreach ( $selection as $candidate ) {
+		$example  = isset( $examples[ $candidate ] ) ? $examples[ $candidate ] : array();
+		$price    = dicey_product_menu_price_number( isset( $example['price'] ) ? $example['price'] : '' );
+		$titles[] = isset( $example['title'] ) && '' !== trim( $example['title'] ) ? $example['title'] : sprintf( 'Рацион %d', $candidate + 1 );
+
+		if ( null === $price ) {
+			$priced = false;
+			continue;
+		}
+
+		$total += $price;
+	}
+
+	$days       = dicey_product_period_day_count( $period );
+	$multiplier = $days >= 28 ? max( 1, (int) ceil( $days / 5 ) ) : 1;
+
+	return array(
+		'selection'  => $selection,
+		'titles'     => $titles,
+		'multiplier' => $multiplier,
+		'total'      => $priced ? $total * $multiplier : null,
+	);
 }
 
 function dicey_product_title_for_card( $post_id ) {
@@ -739,22 +801,72 @@ function dicey_product_add_to_cart_redirect( $url ) {
 add_filter( 'woocommerce_add_to_cart_redirect', 'dicey_product_add_to_cart_redirect' );
 
 function dicey_product_add_period_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
-	if ( $variation_id || empty( $_POST['dicey_product_period'] ) ) {
+	if ( empty( $_POST['dicey_product_period'] ) ) {
 		return $cart_item_data;
 	}
 
-	$period  = sanitize_text_field( wp_unslash( $_POST['dicey_product_period'] ) );
-	$meta    = dicey_get_product_meta( $product_id );
-	$allowed = dicey_product_lines( isset( $meta['terms'] ) ? $meta['terms'] : array() );
+	$period = sanitize_text_field( wp_unslash( $_POST['dicey_product_period'] ) );
+	$meta   = dicey_get_product_meta( $product_id );
+	if ( $variation_id ) {
+		$options = dicey_get_wc_product_period_options( $product_id );
+		$matched = null;
+		foreach ( $options as $option ) {
+			if ( absint( $option['variation_id'] ) === absint( $variation_id ) ) {
+				$matched = $option;
+				break;
+			}
+		}
 
-	if ( in_array( $period, $allowed, true ) ) {
-		$cart_item_data['dicey_period'] = $period;
+		if ( ! $matched || $period !== $matched['label'] ) {
+			return $cart_item_data;
+		}
+	} else {
+		$allowed = dicey_product_lines( isset( $meta['terms'] ) ? $meta['terms'] : array() );
+		if ( ! in_array( $period, $allowed, true ) ) {
+			return $cart_item_data;
+		}
+	}
+
+	$raw_selection = isset( $_POST['dicey_product_menu_selection'] ) ? sanitize_text_field( wp_unslash( $_POST['dicey_product_menu_selection'] ) ) : '';
+	$details       = dicey_product_menu_price_details( $product_id, $raw_selection, $period );
+
+	$cart_item_data['dicey_period']         = $period;
+	$cart_item_data['dicey_menu_selection'] = $details['selection'];
+	$cart_item_data['dicey_menu_titles']    = $details['titles'];
+	if ( null !== $details['total'] ) {
+		$cart_item_data['dicey_menu_total'] = $details['total'];
 	}
 
 	return $cart_item_data;
 }
 
 add_filter( 'woocommerce_add_cart_item_data', 'dicey_product_add_period_to_cart_item', 10, 3 );
+
+function dicey_product_apply_menu_price_to_cart( $cart ) {
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+		return;
+	}
+
+	foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+		if ( empty( $cart_item['data'] ) || empty( $cart_item['product_id'] ) || empty( $cart_item['dicey_period'] ) || ! isset( $cart_item['dicey_menu_selection'] ) ) {
+			continue;
+		}
+
+		$details = dicey_product_menu_price_details( absint( $cart_item['product_id'] ), $cart_item['dicey_menu_selection'], $cart_item['dicey_period'] );
+		$cart->cart_contents[ $cart_item_key ]['dicey_menu_selection'] = $details['selection'];
+		$cart->cart_contents[ $cart_item_key ]['dicey_menu_titles']    = $details['titles'];
+
+		if ( null === $details['total'] ) {
+			unset( $cart->cart_contents[ $cart_item_key ]['dicey_menu_total'] );
+			continue;
+		}
+
+		$cart->cart_contents[ $cart_item_key ]['dicey_menu_total'] = $details['total'];
+		$cart_item['data']->set_price( (float) $details['total'] );
+	}
+}
+
+add_action( 'woocommerce_before_calculate_totals', 'dicey_product_apply_menu_price_to_cart' );
 
 function dicey_render_product_card( $post_id ) {
 	$meta        = dicey_get_product_meta( $post_id );
@@ -965,10 +1077,11 @@ function dicey_render_product_meta_box( $post ) {
 		<div class="dicey-product-field dicey-product-wide"><label>Как кормить?</label><textarea name="dicey_product[feeding_answer]"><?php echo esc_textarea( $meta['feeding_answer'] ); ?></textarea></div>
 		<div class="dicey-product-field dicey-product-wide"><label>Как хранить?</label><textarea name="dicey_product[storage_answer]"><?php echo esc_textarea( $meta['storage_answer'] ); ?></textarea></div>
 		<div class="dicey-product-field dicey-product-wide"><label>Доставка</label><textarea name="dicey_product[delivery_answer]"><?php echo esc_textarea( $meta['delivery_answer'] ); ?></textarea></div>
-		<div class="dicey-product-field dicey-product-wide"><h3>Примеры меню</h3><p class="dicey-product-note">Заполните до пяти дней. Для срока 3 дня сайт покажет первые три примера, для 5 дней и месяца — все пять.</p></div>
+		<div class="dicey-product-field dicey-product-wide"><h3>Примеры меню</h3><p class="dicey-product-note">Заполните пять вариантов и цену каждого. Для 3 дней покупатель выбирает любые три из пяти; итог считается как сумма выбранных вариантов. Для месяца сумма пяти вариантов умножается на шесть.</p></div>
 		<?php foreach ( $menu_examples as $index => $example ) : ?>
 			<div class="dicey-product-field dicey-product-wide"><strong>День <?php echo esc_html( $index + 1 ); ?></strong></div>
 			<div class="dicey-product-field"><label>Название блюда</label><input type="text" name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][title]" value="<?php echo esc_attr( isset( $example['title'] ) ? $example['title'] : '' ); ?>"></div>
+			<div class="dicey-product-field"><label>Стоимость одного дня</label><input type="text" name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][price]" value="<?php echo esc_attr( isset( $example['price'] ) ? $example['price'] : '' ); ?>"><p class="dicey-product-note">Например: 600. Знак ₽ добавится автоматически.</p></div>
 			<div class="dicey-product-field"><label>Вес порции</label><input type="text" name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][portion_weight]" value="<?php echo esc_attr( isset( $example['portion_weight'] ) ? $example['portion_weight'] : '' ); ?>"></div>
 			<div class="dicey-product-field"><label>Состав</label><textarea name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][composition]"><?php echo esc_textarea( isset( $example['composition'] ) ? $example['composition'] : '' ); ?></textarea></div>
 			<div class="dicey-product-field"><label>КБЖУ</label><textarea name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][kbju]"><?php echo esc_textarea( isset( $example['kbju'] ) ? $example['kbju'] : '' ); ?></textarea></div>

@@ -7459,9 +7459,31 @@ text-underline-position: from-font;
 
 .carte-modal{
   transform: translateX(100%);
+  overflow-y: auto;
   .transition;
   &.active{
     transform: translateX(0);
+  }
+}
+
+.carte-var__btn{
+  border: 0;
+}
+
+.carte-modal__close{
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+@media only screen and (max-width: 767px) {
+  .carte-modal__block {
+    height: auto;
+  }
+
+  .carte-modal__block .carte-modal__img {
+    height: 180px;
+    margin-bottom: 12px;
   }
 }
 

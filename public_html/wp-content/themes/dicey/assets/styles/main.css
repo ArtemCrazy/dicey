@@ -7734,6 +7734,7 @@ line-height: 150%;
 
   .carte-var__btn{
 	display: flex;
+	border: 0;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
@@ -8146,6 +8147,7 @@ background: #CFB1E9;
 
 .carte-modal{
 	background-color: #F5F9FF;
+	overflow-y: auto;
 	width: 846px;
 	position: fixed;
 	bottom: 0;
@@ -8162,6 +8164,9 @@ background: #CFB1E9;
 .carte-modal__close{
 	width: 42px;
 height: 42px;
+	padding: 0;
+	border: 0;
+	background: transparent;
 position: absolute;
 top: 80px;
 right: 80px;
@@ -13297,7 +13302,11 @@ cursor: default;
 	}
 	.carte-modal__block{
 		border-radius: 20px;
-		height: 242px;
+		height: auto;
+	}
+	.carte-modal__block .carte-modal__img{
+		height: 180px;
+		margin-bottom: 12px;
 	}
 	.carte-modal__close {
         top: 12px;

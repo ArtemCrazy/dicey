@@ -88,6 +88,10 @@ function dicey_save_order_item_period( $item, $cart_item_key, $values, $order ) 
 	if ( '' !== $period ) {
 		$item->add_meta_data( 'Срок', $period, true );
 	}
+
+	if ( ! empty( $values['dicey_menu_titles'] ) && is_array( $values['dicey_menu_titles'] ) ) {
+		$item->add_meta_data( 'Выбранные рационы', implode( ', ', array_map( 'sanitize_text_field', $values['dicey_menu_titles'] ) ), true );
+	}
 }
 
 function dicey_cart_item_image_url( $product_id, $product ) {
@@ -129,11 +133,35 @@ function dicey_handle_cart_period_change() {
 	}
 
 	$product_id = absint( $cart_item['product_id'] );
+	$options    = dicey_cart_item_period_options( $cart_item );
+	$matched    = null;
+	foreach ( $options as $option ) {
+		if ( absint( $option['variation_id'] ) === $variation_id ) {
+			$matched = $option;
+			break;
+		}
+	}
+	if ( absint( $variation->get_parent_id() ) !== $product_id || ! $matched ) {
+		wc_add_notice( __( 'Не удалось изменить срок рациона.', 'dicey' ), 'error' );
+		wp_safe_redirect( wc_get_cart_url() );
+		exit;
+	}
+
 	$quantity   = max( 1, absint( $cart_item['quantity'] ) );
-	$attributes = wc_get_product_variation_attributes( $variation_id );
+	$attributes = $matched['attributes'];
+	$period     = $matched['label'];
+	$details = function_exists( 'dicey_product_menu_price_details' ) ? dicey_product_menu_price_details( $product_id, isset( $cart_item['dicey_menu_selection'] ) ? $cart_item['dicey_menu_selection'] : array(), $period ) : array();
+	$data    = array(
+		'dicey_period'         => $period,
+		'dicey_menu_selection' => isset( $details['selection'] ) ? $details['selection'] : array(),
+		'dicey_menu_titles'    => isset( $details['titles'] ) ? $details['titles'] : array(),
+	);
+	if ( isset( $details['total'] ) && null !== $details['total'] ) {
+		$data['dicey_menu_total'] = $details['total'];
+	}
 
 	WC()->cart->remove_cart_item( $cart_item_key );
-	WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $attributes );
+	WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $attributes, $data );
 	wc_add_notice( __( 'Срок рациона обновлен.', 'dicey' ), 'success' );
 
 	wp_safe_redirect( wc_get_cart_url() );
@@ -187,6 +215,9 @@ function dicey_render_basket_page() {
 										<p class="basket__block-name"><?php echo esc_html( $product->get_name() ); ?></p>
 										<?php if ( '' !== trim( $calories ) ) : ?>
 											<p class="basket__kbju"><?php echo esc_html( $calories ); ?></p>
+										<?php endif; ?>
+										<?php if ( ! empty( $cart_item['dicey_menu_titles'] ) ) : ?>
+											<p class="basket__kbju">Выбрано: <?php echo esc_html( implode( ', ', $cart_item['dicey_menu_titles'] ) ); ?></p>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -342,6 +373,7 @@ function dicey_render_checkout_order_summary() {
 							<p class="decoration__right-name"><?php echo esc_html( $product->get_name() ); ?></p>
 							<?php $period = dicey_cart_item_period_label( $cart_item ); ?>
 							<?php if ( $period ) : ?><p class="decoration__right-date"><?php echo esc_html( $period ); ?></p><?php endif; ?>
+							<?php if ( ! empty( $cart_item['dicey_menu_titles'] ) ) : ?><p class="decoration__right-date">Выбрано: <?php echo esc_html( implode( ', ', $cart_item['dicey_menu_titles'] ) ); ?></p><?php endif; ?>
 						</div>
 					</div>
 					<div class="decoration__result">

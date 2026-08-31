@@ -19,9 +19,10 @@ $default_variation = $variation_options ? $variation_options[0] : null;
 $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/basket/' );
 $dietary_image     = ! empty( $menu_examples[0]['images'][0]['thumb'] ) ? $menu_examples[0]['images'][0]['thumb'] : dicey_product_card_image_url( $post_id );
 $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dicey_product_card_calories_text( $meta ) : '';
+$default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 ?>
 <main>
-	<section class="carte" data-menu-limit="<?php echo esc_attr( $default_menu_limit ); ?>">
+	<section class="carte" data-menu-limit="<?php echo esc_attr( $default_menu_limit ); ?>" data-menu-selection="<?php echo esc_attr( implode( ',', $default_selection ) ); ?>" data-fallback-price="<?php echo esc_attr( $price ); ?>">
 		<div class="container">
 			<div class="standart-nav">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a>
@@ -45,7 +46,8 @@ $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dic
 					</div>
 					<div class="carte-var__contets">
 						<?php foreach ( $menu_examples as $index => $example ) : ?>
-							<div class="carte-var__content" data-menu-content="<?php echo esc_attr( $index ); ?>" style="<?php echo 0 === $index ? 'display: flex;' : 'display: none;'; ?>">
+							<?php $example_price = function_exists( 'dicey_product_menu_price_number' ) ? dicey_product_menu_price_number( isset( $example['price'] ) ? $example['price'] : '' ) : null; ?>
+							<div class="carte-var__content" data-menu-content="<?php echo esc_attr( $index ); ?>" data-menu-price="<?php echo null === $example_price ? '' : esc_attr( $example_price ); ?>" style="<?php echo 0 === $index ? 'display: flex;' : 'display: none;'; ?>">
 								<div class="carte-var__info">
 									<?php if ( '' !== trim( $example['title'] ) ) : ?>
 										<h3><?php echo esc_html( $example['title'] ); ?></h3>
@@ -66,7 +68,12 @@ $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dic
 										<h4>Вес порции</h4>
 										<p><?php echo esc_html( $example['portion_weight'] ); ?></p>
 									<?php endif; ?>
+									<?php if ( null !== $example_price ) : ?>
+										<h4>Стоимость</h4>
+										<p><?php echo esc_html( dicey_product_price_with_currency( $example['price'] ) ); ?></p>
+									<?php endif; ?>
 								</div>
+								<button type="button" class="carte-var__btn" data-menu-replace>Заменить блюдо <span aria-hidden="true">↻</span></button>
 								<?php if ( ! empty( $example['images'] ) ) : ?>
 									<div class="carte-var__imgswr">
 										<div class="carte-var__img-big">
@@ -102,6 +109,7 @@ $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dic
 												class="carte__term-tab <?php echo 0 === $term_index ? 'active' : ''; ?>"
 												data-menu-limit="<?php echo esc_attr( dicey_product_menu_limit_for_period( $option['label'] ) ); ?>"
 												data-day="<?php echo esc_attr( dicey_product_period_day_count( $option['label'] ) ); ?>"
+												data-period-value="<?php echo esc_attr( $option['label'] ); ?>"
 												data-variation-id="<?php echo esc_attr( $option['variation_id'] ); ?>"
 												data-variation-price="<?php echo esc_attr( $option['price'] ); ?>"
 												data-variation-attributes="<?php echo esc_attr( wp_json_encode( $option['attributes'] ) ); ?>"
@@ -135,9 +143,10 @@ $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dic
 									<input type="hidden" name="add-to-cart" value="<?php echo esc_attr( $post_id ); ?>">
 									<input type="hidden" name="product_id" value="<?php echo esc_attr( $post_id ); ?>">
 									<input type="hidden" name="quantity" value="1">
-									<?php if ( ! $default_variation && '' !== $default_label ) : ?>
+									<?php if ( '' !== $default_label ) : ?>
 										<input type="hidden" name="dicey_product_period" value="<?php echo esc_attr( $default_label ); ?>" data-product-period-input>
 									<?php endif; ?>
+									<input type="hidden" name="dicey_product_menu_selection" value="<?php echo esc_attr( implode( ',', $default_selection ) ); ?>" data-product-menu-selection-input>
 									<?php if ( $default_variation ) : ?>
 										<input type="hidden" name="variation_id" value="<?php echo esc_attr( $default_variation['variation_id'] ); ?>" data-variation-id-input>
 										<?php foreach ( $default_variation['attributes'] as $attribute_key => $attribute_value ) : ?>
@@ -196,6 +205,31 @@ $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dic
 			</div>
 		</div>
 	</section>
+	<div id="dicey-menu-replace-modal" class="carte-modal" aria-hidden="true">
+		<div class="carte-modal__wr">
+			<button type="button" class="carte-modal__close" aria-label="Закрыть окно замены">
+				<svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M9.863 9.863L32.137 32.137M32.137 9.863L9.863 32.137" stroke="#5182A6" stroke-width="1.4" stroke-linecap="round" />
+				</svg>
+			</button>
+			<div class="carte-modal__head"><p>Заменить блюдо</p></div>
+			<div class="carte-modal__blocks">
+				<?php foreach ( $menu_examples as $index => $example ) : ?>
+					<div class="carte-modal__block" data-menu-candidate="<?php echo esc_attr( $index ); ?>">
+						<?php if ( ! empty( $example['images'][0]['thumb'] ) ) : ?>
+							<img src="<?php echo esc_url( $example['images'][0]['thumb'] ); ?>" alt="<?php echo esc_attr( $example['title'] ); ?>" class="carte-modal__img">
+						<?php endif; ?>
+						<div class="carte-modal__block-info">
+							<p class="carte-modal__block-name"><?php echo esc_html( $example['title'] ); ?></p>
+							<?php if ( '' !== trim( $example['kbju'] ) ) : ?><p class="carte-modal__block-text"><?php echo esc_html( wp_strip_all_tags( $example['kbju'] ) ); ?></p><?php endif; ?>
+							<?php if ( '' !== trim( isset( $example['price'] ) ? $example['price'] : '' ) ) : ?><p class="carte-modal__block-text"><?php echo esc_html( dicey_product_price_with_currency( $example['price'] ) ); ?></p><?php endif; ?>
+							<button type="button" class="carte-modal__block-btn" data-menu-choose="<?php echo esc_attr( $index ); ?>">Выбрать</button>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
 	<?php echo dicey_render_related_products( $post_id ); ?>
 	<?php echo dicey_render_why(); ?>
 </main>

@@ -137,7 +137,7 @@ $(".questions__top").click(function () {
 $(".dark,.burger-menu__close,.carte-modal__close").click(function () {
 	$(".burger-menu").removeClass("active")
 	$(".dark").fadeOut(200)
-	$(".carte-modal").removeClass("active")
+	$(".carte-modal").removeClass("active").attr("aria-hidden", "true")
 })
 $(".header-burger").click(function () {
 	$(this).toggleClass("active")
@@ -1217,23 +1217,59 @@ $(".shop__wr").each(function () {
 })
 
 
-function showCarteMenuItem($carte, index) {
+function getCarteMenuSelection($carte) {
+	var selection = String($carte.attr("data-menu-selection") || "")
+		.split(",")
+		.map(function (value) { return parseInt(value, 10) })
+		.filter(function (value, index, values) { return !isNaN(value) && values.indexOf(value) === index })
+	return selection
+}
+
+function setCarteMenuSelection($carte, selection) {
+	var value = selection.join(",")
+	$carte.attr("data-menu-selection", value)
+	$carte.find("[data-product-menu-selection-input]").val(value).attr("value", value)
+}
+
+function normalizeCarteMenuSelection($carte, limit) {
+	var candidateCount = $carte.find(".carte-var__content").length
+	var selection = getCarteMenuSelection($carte).filter(function (candidate) { return candidate >= 0 && candidate < candidateCount })
+	limit = Math.max(1, Math.min(parseInt(limit, 10) || 5, candidateCount))
+
+	for (var candidate = 0; selection.length < limit && candidate < candidateCount; candidate++) {
+		if (selection.indexOf(candidate) === -1) {
+			selection.push(candidate)
+		}
+	}
+
+	selection = selection.slice(0, limit)
+	setCarteMenuSelection($carte, selection)
+	return selection
+}
+
+function showCarteMenuItem($carte, slot) {
 	var $tabs = $carte.find(".carte-var__tab")
 	var $contents = $carte.find(".carte-var__content")
 	if (!$contents.length) {
 		return
 	}
+	var selection = getCarteMenuSelection($carte)
+	slot = Math.max(0, Math.min(parseInt(slot, 10) || 0, selection.length - 1))
+	var candidate = selection[slot]
 
 	$tabs.removeClass("active").attr("aria-selected", "false")
-	$tabs.filter('[data-menu-index="' + index + '"]').addClass("active").attr("aria-selected", "true")
+	$tabs.filter('[data-menu-index="' + slot + '"]').addClass("active").attr("aria-selected", "true")
 	$contents.hide()
-	var $content = $contents.filter('[data-menu-content="' + index + '"]').css("display", "flex")
+	var $content = $contents.filter('[data-menu-content="' + candidate + '"]').css("display", "flex").attr("data-menu-slot", slot)
+	var canReplace = $contents.length > selection.length
+	$content.find("[data-menu-replace]").prop("disabled", !canReplace).toggleClass("disabled", !canReplace)
 	$content.find(".carte-var__img-slider").trigger("refresh.owl.carousel")
 }
 
 function updateCarteMenuLimit($carte, limit) {
 	var $tabs = $carte.find(".carte-var__tab")
 	limit = Math.max(1, Math.min(parseInt(limit, 10) || 5, $tabs.length))
+	normalizeCarteMenuSelection($carte, limit)
 	$carte.attr("data-menu-limit", limit)
 	$tabs.each(function (index) {
 		$(this).toggle(index < limit)
@@ -1241,7 +1277,36 @@ function updateCarteMenuLimit($carte, limit) {
 
 	var activeIndex = parseInt($tabs.filter(".active").attr("data-menu-index"), 10) || 0
 	if (activeIndex >= limit) {
-		showCarteMenuItem($carte, 0)
+		activeIndex = 0
+	}
+	showCarteMenuItem($carte, activeIndex)
+}
+
+function formatCartePrice(value) {
+	return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value) + " ₽"
+}
+
+function updateCarteCalculatedPrice($carte, $periodTab) {
+	var selection = getCarteMenuSelection($carte)
+	var prices = []
+	selection.forEach(function (candidate) {
+		var raw = $carte.find('.carte-var__content[data-menu-content="' + candidate + '"]').attr("data-menu-price")
+		if (raw !== undefined && raw !== "" && !isNaN(parseFloat(raw))) {
+			prices.push(parseFloat(raw))
+		}
+	})
+
+	if (prices.length === selection.length && prices.length) {
+		var days = parseInt($periodTab.attr("data-day"), 10) || 0
+		var multiplier = days >= 28 ? Math.max(1, Math.ceil(days / 5)) : 1
+		var total = prices.reduce(function (sum, price) { return sum + price }, 0) * multiplier
+		$carte.find("[data-product-price]").text(formatCartePrice(total))
+		return
+	}
+
+	var fallback = $periodTab.attr("data-variation-price") || $carte.attr("data-fallback-price")
+	if (fallback) {
+		$carte.find("[data-product-price]").text(fallback)
 	}
 }
 
@@ -1281,6 +1346,20 @@ function updateCarteDietary($carte, $tab) {
 	$carte.find(".carte__dietary").toggle(showDietary).attr("aria-hidden", showDietary ? "false" : "true")
 }
 
+function updateCarteReplacementModal($carte, slot) {
+	var selection = getCarteMenuSelection($carte)
+	var current = selection[slot]
+	$("#dicey-menu-replace-modal [data-menu-candidate]").each(function () {
+		var $block = $(this)
+		var candidate = parseInt($block.attr("data-menu-candidate"), 10)
+		var isCurrent = candidate === current
+		var isUsedElsewhere = selection.indexOf(candidate) !== -1 && !isCurrent
+		var $button = $block.find("[data-menu-choose]")
+		$button.prop("disabled", isCurrent || isUsedElsewhere).toggleClass("disabled", isCurrent || isUsedElsewhere)
+		$button.text(isCurrent ? "Выбрано" : isUsedElsewhere ? "Уже в рационе" : "Выбрать")
+	})
+}
+
 $(document).on("click", ".carte-var__tab", function () {
 	showCarteMenuItem($(this).closest(".carte"), parseInt($(this).attr("data-menu-index"), 10) || 0)
 })
@@ -1292,6 +1371,39 @@ $(document).on("click", ".carte__term-tab", function () {
 	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
 	updateCarteVariation($carte, $tab)
 	updateCarteDietary($carte, $tab)
+	updateCarteCalculatedPrice($carte, $tab)
+})
+
+$(document).on("click", "[data-menu-replace]", function () {
+	if ($(this).prop("disabled")) {
+		return
+	}
+	var $carte = $(this).closest(".carte")
+	var slot = parseInt($carte.find(".carte-var__tab.active").attr("data-menu-index"), 10) || 0
+	$carte.attr("data-menu-replace-slot", slot)
+	updateCarteReplacementModal($carte, slot)
+	$("#dicey-menu-replace-modal").addClass("active").attr("aria-hidden", "false")
+	$(".dark").fadeIn(200)
+})
+
+$(document).on("click", "[data-menu-choose]", function () {
+	var $button = $(this)
+	if ($button.prop("disabled")) {
+		return
+	}
+	var $carte = $(".carte").first()
+	var slot = parseInt($carte.attr("data-menu-replace-slot"), 10) || 0
+	var candidate = parseInt($button.attr("data-menu-choose"), 10)
+	var selection = getCarteMenuSelection($carte)
+	if (isNaN(candidate) || selection.indexOf(candidate) !== -1) {
+		return
+	}
+	selection[slot] = candidate
+	setCarteMenuSelection($carte, selection)
+	showCarteMenuItem($carte, slot)
+	updateCarteCalculatedPrice($carte, $carte.find(".carte__term-tab.active"))
+	$("#dicey-menu-replace-modal").removeClass("active").attr("aria-hidden", "true")
+	$(".dark").fadeOut(200)
 })
 
 $(".carte__term-tab.active").each(function () {
@@ -1299,4 +1411,5 @@ $(".carte__term-tab.active").each(function () {
 	var $carte = $tab.closest(".carte")
 	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
 	updateCarteDietary($carte, $tab)
+	updateCarteCalculatedPrice($carte, $tab)
 })

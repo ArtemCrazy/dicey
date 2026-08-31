@@ -38,11 +38,13 @@ function dicey_register_carbon_product_fields() {
 					->set_rows( 4 ),
 				\Carbon_Fields\Field::make( 'separator', 'dicey_product_menu_separator', 'Примеры меню' ),
 				\Carbon_Fields\Field::make( 'complex', 'dicey_product_menu_examples', 'Дни меню' )
-					->set_help_text( 'Добавьте до пяти примеров. Для срока 3 дня выводятся первые три, для 5 дней и месяца — все пять.' )
+					->set_help_text( 'Добавьте пять вариантов и цену каждого. Для 3 дней покупатель сможет заменить блюда и выбрать любые три; итоговая стоимость рассчитывается автоматически.' )
 					->set_max( 5 )
 					->add_fields(
 						array(
 							\Carbon_Fields\Field::make( 'text', 'title', 'Название блюда' ),
+							\Carbon_Fields\Field::make( 'text', 'price', 'Стоимость одного дня' )
+								->set_help_text( 'Например: 600. Знак ₽ добавится автоматически.' ),
 							\Carbon_Fields\Field::make( 'textarea', 'composition', 'Состав' )->set_rows( 4 ),
 							\Carbon_Fields\Field::make( 'textarea', 'kbju', 'КБЖУ' )->set_rows( 4 ),
 							\Carbon_Fields\Field::make( 'textarea', 'minerals', 'Витамины и минеральные вещества' )->set_rows( 3 ),
