@@ -86,6 +86,16 @@ function dicey_ensure_consultation_products() {
 			continue;
 		}
 
+		$current_title = get_the_title( $product_id );
+		if ( 'Консультация ветеринарного врача диетолога/гастроэнтеролога' === $current_title ) {
+			wp_update_post(
+				array(
+					'ID'         => $product_id,
+					'post_title' => $definition['title'],
+				)
+			);
+		}
+
 		wp_set_object_terms( $product_id, 'simple', 'product_type' );
 		if ( $category_id ) {
 			wp_set_object_terms( $product_id, array( $category_id ), 'product_cat' );
