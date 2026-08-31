@@ -1842,6 +1842,10 @@ header {
 	z-index: -1;
 }
 
+.about-food__mobile-arrow {
+	display: none;
+}
+
 .about-food__wr {
 	position: relative;
 }
@@ -11278,6 +11282,10 @@ cursor: default;
 		top: -271px;
 	}
 
+	.about-food__left .about-food__block:nth-child(1)::before {
+		display: none;
+	}
+
 	.about-food__block-name {
 		margin-bottom: 4px;
 	}
@@ -11359,6 +11367,31 @@ cursor: default;
 		bottom: -553px;
 		top: auto;
 		left: 8px;
+	}
+
+	.about-food__right .about-food__block:nth-child(3)::before {
+		display: none;
+	}
+
+	.about-food__mobile-arrow {
+		display: block;
+		position: absolute;
+		z-index: 3;
+	}
+
+	.about-food__mobile-arrow--protein {
+		top: -150px;
+		left: 145px;
+		width: 60px;
+		height: 79px;
+	}
+
+	.about-food__mobile-arrow--fiber {
+		top: 310px;
+		left: 139px;
+		width: 70px;
+		height: 46px;
+		transform: rotate(45deg);
 	}
 
 	.about-food-kr1 {
@@ -11602,6 +11635,15 @@ cursor: default;
 
 	.shipping__list li {
 		font-size: 13px;
+	}
+
+	.shipping__list li:last-child {
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.shipping__list li:last-child::marker {
+		content: '';
 	}
 
 	.shipping__suggest-wr {

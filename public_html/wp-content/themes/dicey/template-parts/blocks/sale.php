@@ -2,9 +2,9 @@
         <div class="container">
             <div class="banner-sale__block">
                 <div class="banner-sale__info">
-                    <h2 class="banner-sale__title">скидка — 30% на первый заказ</h2>
+                    <h2 class="banner-sale__title">скидка — 15% на первый заказ</h2>
                     <p class="banner-sale__subname">начните кормить своего <br> питомца по-новому</p>
-                    <p class="banner-sale__text"><span>Для новых клиентов</span> <br> Скидка -30% на первый заказ по промокоду <strong>СТАРТ</strong></p>
+                    <p class="banner-sale__text"><span>Для новых клиентов</span> <br> Скидка -15% на первый заказ по промокоду <strong>СТАРТ</strong></p>
                     <a href="#" class="main__link xs-hide">
                         Выбрать рацион
                         <svg width="26" height="25" viewBox="0 0 26 25" fill="none" xmlns="http://www.w3.org/2000/svg">

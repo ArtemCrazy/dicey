@@ -294,7 +294,7 @@ function dicey_register_blocks() {
 			),
 		),
 		'sale'        => array(
-			'title'    => __( 'Скидка - 30% на первый заказ', 'dicey' ),
+			'title'    => __( 'Скидка - 15% на первый заказ', 'dicey' ),
 			'template' => 'template-parts/blocks/sale',
 			'callback' => 'dicey_render_sale',
 			'attributes' => array(

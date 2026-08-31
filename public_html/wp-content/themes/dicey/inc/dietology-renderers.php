@@ -25,7 +25,7 @@ function dicey_dietology_defaults() {
 			array( 'icon' => 'imgs/bg/consultation__img2.svg', 'text' => 'Беременная или лактирующая собака' ),
 			array( 'icon' => 'imgs/bg/consultation__img3.svg', 'text' => 'Питомец с лишним или недостаточным весом' ),
 			array( 'icon' => 'imgs/bg/consultation__img4.svg', 'text' => 'У собаки есть заболевания' ),
-			array( 'icon' => 'imgs/bg/consultation__img5.svg', 'icon_mobile' => 'imgs/bg/consultation__img7.svg', 'text' => 'Собака с пищевой аллергия или непереносимостью' ),
+			array( 'icon' => 'imgs/bg/consultation__img5.svg', 'icon_mobile' => 'imgs/bg/consultation__img7.svg', 'text' => 'Собака с пищевой аллергией или непереносимостью' ),
 			array( 'icon' => 'imgs/bg/consultation__img6.svg', 'text' => 'Ваш хвостик привередлив в еде' ),
 		),
 		'plan_person_name'  => 'Босунова Наталья',
@@ -43,7 +43,7 @@ function dicey_dietology_defaults() {
 		'advisory_steps'    => array(
 			array( 'title' => 'Заполняете заявку и оплачиваете консультацию', 'text' => 'Оставляете контактные данные, <br> чтобы мы могли связаться с вами', 'button' => 'Получить консультацию' ),
 			array( 'title' => 'Заполняете анкету о вашей собаке', 'text' => 'После оплаты вы получаете на почту короткую анкету (3–5 минут). После её заполнения мы свяжемся с вами и согласуем время онлайн-консультации с диетологом', 'icon' => 'imgs/icons/advisory__icon.svg' ),
-			array( 'title' => 'Диетолог проводит консультацию', 'text' => 'Изучаем особенности вашей собаки, отвечаем на вопросы и уточняетм все особенности питания собаки', 'icon' => 'imgs/icons/advisory__icon2.svg' ),
+			array( 'title' => 'Диетолог проводит консультацию', 'text' => 'Изучаем особенности вашей собаки, отвечаем на вопросы и уточняем все особенности питания собаки', 'icon' => 'imgs/icons/advisory__icon2.svg' ),
 			array( 'title' => 'Мы составляем рацион', 'text' => 'Составляем подходящее меню по результатам консультации', 'icon' => 'imgs/icons/advisory__icon3.svg' ),
 			array( 'title' => 'Передаём план питания', 'text' => 'и при необходимости оформляем доставку', 'icon' => 'imgs/icons/advisory__icon4.svg' ),
 		),
@@ -56,7 +56,7 @@ function dicey_dietology_defaults() {
 		),
 		'price_title'       => 'Стоимость консультаций',
 		'prices'            => array(
-			array( 'title' => 'Консультация ветеринарного врача диетолога/гастроэнтеролога', 'text' => 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 1500 руб.', 'items' => array( 'Ответы на вопросы', 'Разбор анализов и дополнительных исследований', 'Рекомендации по лечению' ), 'button' => 'Заказать консультацию и подобрать рацион' ),
+			array( 'title' => 'Консультация ветеринарного врача-диетолога/гастроэнтеролога', 'text' => 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 1500 руб.', 'items' => array( 'Ответы на вопросы', 'Разбор анализов и дополнительных исследований', 'Рекомендации по лечению' ), 'button' => 'Заказать консультацию и подобрать рацион' ),
 			array( 'title' => 'Подбор рациона для здорового питомца', 'text' => 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 3000 руб.', 'items' => array( 'Составление индивидуального рациона питания', 'Ответы на вопросы по рациону', 'Рекомендации по лечению' ), 'button' => 'Заказать консультацию и подобрать рацион' ),
 			array( 'title' => 'Подбор рациона для питомца с заболеванием', 'text' => 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 3500 руб.', 'items' => array( 'Индивидуальное составление рациона питания при заболевании', 'Ответы на вопросы по рациону', 'Рекомендации по кормлению' ), 'button' => 'Заказать консультацию и подобрать рацион' ),
 			array( 'title' => 'Ведение', 'text' => 'При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 2500 руб.', 'items' => array( 'Необходимо для питомцев с заболеваниями, чтобы контролировать состояние питомца и по необходимости корректировать лечение', 'Ответы на вопросы по рациону', 'Рекомендации по кормлению' ), 'button' => 'Заказать консультацию и подобрать рацион' ),
@@ -70,7 +70,7 @@ function dicey_dietology_defaults() {
 			array( 'question' => 'Вы подбираете рацион под мою собаку?', 'answer' => $answer ),
 			array( 'question' => 'Можно ли перейти с сухого корма?', 'answer' => $answer ),
 			array( 'question' => 'Это питание на каждый день?', 'answer' => $answer ),
-			array( 'question' => 'Можно кормить данными рационами если у моей собаки пищевая аллергия или чувствительное пищеварение?', 'answer' => $answer ),
+			array( 'question' => 'Можно ли кормить этими рационами собаку с пищевой аллергией или чувствительным пищеварением?', 'answer' => $answer ),
 			array( 'question' => 'Подойдет ли рацион моему питомцу?', 'answer' => $answer ),
 		),
 	);
@@ -78,6 +78,16 @@ function dicey_dietology_defaults() {
 
 function dicey_render_dietology( $attrs = array() ) {
 	$data = dicey_merge_block_attrs( $attrs, dicey_dietology_defaults() );
+	array_walk_recursive( $data, function ( &$value ) {
+		if ( ! is_string( $value ) ) {
+			return;
+		}
+		$value = str_replace(
+			array( 'пищевой аллергия', 'уточняетм', 'ветеринарного врача диетолога', 'если у Вас', 'Можно кормить данными рационами если у моей собаки пищевая аллергия или чувствительное пищеварение?' ),
+			array( 'пищевой аллергией', 'уточняем', 'ветеринарного врача-диетолога', 'если у вас', 'Можно ли кормить этими рационами собаку с пищевой аллергией или чувствительным пищеварением?' ),
+			$value
+		);
+	} );
 	$consult_items     = dicey_non_empty_items( $data['consult_items'] );
 	$certificates      = dicey_non_empty_items( $data['plan_certificates'] );
 	$advisory_steps    = dicey_non_empty_items( $data['advisory_steps'] );
@@ -137,10 +147,10 @@ function dicey_render_dietology( $attrs = array() ) {
 						<?php if ( '' !== trim( $data['plan_text'] ) ) : ?><p class="plan__text"><?php echo dicey_kses_inline( $data['plan_text'] ); ?></p><?php endif; ?>
 						<?php if ( $certificates ) : ?><div class="plan__imgs">
 							<?php foreach ( $certificates as $certificate ) : ?>
-								<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
+								<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox="dietology-certificates" class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
 							<?php endforeach; ?>
 						</div><?php endif; ?>
-						<?php if ( '' !== trim( $data['plan_link_label'] ) ) : ?><a href="#" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a><?php endif; ?>
+						<?php if ( '' !== trim( $data['plan_link_label'] ) && ! empty( $certificates[0]['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificates[0]['image'] ) ); ?>" data-fancybox-trigger="dietology-certificates" data-fancybox-index="0" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a><?php endif; ?>
 					</div>
 				</div>
 			</section>

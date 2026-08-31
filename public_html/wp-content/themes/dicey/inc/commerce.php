@@ -106,6 +106,10 @@ function dicey_cart_item_image_url( $product_id, $product ) {
 	return function_exists( 'dicey_asset_img' ) ? dicey_asset_img( 'imgs/bg/basket__img.png' ) : '';
 }
 
+function dicey_cart_item_should_show_image( $product_id ) {
+	return ! function_exists( 'dicey_is_consultation_product' ) || ! dicey_is_consultation_product( $product_id );
+}
+
 function dicey_cart_item_period_options( $cart_item ) {
 	if ( empty( $cart_item['product_id'] ) || ! function_exists( 'dicey_get_wc_product_period_options' ) ) {
 		return array();
@@ -210,7 +214,7 @@ function dicey_render_basket_page() {
 							?>
 							<div class="basket__block">
 								<div class="basket__block-left">
-									<img src="<?php echo esc_url( dicey_cart_item_image_url( $product_id, $product ) ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" class="basket__img">
+									<?php if ( dicey_cart_item_should_show_image( $product_id ) ) : ?><img src="<?php echo esc_url( dicey_cart_item_image_url( $product_id, $product ) ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" class="basket__img"><?php endif; ?>
 									<div class="basket__block-info">
 										<p class="basket__block-name"><?php echo esc_html( $product->get_name() ); ?></p>
 										<?php if ( '' !== trim( $calories ) ) : ?>
@@ -368,7 +372,7 @@ function dicey_render_checkout_order_summary() {
 				?>
 				<div class="decoration__right-block">
 					<div class="decoration__right-wr">
-						<img src="<?php echo esc_url( dicey_cart_item_image_url( $product_id, $product ) ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" class="decoration__right-img">
+						<?php if ( dicey_cart_item_should_show_image( $product_id ) ) : ?><img src="<?php echo esc_url( dicey_cart_item_image_url( $product_id, $product ) ); ?>" alt="<?php echo esc_attr( $product->get_name() ); ?>" class="decoration__right-img"><?php endif; ?>
 						<div class="decoration__right-info">
 							<p class="decoration__right-name"><?php echo esc_html( $product->get_name() ); ?></p>
 							<?php $period = dicey_cart_item_period_label( $cart_item ); ?>

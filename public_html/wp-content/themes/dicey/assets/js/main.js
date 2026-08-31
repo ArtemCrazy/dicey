@@ -958,8 +958,8 @@ $(function () {
                 geometry: { type: 'Polygon', coordinates: [ring], fillRule: 'nonZero' },
                 properties: { balloonContent: 'Бесплатная доставка' }
             }, {
-                fillColor: '#FFBD74', strokeColor: '#FF9425',
-                opacity: 0.5, strokeWidth: 3, strokeStyle: 'solid', zIndex: 2
+                fillColor: '#FFBD74', strokeColor: '#F28B1B',
+                opacity: window.matchMedia('(max-width: 767px)').matches ? 0.65 : 0.5, strokeWidth: 3, strokeStyle: 'solid', zIndex: 2
             }));
         });
     }
@@ -972,7 +972,7 @@ $(function () {
                 properties: { balloonContent: 'Платная доставка' }
             }, {
                 fillColor: '#7F9FE0', strokeColor: '#326CEC',
-                opacity: 0.4, strokeWidth: 3, strokeStyle: 'solid', zIndex: 1
+                opacity: window.matchMedia('(max-width: 767px)').matches ? 0.58 : 0.4, strokeWidth: 3, strokeStyle: 'solid', zIndex: 1
             }));
         });
     }
@@ -983,7 +983,11 @@ $(function () {
         if (s.ready || !document.getElementById(c.mapId)) return;
         s.ready = true;
 
-        var map = new ymaps.Map(c.mapId, { center: c.center, zoom: c.zoom, controls: ['zoomControl'] });
+        var map = new ymaps.Map(c.mapId, {
+            center: c.center,
+            zoom: c.zoom,
+            controls: window.matchMedia('(max-width: 767px)').matches ? [] : ['zoomControl']
+        });
         s.map = map;
 
         ['geolocationControl','searchControl','trafficControl','typeSelector','fullscreenControl','rulerControl']

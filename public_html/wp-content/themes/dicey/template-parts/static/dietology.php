@@ -69,7 +69,7 @@
                 <div class="consultation__block">
                     <img src="static/imgs/bg/consultation__img5.svg" alt="" class="consultation__img xs-hide">
                     <img src="static/imgs/bg/consultation__img7.svg" alt="" class="consultation__img xs-show">
-                    <p class="consultation__text">Собака с пищевой аллергия или непереносимостью</p>
+                    <p class="consultation__text">Собака с пищевой аллергией или непереносимостью</p>
                 </div>
                 <div class="consultation__block">
                     <img src="static/imgs/bg/consultation__img6.svg" alt="" class="consultation__img">
@@ -131,7 +131,7 @@
                     <span class="works__block-number"></span>
                     <div class="advisory__info">
                         <p class="advisory__name">Диетолог проводит консультацию</p>
-                        <p class="advisory__text">Изучаем особенности вашей собаки, отвечаем на вопросы и уточняетм все особенности питания собаки</p>
+                        <p class="advisory__text">Изучаем особенности вашей собаки, отвечаем на вопросы и уточняем все особенности питания собаки</p>
                         <img src="static/imgs/icons/advisory__icon2.svg" alt="" class="advisory__icon">
                     </div>
                 </div>
@@ -183,7 +183,7 @@
             <div class="price__blocks">
                 <div class="price__block">
                     <div class="price__head">
-                    <h3 class="price__title">Консультация ветеринарного врача диетолога/гастроэнтеролога</h3>
+                    <h3 class="price__title">Консультация ветеринарного врача-диетолога/гастроэнтеролога</h3>
                     <p class="price__text">При заказе рациона стоимость консультации возвращается при оплате, без заказа рациона стоимость 1500 руб.</p>
                     </div>
                     <div class="price__info">

@@ -21,7 +21,7 @@ function dicey_consultation_definitions() {
 	return array(
 		array(
 			'slug'  => 'consultation-dietologist-gastroenterologist',
-			'title' => 'Консультация ветеринарного врача диетолога/гастроэнтеролога',
+			'title' => 'Консультация ветеринарного врача-диетолога/гастроэнтеролога',
 			'price' => '1500',
 			'text'  => 'Ответы на вопросы, разбор анализов и дополнительных исследований, рекомендации по лечению.',
 		),

@@ -159,9 +159,9 @@ function dicey_shipping_defaults() {
 
 function dicey_sale_defaults() {
 	return array(
-		'title'        => 'скидка — 30% на первый заказ',
+		'title'        => 'скидка — 15% на первый заказ',
 		'subtitle'     => 'начните кормить своего <br> питомца по-новому',
-		'text'         => '<span>Для новых клиентов</span> <br> Скидка -30% на первый заказ по промокоду <strong>СТАРТ</strong>',
+		'text'         => '<span>Для новых клиентов</span> <br> Скидка -15% на первый заказ по промокоду <strong>СТАРТ</strong>',
 		'button_label' => 'Выбрать рацион',
 		'button_url'   => '/shop/',
 		'image'        => 'imgs/bg/banner-sale__img.png',
@@ -481,6 +481,8 @@ function dicey_render_home_about_food( $attrs = array() ) {
 				<?php if ( '' !== trim( $data['link_label'] ) && '' !== trim( $data['link_url'] ) ) : ?><a href="<?php echo esc_url( dicey_link_url( $data['link_url'] ) ); ?>" class="about-food__link"><?php echo esc_html( $data['link_label'] ); ?></a><?php endif; ?>
 			</div>
 			<div class="about-food__wr">
+				<img src="<?php echo esc_url( dicey_asset_img( 'imgs/icons/food-line1.svg' ) ); ?>" alt="" class="about-food__mobile-arrow about-food__mobile-arrow--protein">
+				<img src="<?php echo esc_url( dicey_asset_img( 'imgs/icons/food-line6.svg' ) ); ?>" alt="" class="about-food__mobile-arrow about-food__mobile-arrow--fiber">
 				<div class="about-food__left">
 					<?php foreach ( $left as $item ) : ?>
 						<div class="about-food__block">
@@ -611,6 +613,11 @@ function dicey_render_shipping( $attrs = array() ) {
 
 function dicey_render_sale( $attrs = array() ) {
 	$data = dicey_merge_block_attrs( $attrs, dicey_sale_defaults() );
+	foreach ( array( 'title', 'text' ) as $discount_field ) {
+		if ( isset( $data[ $discount_field ] ) && is_string( $data[ $discount_field ] ) ) {
+			$data[ $discount_field ] = str_replace( array( '−30%', '-30%', '–30%' ), array( '−15%', '-15%', '–15%' ), $data[ $discount_field ] );
+		}
+	}
 	if ( ! dicey_has_value( $data ) ) {
 		return '';
 	}
