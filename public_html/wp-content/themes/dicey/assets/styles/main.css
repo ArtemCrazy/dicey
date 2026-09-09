@@ -11637,12 +11637,12 @@ cursor: default;
 		font-size: 13px;
 	}
 
-	.shipping__list li:last-child {
+	.shipping__list li:nth-child(3):last-child {
 		list-style: none;
 		padding-left: 0;
 	}
 
-	.shipping__list li:last-child::marker {
+	.shipping__list li:nth-child(3):last-child::marker {
 		content: '';
 	}
 
