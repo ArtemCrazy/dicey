@@ -1058,7 +1058,7 @@ $(function () {
             setResult(c, 'shipping__check--ok', messages.free);
         } else if (isInZone(coords, zones.paid)) {
             status = 'paid';
-            setResult(c, 'shipping__check--err', messages.paid);
+            setResult(c, '', '');
         } else {
             setResult(c, 'shipping__check--err', messages.outside);
         }

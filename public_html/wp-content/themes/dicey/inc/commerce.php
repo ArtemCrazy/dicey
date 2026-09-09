@@ -21,6 +21,24 @@ function dicey_is_woocommerce_ready() {
 	return function_exists( 'WC' ) && WC()->cart;
 }
 
+function dicey_cart_position_count_label( $count ) {
+	$count      = absint( $count );
+	$last_two   = $count % 100;
+	$last_digit = $count % 10;
+
+	if ( $last_two >= 11 && $last_two <= 14 ) {
+		$word = 'позиций';
+	} elseif ( 1 === $last_digit ) {
+		$word = 'позиция';
+	} elseif ( $last_digit >= 2 && $last_digit <= 4 ) {
+		$word = 'позиции';
+	} else {
+		$word = 'позиций';
+	}
+
+	return sprintf( '%d %s', $count, $word );
+}
+
 function dicey_register_pending_payment_gateway() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) || class_exists( 'Dicey_Pending_Payment_Gateway' ) ) {
 		return;
@@ -267,7 +285,7 @@ function dicey_render_basket_page() {
 								</div>
 							<?php endif; ?>
 							<div class="basket__wr-total2">
-								<p class="basket__total2-text">Итого (<?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?> рациона):</p>
+								<p class="basket__total2-text">Итого (<?php echo esc_html( dicey_cart_position_count_label( WC()->cart->get_cart_contents_count() ) ); ?>):</p>
 								<p class="basket__total2-value"><?php wc_cart_totals_order_total_html(); ?></p>
 							</div>
 						</div>
@@ -359,7 +377,7 @@ function dicey_render_checkout_order_summary() {
 	<div class="decoration__right">
 		<div class="decoration__right-head">
 			<p class="decoration__right-title">Ваш заказ</p>
-			<div class="decoration__right-col"><?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?> рациона</div>
+			<div class="decoration__right-col"><?php echo esc_html( dicey_cart_position_count_label( WC()->cart->get_cart_contents_count() ) ); ?></div>
 		</div>
 		<div class="decoration__right-blocks">
 			<?php foreach ( WC()->cart->get_cart() as $cart_item ) : ?>

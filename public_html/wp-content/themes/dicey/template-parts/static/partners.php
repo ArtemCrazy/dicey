@@ -3,7 +3,7 @@
         <div class="container">
             <div class="main-wr">
                 <div class="standart-nav">
-                    <a href="#">Главная</a>
+                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a>
                     <p>Сотрудничество</p>
                 </div>
                 <h1 class="main__title">Открыты <br> <span>к партнёрству</span></h1>

@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_filter( 'woocommerce_email_from_name', 'dicey_email_from_name' );
+add_filter( 'woocommerce_email_from_address', 'dicey_email_from_address' );
+add_filter( 'wp_mail_from', 'dicey_email_from_address' );
 add_filter( 'woocommerce_email_footer_text', 'dicey_email_footer_text' );
 add_filter( 'woocommerce_email_styles', 'dicey_email_styles' );
 add_action( 'woocommerce_email_before_order_table', 'dicey_email_intro_text', 8, 4 );
@@ -18,6 +20,12 @@ function dicey_email_from_name( $name ) {
 	unset( $name );
 
 	return 'Дайси';
+}
+
+function dicey_email_from_address( $address ) {
+	unset( $address );
+
+	return 'info@daysi.ru';
 }
 
 function dicey_email_footer_text( $text ) {

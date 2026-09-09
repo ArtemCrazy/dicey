@@ -694,6 +694,7 @@ function dicey_product_cart_payload( $post_id ) {
 			'quantity'    => 1,
 		),
 	);
+	$period = '';
 
 	if ( $product->is_type( 'variable' ) ) {
 		$options = dicey_get_wc_product_period_options( $post_id );
@@ -705,6 +706,18 @@ function dicey_product_cart_payload( $post_id ) {
 		foreach ( $options[0]['attributes'] as $attribute_key => $attribute_value ) {
 			$payload['fields'][ $attribute_key ] = $attribute_value;
 		}
+		$period = $options[0]['label'];
+	} else {
+		$meta    = dicey_get_product_meta( $post_id );
+		$periods = dicey_product_lines( isset( $meta['terms'] ) ? $meta['terms'] : array() );
+		$period  = isset( $periods[0] ) ? $periods[0] : '';
+	}
+
+	if ( '' !== $period ) {
+		$details = dicey_product_menu_price_details( $post_id, array(), $period );
+
+		$payload['fields']['dicey_product_period']         = $period;
+		$payload['fields']['dicey_product_menu_selection'] = implode( ',', $details['selection'] );
 	}
 
 	return $payload;

@@ -16,6 +16,8 @@ while ( have_posts() ) :
 		echo dicey_render_basket_page();
 	} elseif ( 'shop' === $slug && function_exists( 'dicey_render_shop_page' ) ) {
 		echo dicey_render_shop_page();
+	} elseif ( 'partners' === $slug && function_exists( 'dicey_get_template_html' ) ) {
+		echo dicey_get_template_html( 'template-parts/static/partners' );
 	} elseif ( 'decoration' === $slug && function_exists( 'dicey_render_decoration_page' ) ) {
 		echo dicey_render_decoration_page();
 	} elseif ( 'lk' === $slug && function_exists( 'dicey_render_account_page' ) ) {
