@@ -22,6 +22,8 @@ while ( have_posts() ) :
 		echo dicey_render_decoration_page();
 	} elseif ( 'lk' === $slug && function_exists( 'dicey_render_account_page' ) ) {
 		echo dicey_render_account_page();
+	} elseif ( in_array( $slug, array( 'policy', 'offer', 'personal-data-consent' ), true ) ) {
+		echo dicey_get_template_html( 'template-parts/static/' . $slug );
 	} elseif ( '' !== trim( $content ) ) {
 		the_content();
 	} elseif ( function_exists( 'dicey_missing_content_notice' ) ) {
