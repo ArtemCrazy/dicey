@@ -6406,7 +6406,7 @@ footer::before {
 	width: 501px;
 }
 
-.decoration__right-img {
+.decoration__right-wr > .decoration__right-img {
 	border-radius: 10px;
 	width: 60px;
 	height: 61px;
@@ -12798,7 +12798,7 @@ cursor: default;
 		font-size: 16px;
 	}
 
-	.decoration__right-img {
+	.decoration__right-wr > .decoration__right-img {
 		width: 84px;
 		height: 75px;
 	}
