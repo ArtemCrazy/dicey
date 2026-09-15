@@ -89,7 +89,7 @@ def live(baseline):
         fields = {el['name']: el.get('value', '') for el in form.select('input[name]')}
         fields.update({'action': 'edit-theme-plugin-file', 'file': name, 'theme': 'dicey', 'newcontent': desired})
         # Core's authenticated editor API performs its own PHP fatal-error rollback.
-        nonce = soup.select_one('#_wpnonce')
+        nonce = form.select_one('input[name="nonce"]')
         assert nonce is not None, 'Editor nonce unavailable'
         fields['nonce'] = nonce.get('value', '')
         response = session.post(site + '/wp-admin/admin-ajax.php', data=fields, timeout=60)
