@@ -48,32 +48,15 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 						<?php foreach ( $menu_examples as $index => $example ) : ?>
 							<?php $example_price = function_exists( 'dicey_product_menu_price_number' ) ? dicey_product_menu_price_number( isset( $example['price'] ) ? $example['price'] : '' ) : null; ?>
 							<div class="carte-var__content" data-menu-content="<?php echo esc_attr( $index ); ?>" data-menu-price="<?php echo null === $example_price ? '' : esc_attr( $example_price ); ?>" style="<?php echo 0 === $index ? 'display: flex;' : 'display: none;'; ?>">
+								
+								<button type="button" class="carte-var__btn" data-menu-replace>Заменить блюдо <span aria-hidden="true">↻</span></button>
+								
 								<div class="carte-var__info">
 									<?php if ( '' !== trim( $example['title'] ) ) : ?>
 										<h3><?php echo esc_html( $example['title'] ); ?></h3>
-									<?php endif; ?>
-									<?php if ( '' !== trim( $example['composition'] ) ) : ?>
-										<h4>Состав</h4>
-										<?php echo wpautop( wp_kses_post( $example['composition'] ) ); ?>
-									<?php endif; ?>
-									<?php if ( '' !== trim( $example['kbju'] ) ) : ?>
-										<h4>КБЖУ</h4>
-										<?php echo wpautop( wp_kses_post( $example['kbju'] ) ); ?>
-									<?php endif; ?>
-									<?php if ( '' !== trim( $example['minerals'] ) ) : ?>
-										<h4>Витамины и минеральные вещества</h4>
-										<?php echo wpautop( wp_kses_post( $example['minerals'] ) ); ?>
-									<?php endif; ?>
-									<?php if ( '' !== trim( $example['portion_weight'] ) ) : ?>
-										<h4>Вес порции</h4>
-										<p><?php echo esc_html( $example['portion_weight'] ); ?></p>
-									<?php endif; ?>
-									<?php if ( null !== $example_price ) : ?>
-										<h4>Стоимость</h4>
-										<p><?php echo esc_html( dicey_product_price_with_currency( $example['price'] ) ); ?></p>
-									<?php endif; ?>
+									<?php endif; ?> 
 								</div>
-								<button type="button" class="carte-var__btn" data-menu-replace>Заменить блюдо <span aria-hidden="true">↻</span></button>
+								
 								<?php if ( ! empty( $example['images'] ) ) : ?>
 									<div class="carte-var__imgswr">
 										<div class="carte-var__img-big">
@@ -89,7 +72,35 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 											<?php endforeach; ?>
 										</div>
 									</div>
-								<?php endif; ?>
+								<?php endif; ?>	
+								
+								<div class="carte-var__info">	
+									<?php if ( '' !== trim( $example['composition'] ) ) : ?>
+										<h4>Состав</h4>
+										<?php echo wpautop( wp_kses_post( $example['composition'] ) ); ?>
+									<?php endif; ?>
+									<?php if ( '' !== trim( $example['energy_value'] ) ) : ?>
+                                        <h4>Энергетическая ценность суточного рациона</h4>
+        								<p><?php echo esc_html( $example['energy_value'] ); ?></p>
+  								    <?php endif; ?>
+									<?php if ( '' !== trim( $example['kbju'] ) ) : ?>
+										<h4>Пищевая ценность суточного рациона</h4>
+										<?php echo wpautop( wp_kses_post( $example['kbju'] ) ); ?>
+									<?php endif; ?>
+									<?php if ( '' !== trim( $example['minerals'] ) ) : ?>
+										<h4>Витамины и минеральные вещества</h4>
+										<?php echo wpautop( wp_kses_post( $example['minerals'] ) ); ?>
+									<?php endif; ?>
+									<?php if ( '' !== trim( $example['portion_weight'] ) ) : ?>
+										<h4>Вес суточного рациона</h4>
+										<p><?php echo esc_html( $example['portion_weight'] ); ?></p>
+									<?php endif; ?>
+									<?php if ( null !== $example_price ) : ?>
+										<h4>Стоимость</h4>
+										<p><?php echo esc_html( dicey_product_price_with_currency( $example['price'] ) ); ?></p>
+									<?php endif; ?>
+								</div>
+								
 							</div>
 						<?php endforeach; ?>
 					</div>
@@ -127,12 +138,6 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 
 						<div class="carte__right-contents">
 							<div class="carte__right-content" style="display: block;">
-								<?php if ( '' !== $description ) : ?>
-									<div class="carte__right-info">
-										<h3>Описание рациона</h3>
-										<?php echo apply_filters( 'the_content', $description ); ?>
-									</div>
-								<?php endif; ?>
 								<?php if ( '' !== trim( $price ) ) : ?>
 									<div class="carte__right-price">
 										<p>Итого:</p>
@@ -158,6 +163,14 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 										<button type="submit" name="dicey_product_action" value="cart" class="carte__right-btn blue">В корзину</button>
 									</div>
 								</form>
+								
+								<?php if ( '' !== $description ) : ?>
+									<div class="carte__right-info">
+										<h3>Описание рациона</h3>
+										<?php echo apply_filters( 'the_content', $description ); ?>
+									</div>
+								<?php endif; ?>
+								
 							</div>
 						</div>
 					</div>

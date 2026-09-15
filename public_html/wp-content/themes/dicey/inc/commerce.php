@@ -535,7 +535,7 @@ function dicey_render_decoration_page() {
 									<ul class="dropdown">
 										<div class="dropdown-wr">
 											<li>Москва</li>
-											<li>Санкт-Петербург</li>
+									   <!-- <li>Санкт-Петербург</li> -->
 										</div>
 									</ul>
 									<input type="hidden" name="billing_city" value="<?php echo esc_attr( $checkout->get_value( 'billing_city' ) ? $checkout->get_value( 'billing_city' ) : $city['label'] ); ?>">

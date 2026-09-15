@@ -83,7 +83,7 @@ ob_start();
       <div></div>
     </div>
     <a href="/" class="header-logo">
-      <img src="/static/imgs/icons/logo.svg" alt="Логотип">
+      <img src="https://daysi.ru/wp-content/uploads/2026/09/Frame-3.svg" alt="Логотип">
     </a>
     <a href="/shop.php" class="header__link-shop">Магазин</a>
     <div class="header__links">
@@ -104,7 +104,7 @@ ob_start();
         </button>
         <div class="header-city__menu" role="menu">
           <button type="button" class="header-city__option <?php echo 'moscow' === $dicey_city['key'] ? 'active' : ''; ?>" data-city-key="moscow" data-city-label="Москва" role="menuitem">Москва</button>
-          <button type="button" class="header-city__option <?php echo 'spb' === $dicey_city['key'] ? 'active' : ''; ?>" data-city-key="spb" data-city-label="Санкт-Петербург" role="menuitem">СПБ</button>
+<!--           <button type="button" class="header-city__option <?php echo 'spb' === $dicey_city['key'] ? 'active' : ''; ?>" data-city-key="spb" data-city-label="Санкт-Петербург" role="menuitem">СПБ</button> -->
         </div>
       </div>
       <button class="header__btn-consult" data-fancybox data-src="#consult-modal">Консультация диетолога</button>
@@ -190,7 +190,7 @@ ob_start();
 <div class="consult-modal" id="consult-modal">
   <div class="modal__wr">
     <p class="cons__name">Консультация диетолога</p>
-    <p class="cons__text"><span>1.</span> Выберете необходимую форму консультации. Стоимость консультации возвращается при заказе и оплате рациона</p>
+    <p class="cons__text"><span>1.</span> Выберите необходимую форму консультации.</p>
     <?php $dicey_consultation_products = function_exists( 'dicey_get_consultation_products' ) ? dicey_get_consultation_products() : array(); ?>
     <form class="cons__form" method="post" action="<?php echo esc_url( function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/decoration/' ) ); ?>">
       <div class="nutritionist">

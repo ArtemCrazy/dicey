@@ -734,7 +734,8 @@ $(function () {
 	}
 
 	function normalizeCityKey(key) {
-		return key === "spb" ? "spb" : "moscow"
+// 		return key === "spb" ? "spb" : "moscow"
+		return "moscow"
 	}
 
 	function getCityCookie() {

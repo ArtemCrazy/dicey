@@ -161,8 +161,6 @@ function dicey_product_term_options() {
 		'3 дня'     => '3 дня',
 		'5 дней'    => '5 дней',
 		'1 месяц'   => '1 месяц',
-		'3 месяца'  => '3 месяца',
-		'6 месяцев' => '6 месяцев',
 	);
 }
 
@@ -526,6 +524,7 @@ function dicey_sanitize_product_menu_examples( $examples ) {
 			'title'          => isset( $example['title'] ) ? sanitize_text_field( $example['title'] ) : '',
 			'price'          => isset( $example['price'] ) && ! is_array( $example['price'] ) ? dicey_normalize_product_price_value( $example['price'] ) : '',
 			'composition'    => isset( $example['composition'] ) ? wp_kses_post( $example['composition'] ) : '',
+			'energy_value'   => isset( $example['energy_value'] ) ?  sanitize_text_field( $example['energy_value'] ) : '',
 			'kbju'           => isset( $example['kbju'] ) ? wp_kses_post( $example['kbju'] ) : '',
 			'minerals'       => isset( $example['minerals'] ) ? wp_kses_post( $example['minerals'] ) : '',
 			'portion_weight' => isset( $example['portion_weight'] ) ? sanitize_text_field( $example['portion_weight'] ) : '',
@@ -571,6 +570,7 @@ function dicey_product_menu_examples_for_display( $post_id, $meta = null ) {
 		'title'          => get_the_title( $post_id ),
 		'price'          => '',
 		'composition'    => isset( $meta['composition_text'] ) ? $meta['composition_text'] : '',
+		'energy_value'   => '',
 		'kbju'           => function_exists( 'dicey_product_kbju_values_text' ) ? dicey_product_kbju_values_text( $meta ) : '',
 		'minerals'       => '',
 		'portion_weight' => '',
@@ -1097,6 +1097,9 @@ function dicey_render_product_meta_box( $post ) {
 			<div class="dicey-product-field"><label>Стоимость одного дня</label><input type="text" name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][price]" value="<?php echo esc_attr( isset( $example['price'] ) ? $example['price'] : '' ); ?>"><p class="dicey-product-note">Например: 600. Знак ₽ добавится автоматически.</p></div>
 			<div class="dicey-product-field"><label>Вес суточного рациона</label><input type="text" name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][portion_weight]" value="<?php echo esc_attr( isset( $example['portion_weight'] ) ? $example['portion_weight'] : '' ); ?>"></div>
 			<div class="dicey-product-field"><label>Состав</label><textarea name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][composition]"><?php echo esc_textarea( isset( $example['composition'] ) ? $example['composition'] : '' ); ?></textarea></div>
+		<div class="dicey-product-field"><label>Энергетическая ценность суточного рациона</label><input type="text" 
+  name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][energy_value]" value="<?php echo
+  esc_attr( isset( $example['energy_value'] ) ? $example['energy_value'] : '' ); ?>"></div>
 			<div class="dicey-product-field"><label>Пищевая ценность суточного рациона</label><textarea name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][kbju]"><?php echo esc_textarea( isset( $example['kbju'] ) ? $example['kbju'] : '' ); ?></textarea></div>
 			<div class="dicey-product-field dicey-product-wide"><label>Витамины и минеральные вещества</label><textarea name="dicey_product[menu_examples][<?php echo esc_attr( $index ); ?>][minerals]"><?php echo esc_textarea( isset( $example['minerals'] ) ? $example['minerals'] : '' ); ?></textarea></div>
 			<?php foreach ( array( 'image_main' => 'Основное изображение', 'image_second' => 'Дополнительное изображение 1', 'image_third' => 'Дополнительное изображение 2' ) as $image_key => $image_label ) : ?>

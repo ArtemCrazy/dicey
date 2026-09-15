@@ -12,16 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 function dicey_city_options() {
 	return array(
 		'moscow' => array(
-			'key'   => 'moscow',
-			'label' => 'Москва',
-			'lat'   => 55.7558,
-			'lon'   => 37.6173,
+			'key'         => 'moscow',
+			'label'       => 'Москва',
+			'short_label' => 'Москва',
+			'lat'         => 55.7558,
+			'lon'         => 37.6173,
 		),
 		'spb'    => array(
-			'key'   => 'spb',
-			'label' => 'Санкт-Петербург',
-			'lat'   => 59.9343,
-			'lon'   => 30.3351,
+			'key'         => 'spb',
+			'label'       => 'Санкт-Петербург',
+			'short_label' => 'СПБ',
+			'lat'         => 59.9343,
+			'lon'         => 30.3351,
 		),
 	);
 }
@@ -187,7 +189,18 @@ function dicey_detect_city_key_from_ipapi( $ip ) {
 }
 
 function dicey_get_detected_city_key() {
-	return dicey_detect_city_key_by_ip( dicey_get_request_ip() );
+	// Временно работаем только с Москвой.
+    return 'moscow';
+
+    /*
+    $manual_key = isset( $_COOKIE['dicey_city'] ) ? sanitize_key( wp_unslash( $_COOKIE['dicey_city'] ) ) : '';
+
+    if ( in_array( $manual_key, array( 'moscow', 'spb' ), true ) ) {
+        return $manual_key;
+    }
+
+    return dicey_detect_city_key_by_ip( dicey_get_request_ip() );
+    */
 }
 
 function dicey_get_detected_city() {

@@ -107,7 +107,7 @@ function dicey_home_about_food_defaults() {
 			array( 'icon' => 'imgs/icons/about-food-icon1.svg', 'title' => 'Белки', 'text' => 'Строительный материал для клеток, тканей и органов' ),
 			array( 'icon' => 'imgs/icons/about-food-icon2.svg', 'title' => 'Минералы', 'text' => 'Необходимы для костей, <br> мышц и работы нервной <br> системы' ),
 			array( 'icon' => 'imgs/icons/about-food-icon3.svg', 'title' => 'Витамины', 'text' => 'Участвуют в обмене веществ <br> и поддерживают иммунитет' ),
-			array( 'icon' => 'imgs/icons/about-food-icon4.svg', 'title' => 'Углеводы', 'text' => 'Обеспечивают энергией на каждый день' ),
+			array( 'icon' => 'imgs/icons/about-food-icon4.svg', 'title' => 'Углеводы', 'text' => 'Обеспечивают энергией <br> на каждый день' ),
 			array( 'icon' => 'imgs/icons/about-food-icon5.svg', 'title' => 'Жирные кислоты', 'text' => 'Поддерживают кожу, шерсть и нормальную работу организма' ),
 			array( 'icon' => 'imgs/icons/about-food-icon6.svg', 'title' => 'Клетчатка', 'text' => 'Поддерживает пищеварение и здоровье кишечника' ),
 		),
@@ -551,6 +551,20 @@ function dicey_render_home_plan( $attrs = array() ) {
 function dicey_render_shipping( $attrs = array() ) {
 	$data        = dicey_merge_block_attrs( $attrs, dicey_shipping_defaults() );
 	$data['tabs'] = dicey_non_empty_items( $data['tabs'] );
+	
+	
+    // Временно исключаем Санкт-Петербург из вкладок и карт.
+    $data['tabs'] = array_values(
+        array_filter(
+            $data['tabs'],
+            static function ( $tab ) {
+                return ! isset( $tab['id'] )
+                    || 'spb' !== sanitize_key( $tab['id'] );
+            }
+        )
+    );	
+	
+	
 	if ( '' === trim( $data['title'] ) && empty( $data['tabs'] ) ) {
 		return '';
 	}
