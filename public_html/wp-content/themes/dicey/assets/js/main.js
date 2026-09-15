@@ -899,8 +899,7 @@ $(function () {
     };
 
     function cityKeyFromLabel(label) {
-        label = (label || '').toLowerCase();
-        return label.indexOf('петербург') !== -1 || label.indexOf('спб') !== -1 ? 'spb' : 'moscow';
+        return 'moscow'; // Delivery in Saint Petersburg is currently suspended.
     }
 
     function setupCheckoutAddress() {
@@ -1348,7 +1347,7 @@ function updateCarteVariation($carte, $tab) {
 function updateCarteDietary($carte, $tab) {
 	var days = parseInt($tab.attr("data-day"), 10) || 0
 	var showDietary = days >= 28
-	$carte.find(".carte__dietary").toggle(showDietary).attr("aria-hidden", showDietary ? "false" : "true")
+	$carte.find(".carte__dietary, .carte__term-text").toggle(showDietary).attr("aria-hidden", showDietary ? "false" : "true")
 }
 
 function updateCarteReplacementModal($carte, slot) {
@@ -1417,4 +1416,23 @@ $(".carte__term-tab.active").each(function () {
 	updateCarteMenuLimit($carte, $tab.attr("data-menu-limit"))
 	updateCarteDietary($carte, $tab)
 	updateCarteCalculatedPrice($carte, $tab)
+})
+
+
+// Period controls live outside the product link and update only this card's form.
+$(document).on("click", "[data-card-period]", function () {
+	var $button = $(this)
+	var $card = $button.closest("[data-dicey-product]")
+	var option
+	try { option = JSON.parse($button.attr("data-card-period")) } catch (error) { return }
+	if (!option || !option.fields || typeof option.price !== "string") return
+	var $form = $card.find(".popularity__cart-form")
+	if (!$form.length) return
+	$form.find('input[type="hidden"]').remove()
+	Object.keys(option.fields).forEach(function (name) {
+		$("<input>", {type: "hidden", name: name, value: option.fields[name]}).appendTo($form)
+	})
+	$card.find("[data-card-period]").removeClass("active").attr("aria-pressed", "false")
+	$button.addClass("active").attr("aria-pressed", "true")
+	$card.find(".popularity__price").text(option.price)
 })

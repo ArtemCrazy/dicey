@@ -676,7 +676,7 @@ function dicey_product_price_for_card( $post_id, $meta = null ) {
 	return '';
 }
 
-function dicey_product_cart_payload( $post_id ) {
+function dicey_product_cart_payload( $post_id, $requested_period = '' ) {
 	if ( ! function_exists( 'wc_get_product' ) || ! function_exists( 'wc_get_cart_url' ) ) {
 		return array();
 	}
@@ -702,6 +702,14 @@ function dicey_product_cart_payload( $post_id ) {
 			return array();
 		}
 
+		if ( '' !== $requested_period ) {
+			$options = array_values( array_filter( $options, function ( $option ) use ( $requested_period ) {
+				return $requested_period === $option['label'];
+			} ) );
+			if ( ! $options ) {
+				return array();
+			}
+		}
 		$payload['fields']['variation_id'] = $options[0]['variation_id'];
 		foreach ( $options[0]['attributes'] as $attribute_key => $attribute_value ) {
 			$payload['fields'][ $attribute_key ] = $attribute_value;
@@ -710,7 +718,10 @@ function dicey_product_cart_payload( $post_id ) {
 	} else {
 		$meta    = dicey_get_product_meta( $post_id );
 		$periods = dicey_product_lines( isset( $meta['terms'] ) ? $meta['terms'] : array() );
-		$period  = isset( $periods[0] ) ? $periods[0] : '';
+		if ( '' !== $requested_period && ! in_array( $requested_period, $periods, true ) ) {
+			return array();
+		}
+		$period = '' !== $requested_period ? $requested_period : ( isset( $periods[0] ) ? $periods[0] : '' );
 	}
 
 	if ( '' !== $period ) {
@@ -723,8 +734,8 @@ function dicey_product_cart_payload( $post_id ) {
 	return $payload;
 }
 
-function dicey_render_product_cart_button( $post_id ) {
-	$payload = dicey_product_cart_payload( $post_id );
+function dicey_render_product_cart_button( $post_id, $period = '' ) {
+	$payload = dicey_product_cart_payload( $post_id, $period );
 
 	if ( ! $payload ) {
 		?>
@@ -855,31 +866,78 @@ function dicey_product_add_period_to_cart_item( $cart_item_data, $product_id, $v
 
 add_filter( 'woocommerce_add_cart_item_data', 'dicey_product_add_period_to_cart_item', 10, 3 );
 
+/**
+ * Rehydrate the product price as well as the saved menu metadata.
+ * WC restores product objects from the catalog on an ordinary session GET;
+ * saved cart totals alone do not restore a custom product price.
+ */
+function dicey_product_restore_menu_price( $cart_item ) {
+	if ( empty( $cart_item['data'] ) || empty( $cart_item['product_id'] ) || empty( $cart_item['dicey_period'] ) || ! isset( $cart_item['dicey_menu_selection'] ) ) {
+		return $cart_item;
+	}
+
+	$details = dicey_product_menu_price_details( absint( $cart_item['product_id'] ), $cart_item['dicey_menu_selection'], $cart_item['dicey_period'] );
+	$cart_item['dicey_menu_selection'] = $details['selection'];
+	$cart_item['dicey_menu_titles']    = $details['titles'];
+	unset( $cart_item['dicey_menu_total'] );
+
+	if ( null !== $details['total'] ) {
+		// Separate periods of the same product must never share mutable prices.
+		$cart_item['data'] = clone $cart_item['data'];
+		$cart_item['dicey_menu_total'] = $details['total'];
+		$cart_item['data']->set_price( (float) $details['total'] );
+	}
+	return $cart_item;
+}
+
+add_filter( 'woocommerce_get_cart_item_from_session', 'dicey_product_restore_menu_price' );
+
 function dicey_product_apply_menu_price_to_cart( $cart ) {
 	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 		return;
 	}
 
 	foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
-		if ( empty( $cart_item['data'] ) || empty( $cart_item['product_id'] ) || empty( $cart_item['dicey_period'] ) || ! isset( $cart_item['dicey_menu_selection'] ) ) {
-			continue;
-		}
-
-		$details = dicey_product_menu_price_details( absint( $cart_item['product_id'] ), $cart_item['dicey_menu_selection'], $cart_item['dicey_period'] );
-		$cart->cart_contents[ $cart_item_key ]['dicey_menu_selection'] = $details['selection'];
-		$cart->cart_contents[ $cart_item_key ]['dicey_menu_titles']    = $details['titles'];
-
-		if ( null === $details['total'] ) {
-			unset( $cart->cart_contents[ $cart_item_key ]['dicey_menu_total'] );
-			continue;
-		}
-
-		$cart->cart_contents[ $cart_item_key ]['dicey_menu_total'] = $details['total'];
-		$cart_item['data']->set_price( (float) $details['total'] );
+		$cart->cart_contents[ $cart_item_key ] = dicey_product_restore_menu_price( $cart_item );
 	}
 }
 
 add_action( 'woocommerce_before_calculate_totals', 'dicey_product_apply_menu_price_to_cart' );
+
+/** Listing choices use the same server-side menu pricing and payload as the detail page. */
+function dicey_product_card_period_options( $post_id ) {
+	$variations = dicey_get_wc_product_period_options( $post_id );
+	$meta       = dicey_get_product_meta( $post_id );
+	$periods    = $variations ? wp_list_pluck( $variations, 'label' ) : dicey_product_lines( $meta['terms'] );
+	$options    = array();
+	foreach ( $periods as $index => $period ) {
+		if ( ! in_array( dicey_product_period_day_count( $period ), array( 3, 5, 30 ), true ) ) {
+			continue;
+		}
+		$payload = dicey_product_cart_payload( $post_id, $period );
+		if ( ! $payload ) {
+			continue;
+		}
+		$details = dicey_product_menu_price_details( $post_id, array(), $period );
+		if ( null !== $details['total'] ) {
+			$product = wc_get_product( $post_id );
+			$price = wc_price( wc_get_price_to_display( $product, array( 'price' => $details['total'] ) ) );
+		} elseif ( isset( $variations[ $index ] ) ) {
+			$price = $variations[ $index ]['price'];
+		} elseif ( 0 === $index ) {
+			$price = dicey_product_price_for_card( $post_id, $meta );
+		} else {
+			// Do not advertise an unpriced alternative as costing the base price.
+			continue;
+		}
+		$options[] = array(
+			'label'  => $period,
+			'price'  => html_entity_decode( wp_strip_all_tags( $price ), ENT_QUOTES, 'UTF-8' ),
+			'fields' => $payload['fields'],
+		);
+	}
+	return $options;
+}
 
 function dicey_render_product_card( $post_id ) {
 	$meta        = dicey_get_product_meta( $post_id );
@@ -889,6 +947,7 @@ function dicey_render_product_card( $post_id ) {
 	$weight_min  = '' !== trim( $meta['match_weight_min'] ) ? (float) str_replace( ',', '.', $meta['match_weight_min'] ) : '';
 	$weight_max  = '' !== trim( $meta['match_weight_max'] ) ? (float) str_replace( ',', '.', $meta['match_weight_max'] ) : '';
 	$calories    = dicey_product_card_calories_text( $meta );
+	$period_options = dicey_product_card_period_options( $post_id );
 	?>
 	<div class="popularity__block" data-dicey-product="1" data-age-groups="<?php echo esc_attr( implode( ',', $age_groups ) ); ?>" data-weight-min="<?php echo esc_attr( $weight_min ); ?>" data-weight-max="<?php echo esc_attr( $weight_max ); ?>" data-breeds="<?php echo esc_attr( implode( ',', $breeds ) ); ?>" data-vip="<?php echo esc_attr( $meta['is_vip'] ? '1' : '0' ); ?>">
 		<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" class="popularity__link">
@@ -907,12 +966,22 @@ function dicey_render_product_card( $post_id ) {
 				<p class="popularity__name"><?php echo esc_html( dicey_product_title_for_card( $post_id ) ); ?></p>
 				<?php if ( '' !== trim( $calories ) ) : ?><p class="popularity__calories"><?php echo esc_html( $calories ); ?></p><?php endif; ?>
 			</div>
-			<?php $price = dicey_product_price_for_card( $post_id, $meta ); ?>
-			<?php if ( '' !== trim( $price ) ) : ?>
-				<p class="popularity__price"><?php echo esc_html( $price ); ?></p>
-			<?php endif; ?>
 		</a>
-		<?php dicey_render_product_cart_button( $post_id ); ?>
+		<?php if ( count( $period_options ) > 1 ) : ?>
+			<div class="popularity__term">
+				<span>Срок:</span>
+				<div class="popularity__term-blocks" role="group" aria-label="Срок рациона">
+					<?php foreach ( $period_options as $index => $option ) : ?>
+						<button type="button" class="popularity__term-block <?php echo 0 === $index ? 'active' : ''; ?>" data-card-period="<?php echo esc_attr( wp_json_encode( $option ) ); ?>" aria-pressed="<?php echo 0 === $index ? 'true' : 'false'; ?>"><?php echo esc_html( $option['label'] ); ?></button>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		<?php endif; ?>
+		<?php $price = $period_options ? $period_options[0]['price'] : dicey_product_price_for_card( $post_id, $meta ); ?>
+		<?php if ( '' !== trim( $price ) ) : ?>
+			<p class="popularity__price" aria-live="polite"><?php echo esc_html( $price ); ?></p>
+		<?php endif; ?>
+		<?php dicey_render_product_cart_button( $post_id, $period_options ? $period_options[0]['label'] : '' ); ?>
 	</div>
 	<?php
 }

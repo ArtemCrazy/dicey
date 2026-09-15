@@ -38,22 +38,16 @@
           </div>
           <div class="shop__wr">
             <div class="shop__wr-blocks">
-                <div class="shop__block active" style="width: 210px;">
-                    <p class="shop__block-name">Другая <br> порода</p>
+                <div class="shop__block active" style="width: 239px;">
+                    <p class="shop__block-name">Йоркширский терьер</p>
                     <div class="shop__block-img">
-                        <img src="static/imgs/bg/shop-img1.png" alt="">
+                        <img src="static/imgs/bg/shop-img3.png" alt="">
                     </div>
                 </div>
                 <div class="shop__block" style="width: 224px;">
                     <p class="shop__block-name">Шпиц померанский</p>
                     <div class="shop__block-img">
                         <img src="static/imgs/bg/shop-img2.png" alt="">
-                    </div>
-                </div>
-                <div class="shop__block" style="width: 239px;">
-                    <p class="shop__block-name">Йоркширский терьер</p>
-                    <div class="shop__block-img">
-                        <img src="static/imgs/bg/shop-img3.png" alt="">
                     </div>
                 </div>
                 <div class="shop__block" style="width: 216px;">
@@ -104,14 +98,14 @@
                         <img src="static/imgs/bg/shop-img16.png" alt="">
                     </div>
                 </div>
-            </div>
-            <div class="shop__wr-blocks">
                 <div class="shop__block" style="width: 205px;">
                     <p class="shop__block-name">Корги</p>
                     <div class="shop__block-img">
                         <img src="static/imgs/bg/shop-img6.png" alt="">
                     </div>
                 </div>
+            </div>
+            <div class="shop__wr-blocks">
                 <div class="shop__block" style="width: 224px;">
                     <p class="shop__block-name">Французский <br> бульдог</p>
                     <div class="shop__block-img">
@@ -164,6 +158,12 @@
                     <p class="shop__block-name">Миниатюрный <br> пудель</p>
                     <div class="shop__block-img">
                         <img src="static/imgs/bg/shop-img21.png" alt="">
+                    </div>
+                </div>
+                <div class="shop__block" style="width: 210px;">
+                    <p class="shop__block-name">Другая <br> порода</p>
+                    <div class="shop__block-img">
+                        <img src="static/imgs/bg/shop-img1.png" alt="">
                     </div>
                 </div>
             </div>

@@ -350,26 +350,15 @@ function dicey_save_checkout_delivery_check( $order, $data ) {
 function dicey_render_checkout_payment_methods() {
 	$gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
-	if ( empty( $gateways ) ) {
-		?>
-		<label class="decoration__methods-block active dicey-payment-placeholder">
-			<input type="radio" name="payment_method" value="dicey_pending_payment" checked>
-			<div class="decoration__icon"></div>
-			Заказ подтвердит менеджер
-		</label>
-		<?php
+	// The approved checkout uses the existing T-Bank payment-page integration.
+	// Never silently turn "Pay" into the legacy pay-later placeholder.
+	if ( ! isset( $gateways['tbank'] ) ) {
+		echo '<p class="woocommerce-error" role="alert">Онлайн-оплата временно недоступна. Пожалуйста, попробуйте позже или свяжитесь с нами.</p>';
 		return;
 	}
-
-	foreach ( $gateways as $gateway ) :
-		?>
-		<label class="decoration__methods-block <?php echo checked( $gateway->chosen, true, false ) ? 'active' : ''; ?>">
-			<input type="radio" name="payment_method" value="<?php echo esc_attr( $gateway->id ); ?>" <?php checked( $gateway->chosen, true ); ?> style="display:none;">
-			<div class="decoration__icon"></div>
-			<?php echo esc_html( $gateway->get_title() ); ?>
-		</label>
-		<?php
-	endforeach;
+	?>
+	<input type="hidden" name="payment_method" value="tbank">
+	<?php
 }
 
 function dicey_render_checkout_order_summary() {
@@ -538,7 +527,7 @@ function dicey_render_decoration_page() {
 									   <!-- <li>Санкт-Петербург</li> -->
 										</div>
 									</ul>
-									<input type="hidden" name="billing_city" value="<?php echo esc_attr( $checkout->get_value( 'billing_city' ) ? $checkout->get_value( 'billing_city' ) : $city['label'] ); ?>">
+									<input type="hidden" name="billing_city" value="<?php echo esc_attr( $city['label'] ); ?>">
 								</details>
 								<div class="shipping__suggest-wr">
 									<input type="text" id="checkout-shipping-input" name="billing_address_1" class="decoration__input" placeholder="Адрес" value="<?php echo esc_attr( $checkout->get_value( 'billing_address_1' ) ); ?>" autocomplete="off" required>
@@ -557,12 +546,7 @@ function dicey_render_decoration_page() {
 								<input type="text" name="dicey_coupon_code" class="decoration__input" placeholder="Введите промокод">
 							</div>
 						</div>
-						<div class="decoration__methods">
-							<p class="decoration__name">Способ оплаты</p>
-							<div class="decoration__methods-blocks">
-								<?php dicey_render_checkout_payment_methods(); ?>
-							</div>
-						</div>
+						<?php dicey_render_checkout_payment_methods(); ?>
 						<label class="checkbox__parent">
 							<input type="checkbox" name="terms" required checked>
 							<span class="checkbox__icon"></span>
@@ -571,7 +555,12 @@ function dicey_render_decoration_page() {
 							</p>
 						</label>
 						<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
-						<button type="submit" class="decoration__btn" name="woocommerce_checkout_place_order" value="Оформить заказ">Оформить заказ</button>
+						<button type="submit" class="decoration__btn" name="woocommerce_checkout_place_order" value="Оплатить" aria-label="Оплатить заказ"<?php echo isset( WC()->payment_gateways()->get_available_payment_gateways()['tbank'] ) ? '' : ' disabled'; ?>>
+							<span>Оплатить</span>
+							<span class="decoration__btn-line" aria-hidden="true"></span><img src="https://daysi.ru/wp-content/uploads/2026/09/sbp.svg" alt="СБП">
+							<span class="decoration__btn-line" aria-hidden="true"></span><img src="https://daysi.ru/wp-content/uploads/2026/09/cart.png" alt="Банковская карта">
+							<span class="decoration__btn-line" aria-hidden="true"></span><img src="https://daysi.ru/wp-content/uploads/2026/09/split.svg" alt="Долями">
+						</button>
 					</div>
 
 					<?php dicey_render_checkout_order_summary(); ?>
