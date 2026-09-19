@@ -37,3 +37,9 @@ The custom theme may still list these preview fixtures in its own related-produc
 QA runs through authenticated SSH stdin with PHP 8.2; no public PHP helper endpoint, password reset or browser-session copying. The server's default CLI is PHP 5.6 and is not used. Initial HTTPS browser navigation reset; the preview's configured HTTP entry worked and page links subsequently use HTTPS.
 
 Live baseline `aeb7ef0` preserves the client's newer product layout and buttons. Deploy allowlist is only five owned files: `inc/products.php`, `inc/commerce.php`, `template-parts/product/single-content.php`, `assets/js/main.js`, `assets/styles/main.css`. `tools/deploy-theme.py` checks live baseline conflicts, saves a ZIP, updates via the authenticated WP editor API, then verifies readback. No footer/shop/unrelated file is uploaded.
+
+## Published result
+
+Code commit `eb11b3b` was pushed to origin/main and deployed to daysi.ru on September 19. All five editor readbacks matched; pre-release live ZIP: `.codex/backups/20260919-210711-live-theme.zip`.
+
+Authenticated production admin check on product 698 confirmed the new box, nonce and 59 candidate checkboxes; none selected and no product settings saved. In-app Browser production smoke confirmed the six disabled replacement buttons and empty-list explanation, with the existing monthly price of 40,800 preserved. The ordinary product URL serves the new code after reload (script version 1789841234); an older browser-cached document initially showed the previous template. Advise refreshing an already-open product page. No cache plugin/settings or server configuration were changed.
