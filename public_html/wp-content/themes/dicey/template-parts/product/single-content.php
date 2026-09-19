@@ -20,9 +20,24 @@ $form_action       = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : 
 $dietary_image     = ! empty( $menu_examples[0]['images'][0]['thumb'] ) ? $menu_examples[0]['images'][0]['thumb'] : dicey_product_card_image_url( $post_id );
 $dietary_kbju      = function_exists( 'dicey_product_card_calories_text' ) ? dicey_product_card_calories_text( $meta ) : '';
 $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
+$monthly_variation_id = 0;
+foreach ( $variation_options as $monthly_variation ) {
+	if ( 30 === dicey_product_period_day_count( $monthly_variation['label'] ) ) {
+		$monthly_variation_id = $monthly_variation['variation_id'];
+		break;
+	}
+}
+$monthly_options = dicey_monthly_options( $post_id, $monthly_variation_id );
+foreach ( $monthly_options as &$monthly_option ) {
+	$monthly_option['image'] = dicey_product_card_image_url( $monthly_option['id'] );
+	$monthly_option['kbju'] = dicey_product_card_calories_text( dicey_get_product_meta( $monthly_option['id'] ) );
+}
+unset( $monthly_option );
+$monthly_enabled = count( $monthly_options ) > 1;
+
 ?>
 <main>
-	<section class="carte" data-menu-limit="<?php echo esc_attr( $default_menu_limit ); ?>" data-menu-selection="<?php echo esc_attr( implode( ',', $default_selection ) ); ?>" data-fallback-price="<?php echo esc_attr( $price ); ?>">
+	<section class="carte" data-monthly-options="<?php echo esc_attr( wp_json_encode( $monthly_options ) ); ?>" data-monthly-enabled="<?php echo $monthly_enabled ? '1' : '0'; ?>" data-menu-limit="<?php echo esc_attr( $default_menu_limit ); ?>" data-menu-selection="<?php echo esc_attr( implode( ',', $default_selection ) ); ?>" data-fallback-price="<?php echo esc_attr( $price ); ?>">
 		<div class="container">
 			<div class="standart-nav">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Главная</a>
@@ -135,7 +150,7 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</div>
-								<p class="carte__term-text" style="display: none;">В месячный рацион входят 6 пятидневных рационов. При необходимости блюда можно заменить ниже.</p>
+								<p class="carte__term-text" style="display: none;">В месячный рацион входят 6 пятидневных рационов. При необходимости каждый рацион можно заменить ниже.</p>
 							</div>
 						<?php endif; ?>
 
@@ -154,6 +169,7 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 									<?php if ( '' !== $default_label ) : ?>
 										<input type="hidden" name="dicey_product_period" value="<?php echo esc_attr( $default_label ); ?>" data-product-period-input>
 									<?php endif; ?>
+									<input type="hidden" name="dicey_monthly_products" value="<?php echo esc_attr( implode( ',', array_fill( 0, 6, $post_id ) ) ); ?>" disabled data-monthly-products>
 									<input type="hidden" name="dicey_product_menu_selection" value="<?php echo esc_attr( implode( ',', $default_selection ) ); ?>" data-product-menu-selection-input>
 									<?php if ( $default_variation ) : ?>
 										<input type="hidden" name="variation_id" value="<?php echo esc_attr( $default_variation['variation_id'] ); ?>" data-variation-id-input>
@@ -181,10 +197,12 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 					<div class="carte__dietary" style="display: none;" aria-hidden="true">
 						<div class="carte__dietary-top">
 							<h3>Соберите свой рацион</h3>
+							<?php if ( ! $monthly_enabled ) : ?><p>Для этого меню замены пока недоступны.</p><?php endif; ?>
+							<p class="dicey-monthly__status" role="status" aria-live="polite"></p>
 						</div>
 						<div class="carte__dietary-blocks">
 							<?php for ( $dietary_index = 1; $dietary_index <= 6; $dietary_index++ ) : ?>
-								<div class="carte__dietary-block <?php echo 1 === $dietary_index ? 'active' : ''; ?>">
+								<div data-monthly-slot="<?php echo esc_attr( $dietary_index - 1 ); ?>" class="carte__dietary-block <?php echo 1 === $dietary_index ? 'active' : ''; ?>">
 									<p class="carte__dietary-num"><span><?php echo esc_html( $dietary_index ); ?></span> рацион</p>
 									<div class="carte__dietary-wr">
 										<?php if ( $dietary_image ) : ?>
@@ -196,12 +214,13 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 												<p class="carte__dietary-kb"><?php echo esc_html( $dietary_kbju ); ?></p>
 											<?php endif; ?>
 
-											<div class="carte__dietary-btn">
+											<p class="carte__dietary-kb" data-monthly-price></p>
+											<button type="button" class="carte__dietary-btn <?php echo $monthly_enabled ? '' : 'disabled'; ?>" data-monthly-replace="<?php echo esc_attr( $dietary_index - 1 ); ?>" aria-label="<?php echo esc_attr( 'Заменить рацион ' . $dietary_index ); ?>"<?php echo $monthly_enabled ? '' : ' disabled'; ?>>
 												Заменить рацион
 												<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 													<path fill-rule="evenodd" clip-rule="evenodd" d="M6.32899 13.8003C6.51072 13.7787 6.69361 13.8299 6.83762 13.9429C6.98163 14.0558 7.07502 14.2212 7.09733 14.4028L7.41399 16.9795C7.43498 17.161 7.38359 17.3434 7.27096 17.4872C7.15833 17.6311 6.99354 17.7247 6.81233 17.7478L4.27483 18.0645C3.83233 18.0987 3.54649 17.8128 3.50233 17.462C3.48061 17.2799 3.53163 17.0967 3.64429 16.952C3.75696 16.8074 3.92216 16.713 4.10399 16.6895L4.94816 16.5845C3.5751 15.5463 2.56001 14.1057 2.04424 12.4634C1.52847 10.8211 1.5377 9.05881 2.07066 7.422C3.16566 4.00866 6.39316 1.66366 9.95483 1.667C10.4173 1.667 10.6898 1.99366 10.6832 2.37533C10.6723 2.75616 10.3932 3.04866 9.95483 3.04866C6.98566 3.05533 4.29816 5.00616 3.38316 7.84783C2.93552 9.22437 2.93213 10.7068 3.37346 12.0854C3.81479 13.464 4.67849 14.6688 5.84233 15.5295L5.72649 14.5728C5.71519 14.4825 5.72181 14.3909 5.74599 14.3031C5.77017 14.2154 5.81143 14.1333 5.8674 14.0615C5.92338 13.9898 5.99296 13.9297 6.07217 13.8849C6.15138 13.8401 6.23865 13.8114 6.32899 13.8003ZM15.894 3.3145L15.0498 3.4195C16.422 4.45687 17.4366 5.89629 17.9524 7.53736C18.4682 9.17843 18.4594 10.9395 17.9273 12.5753C16.8323 15.9887 13.6048 18.3337 10.0407 18.3337C9.57816 18.3337 9.30566 18.007 9.31233 17.6253C9.32316 17.2445 9.60149 16.952 10.0407 16.952C13.0098 16.9453 15.6973 14.9953 16.6123 12.1528C17.06 10.7763 17.0634 9.29383 16.622 7.91526C16.1807 6.53668 15.317 5.33181 14.1532 4.47116L14.2682 5.42783C14.2847 5.52032 14.2823 5.61521 14.2609 5.70672C14.2396 5.79823 14.1999 5.88443 14.1441 5.96007C14.0884 6.03571 14.0178 6.0992 13.9367 6.14666C13.8556 6.19412 13.7657 6.22456 13.6724 6.23613C13.5792 6.24769 13.4846 6.24013 13.3943 6.21392C13.3041 6.1877 13.2202 6.14338 13.1476 6.08365C13.0751 6.02392 13.0155 5.95004 12.9725 5.86651C12.9294 5.78298 12.9039 5.69156 12.8973 5.59783L12.5848 3.02533C12.5636 2.8436 12.615 2.66084 12.7278 2.5168C12.8407 2.37276 13.0058 2.27909 13.1873 2.25616L15.724 1.9395C16.1665 1.90533 16.4523 2.19116 16.4965 2.542C16.5182 2.72418 16.4671 2.90757 16.3542 3.05224C16.2414 3.19692 16.076 3.29117 15.894 3.3145Z" fill="white"/>
 												</svg>													
-											</div>
+											</button>
 
 										</div>
 									</div>
@@ -255,6 +274,29 @@ $default_selection = range( 0, max( 0, $default_menu_limit - 1 ) );
 			</div>
 		</div>
 	</div>
+
+	<?php if ( $monthly_enabled ) : ?>
+	<div id="dicey-monthly-modal" class="carte-modal dicey-monthly-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dicey-monthly-title">
+		<div class="carte-modal__wr">
+			<button type="button" class="carte-modal__close" data-monthly-close aria-label="Закрыть выбор рациона"><svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M9.863 9.863L32.137 32.137M32.137 9.863L9.863 32.137" stroke="#5182A6" stroke-width="1.4" stroke-linecap="round" />
+				</svg></button>
+			<div class="carte-modal__head"><p id="dicey-monthly-title">Заменить рацион</p></div>
+			<div class="carte-modal__blocks">
+				<?php foreach ( $monthly_options as $monthly_option ) : ?>
+					<div class="carte-modal__block">
+						<img class="carte-modal__img" src="<?php echo esc_url( $monthly_option['image'] ); ?>" alt="<?php echo esc_attr( $monthly_option['name'] ); ?>">
+						<div class="carte-modal__block-info">
+							<p class="carte-modal__block-name"><?php echo esc_html( $monthly_option['name'] ); ?></p>
+							<p class="carte-modal__block-text">5 дней — <?php echo wp_kses_post( wc_price( $monthly_option['display_price'] ) ); ?></p>
+							<button type="button" class="carte-modal__block-btn" data-monthly-choose="<?php echo esc_attr( $monthly_option['id'] ); ?>">Выбрать</button>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
 	<?php echo dicey_render_related_products( $post_id ); ?>
 	<?php echo dicey_render_why(); ?>
 </main>

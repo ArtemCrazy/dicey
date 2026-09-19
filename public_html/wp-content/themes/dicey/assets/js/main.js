@@ -1291,6 +1291,7 @@ function formatCartePrice(value) {
 }
 
 function updateCarteCalculatedPrice($carte, $periodTab) {
+	if (updateMonthlyCartePrice($carte, $periodTab)) return
 	var selection = getCarteMenuSelection($carte)
 	var prices = []
 	selection.forEach(function (candidate) {
@@ -1435,4 +1436,87 @@ $(document).on("click", "[data-card-period]", function () {
 	$card.find("[data-card-period]").removeClass("active").attr("aria-pressed", "false")
 	$button.addClass("active").attr("aria-pressed", "true")
 	$card.find(".popularity__price").text(option.price)
+})
+
+
+function getMonthlyCarteState($carte) {
+	var options
+	try { options = JSON.parse($carte.attr("data-monthly-options") || "{}") } catch (error) { return null }
+	var ids = String($carte.find("[data-monthly-products]").val() || "").split(",")
+	if (ids.length !== 6 || !ids.every(function (id) { return options[id] })) return null
+	return {options: options, ids: ids}
+}
+
+function updateMonthlyCartePrice($carte, $periodTab) {
+	var enabled = $carte.attr("data-monthly-enabled") === "1" && Number($periodTab.attr("data-day")) === 30
+	$carte.find("[data-monthly-products]").prop("disabled", !enabled)
+	if (!enabled) return false
+	var state = getMonthlyCarteState($carte)
+	if (!state) return false
+	var total = 0
+	$carte.find("[data-monthly-slot]").each(function () {
+		var $block = $(this)
+		var option = state.options[state.ids[Number($block.attr("data-monthly-slot"))]]
+		total += Number(option.display_price)
+		$block.find(".carte__dietary-name").text(option.name)
+		$block.find(".carte__dietary-img").attr({src: option.image, alt: option.name})
+		$block.find(".carte__dietary-kb").not("[data-monthly-price]").text(option.kbju || "")
+		$block.find("[data-monthly-price]").text("5 дней — " + formatCartePrice(option.display_price))
+	})
+	$carte.find("[data-product-price]").text(formatCartePrice(total))
+	return true
+}
+
+var monthlyReturnFocus = null
+function closeMonthlyModal() {
+	var $modal = $("#dicey-monthly-modal")
+	if ($modal.attr("aria-hidden") !== "false") return
+	$modal.removeClass("active").attr("aria-hidden", "true")
+	$(".dark").fadeOut(200)
+	if (monthlyReturnFocus) monthlyReturnFocus.focus()
+}
+
+$(document).on("click", "[data-monthly-replace]", function () {
+	if (this.disabled) return
+	var $carte = $(this).closest(".carte")
+	var state = getMonthlyCarteState($carte)
+	if (!state) return
+	var slot = Number($(this).attr("data-monthly-replace"))
+	var $modal = $("#dicey-monthly-modal")
+	monthlyReturnFocus = this
+	$modal.attr("data-slot", slot)
+	$modal.find("#dicey-monthly-title").text("Заменить рацион " + (slot + 1))
+	$modal.find("[data-monthly-choose]").each(function () {
+		var chosen = String($(this).attr("data-monthly-choose")) === state.ids[slot]
+		$(this).prop("disabled", chosen).toggleClass("disabled", chosen).text(chosen ? "Выбрано" : "Выбрать")
+	})
+	$modal.addClass("active").attr("aria-hidden", "false")
+	$(".dark").fadeIn(200)
+	$modal.find("[data-monthly-close]").trigger("focus")
+})
+
+$(document).on("click", "[data-monthly-choose]", function () {
+	if (this.disabled) return
+	var $carte = $(".carte").first()
+	var state = getMonthlyCarteState($carte)
+	var slot = Number($("#dicey-monthly-modal").attr("data-slot"))
+	var id = String($(this).attr("data-monthly-choose"))
+	if (!state || !state.options[id] || slot < 0 || slot > 5) return
+	state.ids[slot] = id
+	$carte.find("[data-monthly-products]").val(state.ids.join(","))
+	updateMonthlyCartePrice($carte, $carte.find(".carte__term-tab.active"))
+	$carte.find(".dicey-monthly__status").text("Рацион " + (slot + 1) + " заменён. Итого: " + $carte.find("[data-product-price]").text())
+	closeMonthlyModal()
+})
+
+$(document).on("click", "[data-monthly-close], .dark", closeMonthlyModal)
+$(document).on("keydown", function (event) {
+	var $modal = $("#dicey-monthly-modal.active")
+	if (!$modal.length) return
+	if (event.key === "Escape") { event.preventDefault(); closeMonthlyModal(); return }
+	if (event.key !== "Tab") return
+	var $focus = $modal.find("button:not(:disabled), a[href]").filter(":visible")
+	var first = $focus[0], last = $focus[$focus.length - 1]
+	if (event.shiftKey && event.target === first) { event.preventDefault(); last.focus() }
+	else if (!event.shiftKey && event.target === last) { event.preventDefault(); first.focus() }
 })

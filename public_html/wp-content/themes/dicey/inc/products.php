@@ -854,6 +854,15 @@ function dicey_product_add_period_to_cart_item( $cart_item_data, $product_id, $v
 	$raw_selection = isset( $_POST['dicey_product_menu_selection'] ) ? sanitize_text_field( wp_unslash( $_POST['dicey_product_menu_selection'] ) ) : '';
 	$details       = dicey_product_menu_price_details( $product_id, $raw_selection, $period );
 
+	if ( isset( $_POST['dicey_monthly_products'] ) && 30 === dicey_product_period_day_count( $period ) ) {
+		$monthly = dicey_monthly_details( $product_id, wp_unslash( $_POST['dicey_monthly_products'] ), $variation_id );
+		if ( is_wp_error( $monthly ) ) {
+			throw new Exception( $monthly->get_error_message() );
+		}
+		$cart_item_data['dicey_monthly_products'] = $monthly['ids'];
+		$cart_item_data['dicey_monthly_blocks'] = $monthly['blocks'];
+		$details['total'] = $monthly['total'];
+	}
 	$cart_item_data['dicey_period']         = $period;
 	$cart_item_data['dicey_menu_selection'] = $details['selection'];
 	$cart_item_data['dicey_menu_titles']    = $details['titles'];
@@ -877,6 +886,16 @@ function dicey_product_restore_menu_price( $cart_item ) {
 	}
 
 	$details = dicey_product_menu_price_details( absint( $cart_item['product_id'] ), $cart_item['dicey_menu_selection'], $cart_item['dicey_period'] );
+	unset( $cart_item['dicey_monthly_error'] );
+	if ( isset( $cart_item['dicey_monthly_products'] ) ) {
+		$monthly = dicey_monthly_details( $cart_item['product_id'], $cart_item['dicey_monthly_products'], isset( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : 0 );
+		if ( is_wp_error( $monthly ) || 30 !== dicey_product_period_day_count( $cart_item['dicey_period'] ) ) {
+			$cart_item['dicey_monthly_error'] = true;
+			return $cart_item;
+		}
+		$cart_item['dicey_monthly_blocks'] = $monthly['blocks'];
+		$details['total'] = $monthly['total'];
+	}
 	$cart_item['dicey_menu_selection'] = $details['selection'];
 	$cart_item['dicey_menu_titles']    = $details['titles'];
 	unset( $cart_item['dicey_menu_total'] );
@@ -1353,3 +1372,182 @@ function dicey_products_import_demo() {
 }
 
 add_action( 'init', 'dicey_products_import_demo', 20 );
+
+/** Explicit product-owned alternatives, never inferred from breed or age. */
+function dicey_monthly_allowed_ids( $product_id ) {
+	$ids = get_post_meta( $product_id, '_dicey_monthly_replacements', true );
+	return is_array( $ids ) ? array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) ) : array();
+}
+
+function dicey_monthly_five_day_option( $product_id ) {
+	$product = wc_get_product( $product_id );
+	if ( ! $product || 'publish' !== get_post_status( $product_id ) || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return null;
+	}
+	if ( function_exists( 'dicey_is_consultation_product' ) && dicey_is_consultation_product( $product_id ) ) {
+		return null;
+	}
+	$priced_product = $product;
+	$period = '';
+	if ( $product->is_type( 'variable' ) ) {
+		foreach ( dicey_get_wc_product_period_options( $product_id ) as $option ) {
+			if ( 5 === dicey_product_period_day_count( $option['label'] ) ) {
+				$priced_product = wc_get_product( $option['variation_id'] );
+				$period = $option['label'];
+				break;
+			}
+		}
+	} elseif ( $product->is_type( 'simple' ) ) {
+		$meta = dicey_get_product_meta( $product_id );
+		foreach ( dicey_product_lines( $meta['terms'] ) as $label ) {
+			if ( 5 === dicey_product_period_day_count( $label ) ) {
+				$period = $label;
+				break;
+			}
+		}
+	}
+	// A composite line does not decrement child inventory. Do not offer stocked
+	// components until an inventory-aware bundle integration exists.
+	if ( ! $period || $product->managing_stock() || $priced_product->managing_stock() || ! $priced_product->is_in_stock() ) {
+		return null;
+	}
+	$details = dicey_product_menu_price_details( $product_id, array(), $period );
+	$price = $details['total'];
+	if ( null === $price && $priced_product->is_type( 'variation' ) && is_numeric( $priced_product->get_price() ) ) {
+		$price = (float) $priced_product->get_price();
+	}
+	if ( null === $price || $price <= 0 ) {
+		return null;
+	}
+	return array(
+		'id' => $product_id, 'variation_id' => $priced_product->is_type( 'variation' ) ? $priced_product->get_id() : 0,
+		'name' => get_the_title( $product_id ), 'price' => (float) $price,
+		'display_price' => (float) wc_get_price_to_display( $priced_product, array( 'price' => $price ) ),
+		'tax_class' => $priced_product->get_tax_class(), 'tax_status' => $priced_product->get_tax_status(),
+		'dishes' => $details['titles'],
+	);
+}
+
+function dicey_monthly_options( $product_id, $variation_id = 0 ) {
+	$base = dicey_monthly_five_day_option( $product_id );
+	if ( ! $base ) {
+		return array();
+	}
+	$parent = wc_get_product( $variation_id ? $variation_id : $product_id );
+	$options = array();
+	foreach ( array_unique( array_merge( array( $product_id ), dicey_monthly_allowed_ids( $product_id ) ) ) as $id ) {
+		$option = $id === $product_id ? $base : dicey_monthly_five_day_option( $id );
+		if ( $option && $parent && $option['tax_class'] === $parent->get_tax_class() && $option['tax_status'] === $parent->get_tax_status() ) {
+			$options[ $id ] = $option;
+		}
+	}
+	return isset( $options[ $product_id ] ) ? $options : array();
+}
+
+function dicey_monthly_details( $product_id, $raw, $variation_id = 0 ) {
+	$error = new WP_Error( 'dicey_monthly_selection', 'Состав месячного меню недоступен или изменился. Выберите разрешённые замены заново в карточке товара.' );
+	if ( is_string( $raw ) ) {
+		$raw = explode( ',', $raw );
+	}
+	if ( ! is_array( $raw ) || count( $raw ) !== 6 ) {
+		return $error;
+	}
+	$options = dicey_monthly_options( $product_id, $variation_id );
+	if ( count( $options ) < 2 ) {
+		return $error;
+	}
+	$blocks = array();
+	$total = 0.0;
+	foreach ( array_values( $raw ) as $index => $id ) {
+		if ( ! is_scalar( $id ) || ! preg_match( '/^[1-9][0-9]*$/D', (string) $id ) || ! isset( $options[ (int) $id ] ) ) {
+			return $error;
+		}
+		$block = $options[ (int) $id ];
+		$block['slot'] = $index + 1;
+		$blocks[] = $block;
+		$total += $block['price'];
+	}
+	return array( 'ids' => array_column( $blocks, 'id' ), 'blocks' => $blocks, 'total' => $total );
+}
+
+function dicey_monthly_validate_add( $passed, $product_id, $quantity, $variation_id = 0 ) {
+	if ( ! isset( $_POST['dicey_monthly_products'] ) ) {
+		return $passed;
+	}
+	$period = isset( $_POST['dicey_product_period'] ) && is_string( $_POST['dicey_product_period'] ) ? sanitize_text_field( wp_unslash( $_POST['dicey_product_period'] ) ) : '';
+	$valid_period = false;
+	if ( $variation_id ) {
+		foreach ( dicey_get_wc_product_period_options( $product_id ) as $option ) {
+			if ( (int) $option['variation_id'] === (int) $variation_id && $option['label'] === $period ) {
+				$valid_period = true;
+			}
+		}
+	} else {
+		$meta = dicey_get_product_meta( $product_id );
+		$valid_period = in_array( $period, dicey_product_lines( $meta['terms'] ), true );
+	}
+	$details = dicey_monthly_details( $product_id, wp_unslash( $_POST['dicey_monthly_products'] ), $variation_id );
+	if ( ! $valid_period || 30 !== dicey_product_period_day_count( $period ) || is_wp_error( $details ) ) {
+		wc_add_notice( 'Не удалось добавить месячное меню. Обновите карточку товара и выберите разрешённые замены.', 'error' );
+		return false;
+	}
+	return $passed;
+}
+add_filter( 'woocommerce_add_to_cart_validation', 'dicey_monthly_validate_add', 10, 4 );
+
+function dicey_monthly_price_matches( $item, $details ) {
+	return isset( $item['data'], $item['dicey_menu_total'] ) && abs( (float) $item['data']->get_price() - $details['total'] ) < 0.00001 && abs( (float) $item['dicey_menu_total'] - $details['total'] ) < 0.00001;
+}
+
+function dicey_monthly_validate_checkout( $data, $errors ) {
+	foreach ( WC()->cart->get_cart() as $item ) {
+		if ( ! isset( $item['dicey_monthly_products'] ) ) {
+			continue;
+		}
+		$details = dicey_monthly_details( $item['product_id'], $item['dicey_monthly_products'], isset( $item['variation_id'] ) ? $item['variation_id'] : 0 );
+		if ( 30 !== dicey_product_period_day_count( $item['dicey_period'] ) || is_wp_error( $details ) || ! dicey_monthly_price_matches( $item, $details ) ) {
+			$errors->add( 'dicey_monthly_unavailable', 'Разрешённые замены или наличие меню изменились. Удалите месячное меню из корзины и соберите его заново.' );
+			break;
+		}
+	}
+}
+add_action( 'woocommerce_after_checkout_validation', 'dicey_monthly_validate_checkout', 10, 2 );
+
+function dicey_render_monthly_settings( $post ) {
+	wp_nonce_field( 'dicey_monthly_settings', 'dicey_monthly_nonce' );
+	$selected = dicey_monthly_allowed_ids( $post->ID );
+	$products = get_posts( array( 'post_type' => 'product', 'post_status' => array( 'publish', 'draft', 'private', 'pending' ), 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+	?>
+	<div class="dicey-product-field dicey-product-wide">
+		<h3>Разрешённые замены в месячном меню</h3>
+		<input type="hidden" name="dicey_monthly_settings_present" value="1">
+		<p class="description">Отметьте меню для замены любого из шести пятидневных блоков. Список общий для этого товара. Пустой список отключает замену. На сайте доступны только опубликованные меню с ценой за 5 дней, без складского учёта и с той же налоговой ставкой.</p>
+		<details><summary>Выбрать меню для замены (<?php echo count( $selected ); ?>)</summary>
+		<?php foreach ( $products as $candidate ) : ?>
+			<?php if ( $candidate->ID === $post->ID ) { continue; } ?>
+			<p><label><input type="checkbox" name="dicey_monthly_replacements[]" value="<?php echo esc_attr( $candidate->ID ); ?>" <?php checked( in_array( $candidate->ID, $selected, true ) ); ?>> <?php echo esc_html( $candidate->post_title . ' — #' . $candidate->ID ); ?></label></p>
+		<?php endforeach; ?>
+		</details>
+	</div>
+	<?php
+}
+
+function dicey_save_monthly_settings( $post_id ) {
+	if ( empty( $_POST['dicey_monthly_settings_present'] ) || empty( $_POST['dicey_monthly_nonce'] ) || ! is_string( $_POST['dicey_monthly_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['dicey_monthly_nonce'] ) ), 'dicey_monthly_settings' ) || ! current_user_can( 'edit_post', $post_id ) || ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
+		return;
+	}
+	$raw = isset( $_POST['dicey_monthly_replacements'] ) && is_array( $_POST['dicey_monthly_replacements'] ) ? wp_unslash( $_POST['dicey_monthly_replacements'] ) : array();
+	$ids = array();
+	foreach ( array_slice( $raw, 0, 200 ) as $id ) {
+		if ( is_scalar( $id ) && absint( $id ) !== absint( $post_id ) && 'product' === get_post_type( absint( $id ) ) ) {
+			$ids[] = absint( $id );
+		}
+	}
+	update_post_meta( $post_id, '_dicey_monthly_replacements', array_values( array_unique( $ids ) ) );
+}
+add_action( 'save_post_product', 'dicey_save_monthly_settings', 20 );
+
+function dicey_add_monthly_settings_box() {
+	add_meta_box( 'dicey_monthly_settings', 'Замены рационов на месяц', 'dicey_render_monthly_settings', 'product', 'normal', 'default' );
+}
+add_action( 'add_meta_boxes_product', 'dicey_add_monthly_settings_box' );

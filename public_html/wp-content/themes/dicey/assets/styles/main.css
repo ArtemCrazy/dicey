@@ -14222,3 +14222,14 @@ margin-top: 20px;
 		grid-template-columns: 1fr;
 	}
 }
+
+.carte {
+	--dicey-monthly-disabled-opacity: 0.5;
+}
+.carte__dietary-btn:disabled {
+	opacity: var(--dicey-monthly-disabled-opacity);
+	cursor: not-allowed;
+}
+.dicey-monthly__status:empty {
+	display: none;
+}

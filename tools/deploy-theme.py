@@ -16,9 +16,8 @@ PREFIX = 'public_html/wp-content/themes/dicey/'
 FILES = [
     'assets/styles/main.css', 'assets/js/main.js', 'inc/products.php',
     'inc/commerce.php', 'template-parts/product/single-content.php',
-    'template-parts/static/shop.php', 'footer.php',
 ]
-PREVIEW_FILES = FILES + ['header.php', 'inc/home-block-renderers.php', 'inc/delivery-renderers.php', 'inc/city.php']
+PREVIEW_FILES = FILES
 
 def normalized(value):
     return value.replace('\r\n', '\n').rstrip() + '\n'
@@ -104,7 +103,7 @@ def live(baseline):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('target', choices=['preview', 'live'])
-    parser.add_argument('--baseline', default='ad1b162')
+    parser.add_argument('--baseline', default='aeb7ef0')
     args = parser.parse_args()
     if args.target == 'preview':
         preview()

@@ -107,8 +107,30 @@ function dicey_save_order_item_period( $item, $cart_item_key, $values, $order ) 
 		$item->add_meta_data( 'Срок', $period, true );
 	}
 
-	if ( ! empty( $values['dicey_menu_titles'] ) && is_array( $values['dicey_menu_titles'] ) ) {
+	if ( isset( $values['dicey_monthly_products'] ) ) {
+		$details = dicey_monthly_details( $values['product_id'], $values['dicey_monthly_products'], isset( $values['variation_id'] ) ? $values['variation_id'] : 0 );
+		if ( is_wp_error( $details ) || 30 !== dicey_product_period_day_count( $period ) || ! dicey_monthly_price_matches( $values, $details ) ) {
+			throw new Exception( 'Состав или стоимость месячного меню изменились. Обновите корзину перед оформлением.' );
+		}
+		foreach ( $details['blocks'] as $block ) {
+			$item->add_meta_data( 'Рацион ' . $block['slot'] . ' (дни ' . ( ( $block['slot'] - 1 ) * 5 + 1 ) . '–' . ( $block['slot'] * 5 ) . ')', $block['name'] . ' — ' . wp_strip_all_tags( wc_price( $block['display_price'] ) ), true );
+		}
+		$item->add_meta_data( '_dicey_monthly_blocks', $details['blocks'], true );
+	} elseif ( ! empty( $values['dicey_menu_titles'] ) && is_array( $values['dicey_menu_titles'] ) ) {
 		$item->add_meta_data( 'Выбранные рационы', implode( ', ', array_map( 'sanitize_text_field', $values['dicey_menu_titles'] ) ), true );
+	}
+}
+
+function dicey_render_monthly_cart_composition( $cart_item ) {
+	if ( ! isset( $cart_item['dicey_monthly_products'] ) ) {
+		return;
+	}
+	if ( ! empty( $cart_item['dicey_monthly_error'] ) ) {
+		echo '<p role="alert">Замены в этом меню больше недоступны. Удалите его из корзины и соберите заново в карточке товара.</p>';
+		return;
+	}
+	foreach ( $cart_item['dicey_monthly_blocks'] ?? array() as $block ) {
+		echo '<p class="dicey-monthly__composition">' . esc_html( 'Дни ' . ( ( $block['slot'] - 1 ) * 5 + 1 ) . '–' . ( $block['slot'] * 5 ) . ': ' . $block['name'] ) . ' — ' . wp_kses_post( wc_price( $block['display_price'] ) ) . '</p>';
 	}
 }
 
@@ -238,7 +260,8 @@ function dicey_render_basket_page() {
 										<?php if ( '' !== trim( $calories ) ) : ?>
 											<p class="basket__kbju"><?php echo esc_html( $calories ); ?></p>
 										<?php endif; ?>
-										<?php if ( ! empty( $cart_item['dicey_menu_titles'] ) ) : ?>
+										<?php dicey_render_monthly_cart_composition( $cart_item ); ?>
+										<?php if ( ! isset( $cart_item['dicey_monthly_products'] ) && ! empty( $cart_item['dicey_menu_titles'] ) ) : ?>
 											<p class="basket__kbju">Выбрано: <?php echo esc_html( implode( ', ', $cart_item['dicey_menu_titles'] ) ); ?></p>
 										<?php endif; ?>
 									</div>
@@ -384,7 +407,8 @@ function dicey_render_checkout_order_summary() {
 							<p class="decoration__right-name"><?php echo esc_html( $product->get_name() ); ?></p>
 							<?php $period = dicey_cart_item_period_label( $cart_item ); ?>
 							<?php if ( $period ) : ?><p class="decoration__right-date"><?php echo esc_html( $period ); ?></p><?php endif; ?>
-							<?php if ( ! empty( $cart_item['dicey_menu_titles'] ) ) : ?><p class="decoration__right-date">Выбрано: <?php echo esc_html( implode( ', ', $cart_item['dicey_menu_titles'] ) ); ?></p><?php endif; ?>
+							<?php dicey_render_monthly_cart_composition( $cart_item ); ?>
+							<?php if ( ! isset( $cart_item['dicey_monthly_products'] ) && ! empty( $cart_item['dicey_menu_titles'] ) ) : ?><p class="decoration__right-date">Выбрано: <?php echo esc_html( implode( ', ', $cart_item['dicey_menu_titles'] ) ); ?></p><?php endif; ?>
 						</div>
 					</div>
 					<div class="decoration__result">

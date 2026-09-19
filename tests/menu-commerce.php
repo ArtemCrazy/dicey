@@ -17,14 +17,24 @@ function wc_get_cart_url() { return '/basket/'; }
 function wp_list_pluck( $rows, $key ) { return array_column( $rows, $key ); }
 function wc_price( $price ) { return number_format( $price, 2, ',', ' ' ) . ' ₽'; }
 function wc_get_price_to_display( $product, $args ) { return $args['price']; }
-function wc_get_product( $id ) { return new TestProduct(); }
+function wc_get_product( $id ) { return $GLOBALS['test_products'][$id] ?? new TestProduct(); }
 class TestProduct {
     public $price = 2880;
+    public $stock = true;
+    public $managed = false;
+    public $tax = '';
+    public $type = 'simple';
+    public $id = 1;
+    function get_id() { return $this->id; }
+    function get_price() { return $this->price; }
+    function managing_stock() { return $this->managed; }
+    function get_tax_class() { return $this->tax; }
+    function get_tax_status() { return 'taxable'; }
     function set_price( $value ) { $this->price = $value; }
     function exists() { return true; }
     function is_purchasable() { return true; }
-    function is_in_stock() { return true; }
-    function is_type( $type ) { return 'simple' === $type; }
+    function is_in_stock() { return $this->stock; }
+    function is_type( $type ) { return $this->type === $type; }
 }
 class TestCart {
     public $cart_contents;
@@ -32,6 +42,7 @@ class TestCart {
 }
 class TestWoo {
     public $gateways = array();
+    public $cart;
     function payment_gateways() { return $this; }
     function get_available_payment_gateways() { return $this->gateways; }
 }
