@@ -41,8 +41,13 @@ if ($mode === 'setup') {
             $examples[]=array('title'=>'Тестовое блюдо '.($n+1),'price'=>(string)$price);
         }
         carbon_set_post_meta($id,'dicey_product_menu_examples',$examples);
+        carbon_set_post_meta($id,'dicey_product_match_age_groups',array($i===2?'senior':'adult'));
+        carbon_set_post_meta($id,'dicey_product_match_weight_min','3');
+        carbon_set_post_meta($id,'dicey_product_match_weight_max','5');
+        carbon_set_post_meta($id,'dicey_product_match_breeds',array($i===0?'Мопс':'Мальтипу'));
     }
-    update_post_meta($ids[0],'_dicey_monthly_replacements',array($ids[1]));
+    // Deliberately stale manual list: it must not affect automatic eligibility.
+    update_post_meta($ids[0],'_dicey_monthly_replacements',array($ids[2]));
     echo json_encode(array('ids'=>$ids,'url'=>get_permalink($ids[0]),'admin'=>admin_url('post.php?post='.$ids[0].'&action=edit'),'options'=>dicey_monthly_options($ids[0])),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\n";
     exit;
 }
@@ -57,11 +62,10 @@ if ($mode === 'verify') {
     dicey_add_monthly_settings_box();
     if (!isset($GLOBALS['wp_meta_boxes']['product']['normal']['default']['dicey_monthly_settings'])) { throw new Exception('Admin box not registered'); }
     ob_start(); dicey_render_monthly_settings(get_post($ids[0])); $admin_html=ob_get_clean();
-    if (strpos($admin_html,'name="dicey_monthly_nonce"')===false || strpos($admin_html,'name="dicey_monthly_replacements[]"')===false) { throw new Exception('Admin controls missing'); }
-    $_POST=array('dicey_monthly_settings_present'=>1,'dicey_monthly_nonce'=>wp_create_nonce('dicey_monthly_settings'),'dicey_monthly_replacements'=>array($ids[1]));
-    dicey_save_monthly_settings($ids[0]);
-    if (dicey_monthly_allowed_ids($ids[0])!==array($ids[1])) { throw new Exception('Admin save'); }
-    echo "PASS actual product admin box, nonce-protected save, Carbon Fields coexistence.\n";
+    if (strpos($admin_html,'Автоматический подбор')===false || strpos($admin_html,'name="dicey_monthly_replacements[]"')!==false) { throw new Exception('Automatic admin summary missing'); }
+    $eligible=dicey_monthly_allowed_ids($ids[0]);
+    if (!in_array($ids[1],$eligible,true) || in_array($ids[2],$eligible,true)) { throw new Exception('Age/weight matching'); }
+    echo "PASS actual automatic admin summary and Carbon Fields age/weight matching, ignoring breeds/manual lists.\n";
     wp_set_current_user(0);
     unset($GLOBALS['current_screen']);
     if (!WC()->cart) { wc_load_cart(); }
@@ -81,9 +85,12 @@ if ($mode === 'verify') {
     $variable=wc_get_products(array('type'=>'variable','status'=>'publish','limit'=>1));
     if ($variable) {
         $root=$variable[0]->get_id();
-        $saved=get_post_meta($root,'_dicey_monthly_replacements',true);
+        $saved=array();
+        foreach(array('match_age_groups','match_weight_min','match_weight_max') as $field) { $saved[$field]=carbon_get_post_meta($root,'dicey_product_'.$field); }
         try {
-            update_post_meta($root,'_dicey_monthly_replacements',array($ids[1]));
+            carbon_set_post_meta($root,'dicey_product_match_age_groups',array('adult'));
+            carbon_set_post_meta($root,'dicey_product_match_weight_min','3');
+            carbon_set_post_meta($root,'dicey_product_match_weight_max','5');
             $periods=dicey_get_wc_product_period_options($root);
             foreach ($periods as $period) {
                 if (dicey_product_period_day_count($period['label'])!==30) { continue; }
@@ -99,7 +106,7 @@ if ($mode === 'verify') {
                 break;
             }
         } finally {
-            update_post_meta($root,'_dicey_monthly_replacements',$saved);
+            foreach($saved as $field=>$value) { carbon_set_post_meta($root,'dicey_product_'.$field,$value); }
             WC()->cart->empty_cart();
         }
     }

@@ -10,6 +10,7 @@ function is_wp_error($value) { return $value instanceof WP_Error; }
 function get_post_status($id) { return $GLOBALS['statuses'][$id] ?? 'publish'; }
 function get_post_type($id) { return isset($GLOBALS['fixture'][$id]) ? 'product' : 'page'; }
 function get_the_title($id) { return 'Menu ' . $id; }
+function get_posts($args) { return array_values(array_filter(array_keys($GLOBALS['fixture']), function($id){return get_post_status($id)==='publish';})); }
 function wc_add_notice($message,$type) { $GLOBALS['notices'][] = $message; }
 function wp_verify_nonce($nonce,$action) { return $nonce === 'valid' && $action === 'dicey_monthly_settings'; }
 function current_user_can(...$args) { return $GLOBALS['can_edit'] ?? true; }
@@ -20,14 +21,20 @@ class TestOrderItem {
     function add_meta_data($key,$value,$unique) { $this->meta[$key] = $value; }
 }
 $fixture[1]['_dicey_product_menu_examples'][4]['price'] = '700';
+$fixture[1]['_dicey_product_match_age_groups']=array('adult');
+$fixture[1]['_dicey_product_match_weight_min']='3';
+$fixture[1]['_dicey_product_match_weight_max']='5';
+$fixture[1]['_dicey_product_match_breeds']=array('Мопс');
 $fixture[2] = $fixture[1];
+$fixture[2]['_dicey_product_match_breeds']=array('Мальтипу');
 $fixture[2]['_dicey_product_menu_examples'][0]['price'] = '500';
 $fixture[3] = $fixture[2];
-$fixture[1]['_dicey_monthly_replacements'] = array(2);
+$fixture[3]['_dicey_product_match_age_groups']=array('senior');
+$fixture[1]['_dicey_monthly_replacements'] = array(3);
 $test_products = array(1=>new TestProduct(),2=>new TestProduct(),3=>new TestProduct());
 $test_products[2]->id=2;
 $test_products[3]->id=3;
-check(array_keys(dicey_monthly_options(1)) === array(1,2), 'Only product-owned allowlist is offered');
+check(array_keys(dicey_monthly_options(1)) === array(1,2), 'Automatic age/weight match ignores breed and obsolete manual allowlist');
 $mixed = dicey_monthly_details(1,'1,2,1,1,1,1');
 check($mixed['total'] === 15100.0 && $mixed['ids'] === array(1,2,1,1,1,1), 'Only selected block changes and six five-day prices are summed');
 check(dicey_monthly_details(1,'2,2,2,2,2,2')['total'] === 15600.0, 'Alternative may be repeated in every block');
@@ -71,21 +78,45 @@ foreach (array('stock','managed','tax','status','price') as $reason) {
     check(is_wp_error(dicey_monthly_details(1,'1,2,1,1,1,1')),'Unavailable alternative rejected: '.$reason);
 }
 $test_products[2]->stock=true; $test_products[2]->managed=false; $test_products[2]->tax=''; $statuses[2]='publish'; $fixture[2]['_dicey_product_menu_examples'][0]['price']='500';
-$fixture[1]['_dicey_monthly_replacements']=array();
+$fixture[2]['_dicey_product_match_weight_min']='4';
 $stale=dicey_product_restore_menu_price($composite);
-check(!empty($stale['dicey_monthly_error']),'Removed allowlist invalidates an old cart');
+check(!empty($stale['dicey_monthly_error']),'Changed weight eligibility invalidates an old cart');
 $errors=new WP_Error(); dicey_monthly_validate_checkout(array(),$errors);
-check((bool)$errors->errors,'Removed alternative blocks final checkout');
+check((bool)$errors->errors,'Ineligible weight blocks final checkout');
 ob_start(); dicey_render_monthly_cart_composition($stale); $warning=ob_get_clean();
 check(strpos($warning,'role="alert"')!==false,'Invalid composition is visibly explained in cart');
-$_POST=array('dicey_monthly_settings_present'=>1,'dicey_monthly_nonce'=>'invalid','dicey_monthly_replacements'=>array(2));
-dicey_save_monthly_settings(1); check(dicey_monthly_allowed_ids(1)===array(),'Admin save requires valid nonce');
-$_POST['dicey_monthly_nonce']='valid'; $can_edit=false;
-dicey_save_monthly_settings(1); check(dicey_monthly_allowed_ids(1)===array(),'Admin save requires product-edit permission');
-$can_edit=true; $_POST['dicey_monthly_replacements']=array(2,2,1,999,array(3));
-dicey_save_monthly_settings(1); check(dicey_monthly_allowed_ids(1)===array(2),'Admin saves only unique other product IDs');
-unset($_POST['dicey_monthly_settings_present']); $_POST['dicey_monthly_replacements']=array(3);
-dicey_save_monthly_settings(1); check(dicey_monthly_allowed_ids(1)===array(2),'Unrelated saves do not erase replacements');
-$_POST['dicey_monthly_settings_present']=1; unset($_POST['dicey_monthly_replacements']);
-dicey_save_monthly_settings(1); check(dicey_monthly_allowed_ids(1)===array(),'Unchecking all alternatives disables replacement');
+$fixture[2]['_dicey_product_match_weight_min']='3';
+$profile_cases=array(
+    array('3','5',array('adult'),true,'Exact range and age'),
+    array('2,5','5.5',array('adult','senior'),true,'Wider range, decimal comma and superset of ages'),
+    array('4','6',array('adult'),false,'Partial weight overlap'),
+    array('5','7',array('adult'),false,'Shared endpoint alone'),
+    array('1','2.9',array('adult'),false,'Disjoint weight range'),
+    array('3','5',array('senior'),false,'Wrong age'),
+    array('3','5',array(),true,'Empty age follows existing any-age editor contract'),
+    array('','',array('adult'),false,'Missing weight is not a wildcard'),
+    array('3','',array('adult'),true,'Unbounded maximum'),
+    array('','5',array('adult'),true,'Unbounded minimum'),
+    array('6','3',array('adult'),false,'Reversed bounds'),
+    array('-1','5',array('adult'),false,'Negative bound'),
+    array('oops','5',array('adult'),false,'Non-numeric bound'),
+    array('3','5',array('unknown'),false,'Unknown age label'),
+);
+foreach($profile_cases as [$min,$max,$ages,$allowed,$label]) {
+    $fixture[2]['_dicey_product_match_weight_min']=$min;
+    $fixture[2]['_dicey_product_match_weight_max']=$max;
+    $fixture[2]['_dicey_product_match_age_groups']=$ages;
+    check(in_array(2,dicey_monthly_allowed_ids(1),true)===$allowed,$label);
+}
+$fixture[2]['_dicey_product_match_weight_min']='3'; $fixture[2]['_dicey_product_match_weight_max']='5'; $fixture[2]['_dicey_product_match_age_groups']=array('adult');
+$fixture[1]['_dicey_product_match_age_groups']=array('adult','senior');
+check(!in_array(2,dicey_monthly_allowed_ids(1),true),'Candidate must cover every source age, not just one');
+$fixture[1]['_dicey_product_match_age_groups']=array('adult');
+$fixture[1]['_dicey_product_match_weight_min']=''; $fixture[1]['_dicey_product_match_weight_max']='';
+check(dicey_monthly_allowed_ids(1)===array(),'Missing source weight never offers random alternatives');
+$fixture[1]['_dicey_product_match_weight_min']='3'; $fixture[1]['_dicey_product_match_weight_max']='5';
+$fixture[2]['_dicey_product_match_age_groups']=array('senior');
+$errors=new WP_Error(); dicey_monthly_validate_checkout(array(),$errors);
+check((bool)$errors->errors,'Changed age eligibility is rechecked at checkout');
+check(!function_exists('dicey_save_monthly_settings'),'Obsolete manual-save endpoint is removed');
 echo "All monthly replacement regressions passed.\n";

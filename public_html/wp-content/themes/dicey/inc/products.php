@@ -1373,10 +1373,44 @@ function dicey_products_import_demo() {
 
 add_action( 'init', 'dicey_products_import_demo', 20 );
 
-/** Explicit product-owned alternatives, never inferred from breed or age. */
+/** Product eligibility uses existing age/weight fields, never breed or a manual list. */
+function dicey_monthly_match_profile( $product_id ) {
+	$meta = dicey_get_product_meta( $product_id );
+	$ages = dicey_product_lines( $meta['match_age_groups'] );
+	// The existing editor defines an empty age selection as "any age".
+	$ages = $ages ? array_values( array_unique( $ages ) ) : array( 'adult', 'senior' );
+	if ( array_diff( $ages, array( 'adult', 'senior' ) ) ) {
+		return null;
+	}
+	$bounds = array();
+	foreach ( array( 'match_weight_min', 'match_weight_max' ) as $key ) {
+		if ( ! is_scalar( $meta[ $key ] ) ) { return null; }
+		$value = str_replace( ',', '.', trim( (string) $meta[ $key ] ) );
+		if ( '' !== $value && ( ! is_numeric( $value ) || ! is_finite( (float) $value ) || (float) $value < 0 ) ) { return null; }
+		$bounds[] = '' === $value ? null : (float) $value;
+	}
+	// Missing weight data must not turn an unrelated product into a substitute.
+	if ( null === $bounds[0] && null === $bounds[1] ) { return null; }
+	$min = null === $bounds[0] ? 0.0 : $bounds[0];
+	$max = null === $bounds[1] ? INF : $bounds[1];
+	return $max >= $min ? array( 'ages' => $ages, 'min' => $min, 'max' => $max ) : null;
+}
+
 function dicey_monthly_allowed_ids( $product_id ) {
-	$ids = get_post_meta( $product_id, '_dicey_monthly_replacements', true );
-	return is_array( $ids ) ? array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) ) : array();
+	$source = dicey_monthly_match_profile( $product_id );
+	if ( ! $source ) { return array(); }
+	$ids = get_posts( array( 'post_type' => 'product', 'post_status' => 'publish', 'numberposts' => -1, 'fields' => 'ids', 'orderby' => 'title', 'order' => 'ASC' ) );
+	$allowed = array();
+	foreach ( $ids as $id ) {
+		if ( (int) $id === (int) $product_id ) { continue; }
+		$candidate = dicey_monthly_match_profile( $id );
+		// No individual pet profile is posted with the cart: a replacement must
+		// cover ALL ages and weights served by the original menu, not just overlap.
+		if ( $candidate && ! array_diff( $source['ages'], $candidate['ages'] ) && $candidate['min'] <= $source['min'] && $candidate['max'] >= $source['max'] ) {
+			$allowed[] = (int) $id;
+		}
+	}
+	return $allowed;
 }
 
 function dicey_monthly_five_day_option( $product_id ) {
@@ -1514,38 +1548,22 @@ function dicey_monthly_validate_checkout( $data, $errors ) {
 add_action( 'woocommerce_after_checkout_validation', 'dicey_monthly_validate_checkout', 10, 2 );
 
 function dicey_render_monthly_settings( $post ) {
-	wp_nonce_field( 'dicey_monthly_settings', 'dicey_monthly_nonce' );
-	$selected = dicey_monthly_allowed_ids( $post->ID );
-	$products = get_posts( array( 'post_type' => 'product', 'post_status' => array( 'publish', 'draft', 'private', 'pending' ), 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+	$options = dicey_monthly_options( $post->ID );
+	unset( $options[ $post->ID ] );
 	?>
 	<div class="dicey-product-field dicey-product-wide">
-		<h3>Разрешённые замены в месячном меню</h3>
-		<input type="hidden" name="dicey_monthly_settings_present" value="1">
-		<p class="description">Отметьте меню для замены любого из шести пятидневных блоков. Список общий для этого товара. Пустой список отключает замену. На сайте доступны только опубликованные меню с ценой за 5 дней, без складского учёта и с той же налоговой ставкой.</p>
-		<details><summary>Выбрать меню для замены (<?php echo count( $selected ); ?>)</summary>
-		<?php foreach ( $products as $candidate ) : ?>
-			<?php if ( $candidate->ID === $post->ID ) { continue; } ?>
-			<p><label><input type="checkbox" name="dicey_monthly_replacements[]" value="<?php echo esc_attr( $candidate->ID ); ?>" <?php checked( in_array( $candidate->ID, $selected, true ) ); ?>> <?php echo esc_html( $candidate->post_title . ' — #' . $candidate->ID ); ?></label></p>
+		<h3>Автоматический подбор по возрасту и весу</h3>
+		<p class="description">Список формируется автоматически из полей «Возраст собаки», «Вес от, кг» и «Вес до, кг». Порода и прежние ручные списки не учитываются. Замена должна подходить для всех возрастов и всего диапазона веса исходного меню. Пустой возраст означает любой возраст; без указания веса замены не предлагаются.</p>
+		<p class="description">После изменения возраста или веса обновите товар. Доступны опубликованные меню с ценой за 5 дней, без складского учёта и с той же налоговой ставкой.</p>
+		<details><summary>Подходящие меню сейчас (<?php echo count( $options ); ?>)</summary>
+		<?php if ( ! $options ) : ?><p>Подходящих замен пока нет. Проверьте возраст, диапазон веса, наличие и цены исходного меню и других товаров.</p><?php endif; ?>
+		<?php foreach ( $options as $option ) : ?>
+			<p><?php echo esc_html( $option['name'] . ' — #' . $option['id'] ); ?></p>
 		<?php endforeach; ?>
 		</details>
 	</div>
 	<?php
 }
-
-function dicey_save_monthly_settings( $post_id ) {
-	if ( empty( $_POST['dicey_monthly_settings_present'] ) || empty( $_POST['dicey_monthly_nonce'] ) || ! is_string( $_POST['dicey_monthly_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['dicey_monthly_nonce'] ) ), 'dicey_monthly_settings' ) || ! current_user_can( 'edit_post', $post_id ) || ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
-		return;
-	}
-	$raw = isset( $_POST['dicey_monthly_replacements'] ) && is_array( $_POST['dicey_monthly_replacements'] ) ? wp_unslash( $_POST['dicey_monthly_replacements'] ) : array();
-	$ids = array();
-	foreach ( array_slice( $raw, 0, 200 ) as $id ) {
-		if ( is_scalar( $id ) && absint( $id ) !== absint( $post_id ) && 'product' === get_post_type( absint( $id ) ) ) {
-			$ids[] = absint( $id );
-		}
-	}
-	update_post_meta( $post_id, '_dicey_monthly_replacements', array_values( array_unique( $ids ) ) );
-}
-add_action( 'save_post_product', 'dicey_save_monthly_settings', 20 );
 
 function dicey_add_monthly_settings_box() {
 	add_meta_box( 'dicey_monthly_settings', 'Замены рационов на месяц', 'dicey_render_monthly_settings', 'product', 'normal', 'default' );

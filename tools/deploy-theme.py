@@ -14,8 +14,7 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'public_html/wp-content/themes/dicey/'
 FILES = [
-    'assets/styles/main.css', 'assets/js/main.js', 'inc/products.php',
-    'inc/commerce.php', 'template-parts/product/single-content.php',
+    'inc/products.php',
 ]
 PREVIEW_FILES = FILES
 
@@ -103,7 +102,7 @@ def live(baseline):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('target', choices=['preview', 'live'])
-    parser.add_argument('--baseline', default='aeb7ef0')
+    parser.add_argument('--baseline', default='eb11b3b')
     args = parser.parse_args()
     if args.target == 'preview':
         preview()
