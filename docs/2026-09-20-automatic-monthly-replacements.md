@@ -22,3 +22,9 @@ Roman's September 20 voice message supersedes the September 19 manual allowlist 
 ## Release
 
 Only `inc/products.php` is deployed, with conflict checking against `eb11b3b` and a pre-change backup. No JS, CSS, commerce, footer or unrelated template is uploaded.
+
+Published code commit: `76bdbe3`. Production readback matched; backup `.codex/backups/20260920-143705-live-theme.zip`.
+
+Post-deploy in-app Browser on product 698 (rabbit, adult, 15.5–17 kg): all six replacement buttons enabled automatically, five alternative menus offered (beef, turkey, chicken, venison, fish). Replacing block two with chicken changes 40,800 to 38,590 RUB. No production cart/order/payment was submitted. Authenticated admin read-only check confirmed automatic summary with five suggestions and zero manual-list checkboxes.
+
+Customer check: `https://daysi.ru/?post_type=product&p=698&codex=auto-age-weight` → “1 месяц” → “Заменить рацион”. Refresh previously open pages to avoid the old cached list.
