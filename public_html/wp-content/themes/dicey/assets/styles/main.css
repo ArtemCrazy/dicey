@@ -6356,6 +6356,11 @@ footer::before {
 	flex-wrap: wrap;
 	align-items: center;
 }
+.contacts__icon{
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
 
 @media (max-width: 767px) {
 	.dicey-thankyou__box {
