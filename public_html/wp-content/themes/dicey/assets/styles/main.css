@@ -14238,3 +14238,7 @@ margin-top: 20px;
 .dicey-monthly__status:empty {
 	display: none;
 }
+
+.dicey-monthly-modal .carte-modal__img {
+	object-fit: contain;
+}
