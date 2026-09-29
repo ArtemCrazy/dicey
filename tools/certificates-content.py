@@ -44,6 +44,15 @@ def block(raw):
     return match, json.loads(match.group(1))
 
 
+def same_content(left, right):
+    # WordPress may normalize JSON escaping while preserving block attributes.
+    left_match, left_attrs = block(left)
+    right_match, right_attrs = block(right)
+    return (left_attrs == right_attrs
+            and left[:left_match.start(1)] == right[:right_match.start(1)]
+            and left[left_match.end(1):] == right[right_match.end(1):])
+
+
 def main(mode):
     original = json.loads((BACKUP / 'page.json').read_text(encoding='utf-8'))
     client = session()
@@ -80,11 +89,11 @@ def main(mode):
     replacement = json.dumps(attrs, ensure_ascii=False, separators=(',', ':'))
     replacement = replacement.replace('--', '\\u002d\\u002d').replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
     desired = original_raw[:match.start(1)] + replacement + original_raw[match.end(1):]
-    if mode == 'apply' and current['content']['raw'] != desired:
+    if mode == 'apply' and not same_content(current['content']['raw'], desired):
         assert current['content']['raw'] == original_raw, 'Concurrent page edit; no write performed'
         request(client, 'POST', f'pages/{page_id}', json={'content': desired})
     actual = request(client, 'GET', f'pages/{page_id}', params={'context': 'edit'})
-    assert actual['content']['raw'] == desired, 'Page readback mismatch'
+    assert same_content(actual['content']['raw'], desired), 'Page readback mismatch'
     assert actual['status'] == original['status'], 'Page status changed'
     (BACKUP / 'page-after.json').write_text(json.dumps(actual, ensure_ascii=False, indent=2), encoding='utf-8')
     print('Verified page', page_id, ': original two certificates plus six new certificates; all other content preserved.')
