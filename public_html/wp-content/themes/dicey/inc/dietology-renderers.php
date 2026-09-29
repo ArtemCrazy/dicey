@@ -89,7 +89,9 @@ function dicey_render_dietology( $attrs = array() ) {
 		);
 	} );
 	$consult_items     = dicey_non_empty_items( $data['consult_items'] );
-	$certificates      = dicey_non_empty_items( $data['plan_certificates'] );
+	$certificates      = array_values( array_filter( dicey_non_empty_items( $data['plan_certificates'] ), function ( $item ) {
+		return is_array( $item ) && isset( $item['image'] ) && is_string( $item['image'] ) && '' !== trim( $item['image'] );
+	} ) );
 	$advisory_steps    = dicey_non_empty_items( $data['advisory_steps'] );
 	$advantages        = dicey_non_empty_items( $data['advantages'] );
 	$prices            = dicey_non_empty_items( $data['prices'] );
@@ -146,8 +148,12 @@ function dicey_render_dietology( $attrs = array() ) {
 						<?php if ( '' !== trim( $data['plan_subtitle'] ) ) : ?><p class="plan__subname"><?php echo dicey_kses_inline( $data['plan_subtitle'] ); ?></p><?php endif; ?>
 						<?php if ( '' !== trim( $data['plan_text'] ) ) : ?><p class="plan__text"><?php echo dicey_kses_inline( $data['plan_text'] ); ?></p><?php endif; ?>
 						<?php if ( $certificates ) : ?><div class="plan__imgs">
-							<?php foreach ( $certificates as $certificate ) : ?>
-								<?php if ( ! empty( $certificate['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox="dietology-certificates" class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt=""></a><?php endif; ?>
+							<?php foreach ( $certificates as $index => $certificate ) : ?>
+								<?php if ( $index < 2 ) : ?>
+									<a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox="dietology-certificates" class="plan__img"><img src="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" alt="<?php echo esc_attr( 'Сертификат ' . ( $index + 1 ) ); ?>"></a>
+								<?php else : ?>
+									<a href="<?php echo esc_url( dicey_asset_img( $certificate['image'] ) ); ?>" data-fancybox="dietology-certificates" hidden aria-label="<?php echo esc_attr( 'Сертификат ' . ( $index + 1 ) ); ?>"></a>
+								<?php endif; ?>
 							<?php endforeach; ?>
 						</div><?php endif; ?>
 						<?php if ( '' !== trim( $data['plan_link_label'] ) && ! empty( $certificates[0]['image'] ) ) : ?><a href="<?php echo esc_url( dicey_asset_img( $certificates[0]['image'] ) ); ?>" data-fancybox-trigger="dietology-certificates" data-fancybox-index="0" class="plan__imgs-link"><?php echo esc_html( $data['plan_link_label'] ); ?></a><?php endif; ?>

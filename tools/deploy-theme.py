@@ -14,7 +14,8 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'public_html/wp-content/themes/dicey/'
 FILES = [
-    'assets/styles/main.css',
+    'blocks/index.js',
+    'inc/dietology-renderers.php',
 ]
 PREVIEW_FILES = FILES
 

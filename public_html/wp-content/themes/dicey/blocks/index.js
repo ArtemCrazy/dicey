@@ -724,7 +724,7 @@
 		var attrs = props.attributes;
 		var setAttributes = props.setAttributes;
 		var consultItems = arr( attrs, 'dietology', 'consult_items' );
-		var planCertificates = arr( attrs, 'dietology', 'plan_certificates' );
+		var planCertificates = Array.isArray( attrs.plan_certificates ) ? clone( attrs.plan_certificates ) : clone( defaults.dietology.plan_certificates );
 		var advisorySteps = arr( attrs, 'dietology', 'advisory_steps' );
 		var advantages = arr( attrs, 'dietology', 'advantages' );
 		var prices = arr( attrs, 'dietology', 'prices' );
@@ -740,6 +740,14 @@
 
 		function setPlanCertificate( index, value ) {
 			setArrayItem( planCertificates, setAttributes, 'plan_certificates', index, 'image', value );
+		}
+
+		function movePlanCertificate( index, offset ) {
+			var nextIndex = index + offset;
+			if ( nextIndex < 0 || nextIndex >= planCertificates.length ) { return; }
+			var next = clone( planCertificates );
+			next.splice( nextIndex, 0, next.splice( index, 1 )[0] );
+			setAttributes( { plan_certificates: next } );
 		}
 
 		function setAdvisoryStep( index, key, value ) {
@@ -841,9 +849,20 @@
 					value: val( attrs, 'dietology', 'plan_link_label' ),
 					onChange: function ( value ) { setAttributes( { plan_link_label: value } ); },
 				} ),
+				el( 'p', null, 'Первые два сертификата показаны на странице, весь список открывается в галерее. Можно добавить любое количество сертификатов.' ),
 				planCertificates.map( function ( certificate, index ) {
-					return imageControl( 'Сертификат ' + ( index + 1 ), certificate.image, function ( value ) { setPlanCertificate( index, value ); } );
+					return panel( 'Сертификат ' + ( index + 1 ), [
+						imageControl( 'Изображение сертификата', certificate.image, function ( value ) { setPlanCertificate( index, value ); } ),
+						el( Button, { variant: 'secondary', disabled: index === 0, onClick: function () { movePlanCertificate( index, -1 ); } }, 'Выше' ),
+						el( Button, { variant: 'secondary', disabled: index === planCertificates.length - 1, onClick: function () { movePlanCertificate( index, 1 ); } }, 'Ниже' ),
+						el( Button, { isDestructive: true, onClick: function () {
+							setAttributes( { plan_certificates: planCertificates.filter( function ( item, itemIndex ) { return itemIndex !== index; } ) } );
+						} }, 'Удалить сертификат' ),
+					], false );
 				} ),
+				el( Button, { variant: 'secondary', onClick: function () {
+					setAttributes( { plan_certificates: planCertificates.concat( [ { image: '' } ] ) } );
+				} }, 'Добавить сертификат' ),
 			], false ),
 			box( 'Как проходит консультация', [
 				el( TextControl, {
