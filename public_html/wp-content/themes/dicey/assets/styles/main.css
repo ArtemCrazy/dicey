@@ -5076,6 +5076,10 @@ footer::before {
 	position: relative;
 }
 
+.contacts-form .select-box[open] {
+	z-index: 1;
+}
+
 .select-box summary {
 	height: 60px;
 	display: flex;
